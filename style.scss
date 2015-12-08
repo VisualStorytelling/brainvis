@@ -20,9 +20,10 @@ main.clue_demo {
       }
     }
   }
-  &:not([ data-clue = "E" ]) {
-    div.toolbar {
-      display: none;
-    }
+}
+
+body:not([ data-clue = "E" ]) {
+  main.clue_demo div.block div.toolbar {
+    display: none;
   }
 }
