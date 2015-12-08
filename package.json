@@ -1,0 +1,42 @@
+{
+  "name": "clue_dummy",
+  "version": "0.0.1",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": "Caleydo/clue_dummy",
+  "dependencies": {
+  },
+  "peerDependencies": {
+    "clue": "*"
+  },
+  "caleydo": {
+    "plugins": {
+      "web": [
+        {
+          "type": "application",
+          "name": "CLUE Demo"
+        },
+        {
+          "type": "actionFactory",
+          "id": "clue_demo",
+          "file": "cmds",
+          "factory": "createCmd",
+          "creates": "(addClueElem|removeClueElem)"
+        }
+      ]
+    },
+    "products": [
+      {
+        "name": "CLUE Demo",
+        "type": "python",
+        "app": "clue_dummy",
+        "plugins": [
+          "clue_dummy",
+          "caleydo_server"
+        ]
+      }
+    ]
+  },
+  "publishConfig": {
+    "registry": "http://registry.caleydo.org/"
+  }
+}
