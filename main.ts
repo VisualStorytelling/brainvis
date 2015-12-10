@@ -9,7 +9,11 @@ import selection = require('../caleydo_d3/selectioninfo');
 import cmode = require('../caleydo_provenance/mode');
 import $ = require('jquery');
 
-const elems = template.create(document.body);
+const elems = template.create(document.body, {
+  app: 'CLUE',
+  application: '/clue_dummy',
+  id: 'clue_dummy'
+});
 
 {
   $(`<aside class="left" style="width: 12vw">
