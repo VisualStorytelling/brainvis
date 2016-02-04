@@ -17,7 +17,7 @@ function addElem(inputs, parameter, graph, within) {
       left: pos.x + 'px',
       top: pos.y + 'px',
       opacity: within > 0 ? 0 : 1
-    });
+    }).attr('data-anchor', desc_name);
     var $toolbar = $div.append('div').classed('toolbar', true);
     var $body = $div.append('div').classed('body', true);
     /*vis.list(data)[0].load().then((p) => {
