@@ -6,7 +6,7 @@ import template = require('../clue/template');
 import cmds = require('./cmds');
 import databrowser = require('../caleydo_d3/databrowser');
 import selection = require('../caleydo_d3/selectioninfo');
-import cmode = require('../caleydo_provenance/mode');
+import cmode = require('../clue/mode');
 import $ = require('jquery');
 
 const elems = template.create(document.body, {
