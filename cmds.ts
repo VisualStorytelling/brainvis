@@ -3,7 +3,7 @@
  */
 
 import C = require('../caleydo_core/main');
-import prov = require('../caleydo_clue/prov');
+import prov = require('../caleydo_core/provenance');
 import d3 = require('d3');
 
 function addElem(inputs, parameter, graph, within) {
