@@ -1,7 +1,9 @@
 Caleydo CLUE Dummy ![Caleydo Web Application](https://img.shields.io/badge/Caleydo%20Web-Application-1BA64E.svg)
 ==================
 
-This is a simple application highlighting the features of the [Caleydo CLUE](https://github.com/Caleydo/caleydo_clue) plugin. Users can drag-and-drop data items from the databrowser that trigger corresponding actions in the CLUE provenance graph. 
+This is a simple application highlighting the features of the [Caleydo CLUE](https://github.com/Caleydo/caleydo_clue) plugin. Users can drag-and-drop data items from the databrowser that trigger corresponding actions in the CLUE provenance graph.
+
+A [demonstration](http://playground.caleydo.org/clue_dummy/) is available in the Caleydo Playground.
 
 Installation
 ------------
