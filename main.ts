@@ -37,13 +37,13 @@ const elems = template.create(document.body, {
   elems.$main.classed('clue_demo',true);
   const $left = $('aside.left');
 
-  function updateMode(new_) {
+  var updateMode = (new_) => {
     if (new_.exploration < 0.8) {
       $left.hide(); //({width: 'hide'});
     } else {
       $left.show(); //({width: 'show'});
     }
-  }
+  };
 
   elems.on('modeChanged', (event, new_) => {
     updateMode(new_);
