@@ -2,6 +2,12 @@
  * Created by Samuel Gratzl on 27.08.2015.
  */
 
+
+import 'file?name=index.html!./index.html';
+import 'file?name=404.html!./404.html';
+import 'file?name=robots.txt!./robots.txt';
+import 'phovea_bootstrap_fontawesome/src/_bootstrap';
+import './style.scss';
 import * as template from 'phovea_clue/src/template';
 import * as cmds from './cmds';
 import * as databrowser from 'phovea_d3/src/databrowser';
