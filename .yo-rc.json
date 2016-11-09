@@ -3,7 +3,7 @@
     "type": "app",
     "name": "clue_dummy",
     "author": "The Caleydo Team",
-    "githubAccount": "phovea",
+    "githubAccount": "caleydo",
     "modules": [
       "phovea_clue"
     ],

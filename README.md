@@ -9,7 +9,7 @@ Installation
 ------------
 
 ```
-git clone https://github.com/phovea/clue_dummy.git
+git clone https://github.com/caleydo/clue_dummy.git
 cd clue_dummy
 npm install
 ```
@@ -40,7 +40,7 @@ This repository is part of **[Phovea](http://phovea.caleydo.org/)**, a platform 
 [phovea-url]: https://phovea.caleydo.org
 [npm-image]: https://badge.fury.io/js/clue_dummy.svg
 [npm-url]: https://npmjs.org/package/clue_dummy
-[travis-image]: https://travis-ci.org/phovea/clue_dummy.svg?branch=master
-[travis-url]: https://travis-ci.org/phovea/clue_dummy
-[daviddm-image]: https://david-dm.org/phovea/clue_dummy.svg?theme=shields.io
-[daviddm-url]: https://david-dm.org/phovea/clue_dummy
+[travis-image]: https://travis-ci.org/caleydo/clue_dummy.svg?branch=master
+[travis-url]: https://travis-ci.org/caleydo/clue_dummy
+[daviddm-image]: https://david-dm.org/caleydo/clue_dummy.svg?theme=shields.io
+[daviddm-url]: https://david-dm.org/caleydo/clue_dummy
