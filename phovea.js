@@ -8,7 +8,7 @@
 module.exports = function(registry) {
   //registry.push('extension-type', 'extension-id', function() { return System.import('./src/extension_impl'); }, {});
   // generator-phovea:begin
-  registry.push('application', 'clue_dummy', function() { return System.import('./src/'); }, {
+  registry.push('app', 'clue_dummy', null, {
   'name': 'CLUE Demo'
  });
 
