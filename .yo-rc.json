@@ -39,7 +39,6 @@
     },
     "libraryAliases": {},
     "libraryExternals": [
-      "marked",
       "marked"
     ],
     "ignores": [],
