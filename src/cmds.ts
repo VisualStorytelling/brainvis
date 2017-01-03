@@ -2,9 +2,9 @@
  * Created by Samuel Gratzl on 27.08.2015.
  */
 
-import C = require('../caleydo_core/main');
-import prov = require('../caleydo_core/provenance');
-import d3 = require('d3');
+import * as C from 'phovea_core/src/index';
+import * as prov from 'phovea_core/src/provenance';
+import * as d3 from 'd3';
 
 function addElem(inputs, parameter, graph, within) {
   return C.resolveIn(within).then(() => {

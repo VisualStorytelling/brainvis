@@ -2,12 +2,18 @@
  * Created by Samuel Gratzl on 27.08.2015.
  */
 
-import template = require('../caleydo_clue/template');
-import cmds = require('./cmds');
-import databrowser = require('../caleydo_d3/databrowser');
-import selection = require('../caleydo_d3/selectioninfo');
-import cmode = require('../caleydo_clue/mode');
-import $ = require('jquery');
+
+import 'file-loader?name=index.html!extract-loader!html-loader!./index.html';
+import 'file-loader?name=404.html!./404.html';
+import 'file-loader?name=robots.txt!./robots.txt';
+import 'phovea_ui/src/_bootstrap';
+import './style.scss';
+import * as template from 'phovea_clue/src/template';
+import * as cmds from './cmds';
+import * as databrowser from 'phovea_d3/src/databrowser';
+import * as selection from 'phovea_d3/src/selectioninfo';
+import * as cmode from 'phovea_clue/src/mode';
+import * as $ from 'jquery';
 
 const elems = template.create(document.body, {
   app: 'CLUE',
