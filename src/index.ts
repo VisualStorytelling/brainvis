@@ -31,7 +31,7 @@ const elems = template.create(document.body, {
     </section>
     </aside>`).prependTo('div.content');
 
-  selection.create(document.querySelector('#selectioninfo'), {
+  selection.create(<HTMLElement>document.querySelector('#selectioninfo'), {
     useNames: true,
     filter: (idtype) => {
       return idtype && idtype.name[0] !== '_';
