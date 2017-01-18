@@ -66,7 +66,7 @@
     "extract-loader": "0.1.0"
   },
   "dependencies": {
-    "phovea_clue": "github:phovea/phovea_clue#feature_update_dependencies"
+    "phovea_clue": "github:phovea/phovea_clue#develop"
   },
   "name": "clue_dummy",
   "description": "",
