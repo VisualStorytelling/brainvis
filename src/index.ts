@@ -38,7 +38,7 @@ const elems = template.create(document.body, {
     }
   });
 
-  databrowser.create(document.querySelector('#databrowser'));
+  databrowser.create(<HTMLElement>document.querySelector('#databrowser'));
 
   elems.$main.classed('clue_demo',true);
   const $left = $('aside.left');
