@@ -31,34 +31,34 @@ const elems = template.create(document.body, {
     </section>
     </aside>`).prependTo('div.content');
 
-  selection.create(document.querySelector('#selectioninfo'), {
+  selection.create(<HTMLElement>document.querySelector('#selectioninfo'), {
     useNames: true,
     filter: (idtype) => {
       return idtype && idtype.name[0] !== '_';
     }
   });
 
-  databrowser.create(document.querySelector('#databrowser'));
+  databrowser.create(<HTMLElement>document.querySelector('#databrowser'));
 
   elems.$main.classed('clue_demo',true);
   const $left = $('aside.left');
 
-  var updateMode = (new_) => {
-    if (new_.exploration < 0.8) {
+  const updateMode = (newMode) => {
+    if (newMode.exploration < 0.8) {
       $left.hide(); //({width: 'hide'});
     } else {
       $left.show(); //({width: 'show'});
     }
   };
 
-  elems.on('modeChanged', (event, new_) => {
-    updateMode(new_);
+  elems.on('modeChanged', (event, newMode) => {
+    updateMode(newMode);
   });
   updateMode(cmode.getMode());
 
   databrowser.makeDropable(<Element>elems.$main.node(), (data, op, pos) => {
     elems.graph.then((graph) => {
-      graph.push(cmds.createAddCmd(elems.$main_ref, data.desc.name, pos));
+      graph.push(cmds.createAddCmd(elems.$mainRef, data.desc.name, pos));
     });
   });
   elems.jumpToStored();
