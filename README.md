@@ -3,7 +3,6 @@ clue_dummy [![Phovea][phovea-image]][phovea-url] [![NPM version][npm-image]][npm
 
 This is a simple application highlighting the features of the [Caleydo CLUE](https://github.com/Caleydo/caleydo_clue) plugin. Users can drag-and-drop data items from the databrowser that trigger corresponding actions in the CLUE provenance graph.
 
-A [demonstration](http://playground.caleydo.org/clue_dummy/) is available in the Caleydo Playground.
 
 Installation
 ------------
