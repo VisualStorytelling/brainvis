@@ -16,6 +16,8 @@ import * as cmode from 'phovea_clue/src/mode';
 import * as $ from 'jquery';
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
+import * as prov from 'phovea_core/src/provenance';
+import * as C from 'phovea_core/src/index';
 
 const elems = template.create(document.body, {
   app: 'CLUE',
@@ -67,12 +69,23 @@ const elems = template.create(document.body, {
   animate();
 
   $('#record_orientation_button').click(function (handler) {
-    console.log(handler);
-    debugger
+    const matrix = this.camera.matrix.toArray();
+    console.log(matrix);
+    const meta = prov.meta('camera position changed');
+    const action = prov.action(meta, 'camera position changed', (inputs, parameter, graph, within) => {
+      return {
+        inverse: () => 1 as any as prov.IAction,
+        consumed: within
+      };
+    }, [], { matrix });
+    this.graph.then((graph) => {
+      graph.push(action);
+    });
   }.bind({
     camera,
     scene,
-    controls
+    controls,
+    graph: elems.graph
   }));
 
   // --------------------
