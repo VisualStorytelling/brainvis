@@ -79,7 +79,22 @@ const elems = template.create(document.body, {
 
   // --------------------
 
+
   elems.$main.classed('clue_demo', true);
+
+  const updateMode = (newMode) => {
+    if (newMode.exploration < 0.8) {
+      controls.enabled = false;
+    } else {
+      controls.enabled = true;
+    }
+  };
+
+  elems.on('modeChanged', (event, newMode) => {
+    updateMode(newMode);
+  });
+
+  updateMode(cmode.getMode());
 
   // elems.jumpToStored();
 }
