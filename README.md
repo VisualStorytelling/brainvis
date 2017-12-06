@@ -27,7 +27,15 @@ Building
 npm run build
 ```
 
+Development
+-----------
 
+```
+docker run -d -p 9000:80 caleydo/taco_server
+npm run start
+```
+
+Goto http://localhost:8080 , page will reload with every change in src/ dir.
 
 ***
 
