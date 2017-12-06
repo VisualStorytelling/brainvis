@@ -22,7 +22,7 @@
     "test:watch": "karma start --autoWatch=true --singleRun=false",
     "build:dev": "webpack",
     "build": "webpack --env prod",
-    "start": "webpack-dev-server --inline",
+    "start": "webpack-dev-server --inline --host 0.0.0.0",
     "start:hot": "webpack-dev-server --inline --hot",
     "watch": "webpack --watch",
     "release:major": "npm version major && npm publish && git push --follow-tags",
@@ -35,9 +35,11 @@
     "prepublish": "npm run build"
   },
   "devDependencies": {
+    "@types/handlebars": "4.0.33",
     "@types/jasmine": "2.5.41",
     "awesome-typescript-loader": "3.0.3",
     "css-loader": "0.26.1",
+    "extract-loader": "0.1.0",
     "extract-text-webpack-plugin": "2.0.0-rc.3",
     "file-loader": "0.10.0",
     "html-loader": "0.4.4",
@@ -57,17 +59,18 @@
     "raw-loader": "0.5.1",
     "sass-loader": "5.0.0",
     "style-loader": "0.13.1",
+    "tslib": "1.5.0",
     "tslint": "4.4.2",
     "typedoc": "0.5.5",
     "typescript": "2.2.0",
     "url-loader": "0.5.7",
     "webpack": "2.2.1",
-    "webpack-dev-server": "2.3.0",
-    "extract-loader": "0.1.0",
-    "tslib": "1.5.0"
+    "webpack-dev-server": "2.3.0"
   },
   "dependencies": {
-    "phovea_clue": "github:phovea/phovea_clue#develop"
+    "ami.js": "^0.0.22",
+    "phovea_clue": "github:phovea/phovea_clue#develop",
+    "phovea_d3": "github:phovea/phovea_d3#develop"
   },
   "name": "clue_dummy",
   "description": "",

@@ -14,6 +14,8 @@ import * as databrowser from 'phovea_d3/src/databrowser';
 import * as selection from 'phovea_d3/src/selectioninfo';
 import * as cmode from 'phovea_clue/src/mode';
 import * as $ from 'jquery';
+import * as THREE from 'three';
+import * as AMI from 'ami.js';
 
 const elems = template.create(document.body, {
   app: 'CLUE',
@@ -24,23 +26,58 @@ const elems = template.create(document.body, {
 {
   $(`<aside class="left" style="width: 12vw">
     <section id="selectioninfo">
-      <div><h2>Selection Info</h2></div>
+      <div><h2>Selection Info</h2>
+      </div>
+      <button type="button" class="btn btn-danger" id="record_orientation_button">Record</button>
     </section>
     <section id="databrowser">
       <div><h2>Data Browser</h2></div>
     </section>
     </aside>`).prependTo('div.content');
 
-  selection.create(<HTMLElement>document.querySelector('#selectioninfo'), {
-    useNames: true,
-    filter: (idtype) => {
-      return idtype && idtype.name[0] !== '_';
-    }
-  });
-
   databrowser.create(<HTMLElement>document.querySelector('#databrowser'));
 
-  elems.$main.classed('clue_demo',true);
+  // --------------------
+
+  const container = $('div.content');
+  // const width = container.innerWidth();
+  // const height = container.innerHeight();
+  const width = 1400;
+  const height = 900;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(width, height);
+  container.append(renderer.domElement);
+
+  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
+  camera.position.z = 5;
+
+  // Setup controls
+  const controls = new AMI.TrackballControl(camera, renderer.domElement);
+
+  const animate = () => {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  };
+  animate();
+
+  $('#record_orientation_button').click(function (handler) {
+    console.log(handler);
+    debugger
+  }.bind({
+    camera,
+    scene,
+    controls
+  }));
+
+  // --------------------
+
+  elems.$main.classed('clue_demo', true);
   const $left = $('aside.left');
 
   const updateMode = (newMode) => {
@@ -56,10 +93,10 @@ const elems = template.create(document.body, {
   });
   updateMode(cmode.getMode());
 
-  databrowser.makeDropable(<Element>elems.$main.node(), (data, op, pos) => {
-    elems.graph.then((graph) => {
-      graph.push(cmds.createAddCmd(elems.$mainRef, data.desc.name, pos));
-    });
-  });
-  elems.jumpToStored();
+  // databrowser.makeDropable(<Element>elems.$main.node(), (data, op, pos) => {
+  //   elems.graph.then((graph) => {
+  //     graph.push(cmds.createAddCmd(elems.$mainRef, data.desc.name, pos));
+  //   });
+  // });
+  // elems.jumpToStored();
 }
