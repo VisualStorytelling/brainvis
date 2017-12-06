@@ -44,6 +44,7 @@ const elems = template.create(document.body, {
   scene.add(cube);
   camera.position.z = 5;
   this.camera = camera;
+  this.cameraMatrix = this.camera.matrix.toArray();
 
   // Setup controls
   const controls = new AMI.TrackballControl(camera, renderer.domElement);
@@ -57,12 +58,7 @@ const elems = template.create(document.body, {
 
   const meta = prov.meta('camera position changed', 'layout');
   this.cameraMoved = (oldmatrix, newmatrix) => {
-    const action = prov.action(meta, 'camera position changed', (inputs, parameter, graph, within) => {
-      return {
-        inverse: () => 1 as any as prov.IAction,
-        consumed: within
-      };
-    }, [], { oldmatrix, newmatrix });;
+    const action = this.createChangeCameraMatrixCmd( this.ref, newmatrix );;
     elems.graph.then((graph) => {
       graph.push(action);
     });
@@ -77,7 +73,45 @@ const elems = template.create(document.body, {
     this.cameraMoved(this.oldmatrix, newmatrix);
   });
 
-  // --------------------
+  elems.graph.then((graph) => {
+    this.ref = graph.findOrAddObject(this, 'Brainvis', 'visual');;
+  });
+
+  this.createCmd = (id) => {
+    switch (id) {
+      case 'setBrainvisChangeCameraMatrix' :
+        return this.setChangeCameraMatrixImpl;
+    }
+    return null;
+  };
+
+  this.setChangeCameraMatrixImpl = (inputs, parameter, graph, within) => {
+    const brainvis: any = inputs[0].value;
+    const name = parameter.name;
+
+    const old = brainvis.setChangeCameraMatrixImpl(parameter.matrix);
+    return {
+      inverse: this.createChangeCameraMatrixCmd(inputs[0], old),
+      consumed: within
+    };
+  };
+
+  this.setChangeCameraMatrixImpl = (matrix: Number[]) => {
+    const old = this.cameraMatrix;
+    this.cameraMatrix = matrix;
+
+    // this.update(); // TODO?
+    return old;
+  };
+
+
+  this.createChangeCameraMatrixCmd = ($mainRef: prov.IObjectRef<any>, matrix: Number[]) => {
+    return prov.action(
+      prov.meta('CameraViewChanged=' + matrix[0] + ' ' + matrix[1] + ' ' + matrix[2], prov.cat.visual, prov.op.update),
+      'setChangeCameraMatrix', this.setChangeCameraMatrixImpl, [$mainRef], { matrix }
+    );
+  };
+
 
 
   elems.$main.classed('clue_demo', true);
