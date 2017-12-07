@@ -15,7 +15,7 @@ module.exports = function (registry) {
     return System.import('./src/brainvisCmds');
   }, {
     'factory': 'createCmd',
-    'creates': '(setCameraMatrix)'
+    'creates': '(setControlOrientation)'
   });
   // generator-phovea:end
 };

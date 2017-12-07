@@ -1,36 +1,35 @@
 import * as prov from 'phovea_core/src/provenance';
 
-export function setCameraMatrix(ref: prov.IObjectRef<any>, matrices) {
+export function setControlOrientation(ref: prov.IObjectRef<any>, orientations) {
     return prov.action(
         prov.meta(
-            'CameraViewChanged=' +
-            matrices.newMatrix[0] + ' ' + matrices.newMatrix[1] + ' ' + matrices.newMatrix[2],
+            'OrientationChanged=' +
             prov.cat.visual, prov.op.update
         ),
 
-        'setCameraMatrix', setCameraMatrixImpl, [ref], matrices
+        'setControlOrientation',setControlOrientationImpl, [ref], orientations
     );
 }
 
-export function setCameraMatrixImpl(inputs, parameter, graph, within) {
+export function setControlOrientationImpl(inputs, parameter, graph, within) {
     const brainvis: any = inputs[0].value;
-    const matrices = parameter;
-    brainvis.setCameraMatrixImpl(matrices.newMatrix);
-    const inverseMatrices = {
-        oldMatrix: matrices.newMatrix,
-        newMatrix: matrices.oldMatrix
+    const orientations = parameter;
+    brainvis.setControlOrientationImpl(orientations.new);
+    const inverseOrientations = {
+        old: orientations.new,
+        new: orientations.old
     };
 
     return {
-        inverse: setCameraMatrix(inputs[0], inverseMatrices),
+        inverse: setControlOrientation(inputs[0], inverseOrientations),
         consumed: within
     };
 };
 
 export function createCmd(id) {
     switch (id) {
-        case 'setCameraMatrix':
-            return setCameraMatrixImpl;
+        case 'setControlOrientation':
+            return setControlOrientationImpl;
     }
     return null;
 };

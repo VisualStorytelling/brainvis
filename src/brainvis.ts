@@ -6,13 +6,13 @@ import { Rect } from 'phovea_core/src/geom';
 
 import BrainvisCanvas from './brainvisWebGLcanvas';
 import * as BrainvisCommands from './brainvisCmds';
-import { start } from 'repl';
+import { Orientation } from './brainvisTypes';
 
 class Brainvis extends views.AView {
     private dim: [number, number] = [100, 100];
     private bounds = new Rect(0, 0, 0, 0);
     private canvas: BrainvisCanvas;
-    private cameraMatrixStart: number[];
+    private orientationStart: Orientation;
     private ref:prov.IObjectRef<Brainvis>;
 
     constructor(private elem: Element, private graph: prov.ProvenanceGraph) {
@@ -40,23 +40,22 @@ class Brainvis extends views.AView {
     }
 
     cameraStart = (event) => {
-        this.cameraMatrixStart = event.matrix;
+        this.orientationStart = event.orientation;
     }
 
     cameraEnd = (event) => {
-        const stopMatrix = event.matrix;
-        const startMatrix = this.cameraMatrixStart;
+        const orientationEnd = event.orientation;
 
-        this.setCameraMatrix(startMatrix, stopMatrix);
+        this.setControlOrientation(this.orientationStart, orientationEnd);
     }
 
-    setCameraMatrix(oldMatrix:number[], newMatrix:number[]) {
-        const matrices = { oldMatrix, newMatrix };
-        return this.graph.push(BrainvisCommands.setCameraMatrix(this.ref, matrices));
+    setControlOrientation(oldOrientation:Orientation, newOrientation:Orientation) {
+        const orientations = { old:oldOrientation, new:newOrientation };
+        return this.graph.push(BrainvisCommands.setControlOrientation(this.ref, orientations));
     }
 
-    setCameraMatrixImpl(matrix:number[]) {
-        return this.canvas.setCameraMatrix(matrix);
+    setControlOrientationImpl(orientation:Orientation) {
+        return this.canvas.setControlOrientation(orientation);
     }
 
     private update() { }

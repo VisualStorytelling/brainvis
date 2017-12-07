@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
+import { Orientation } from './brainvisTypes';
+
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
     private width:number;
@@ -26,7 +28,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls = new AMI.TrackballControl(this.camera, this.elem);
 
         //Initial camera position
-        this.camera.position.z = 5;
+        this.controls.position0.set(0,0,5);
+        this.controls.reset();
 
         //Store camera matrix so we can manipulate it in the provenance graph
         // this.cameraMatrix = this.camera.matrix.toArray();
@@ -46,18 +49,26 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     addEventListeners() {
         this.controls.addEventListener('start', (event) => {
-            const matrix = this.camera.matrix.toArray();
+            const position = this.controls.object.position.toArray();
+            const target = this.controls.target.toArray();
+            const up = this.controls.object.up.toArray();
+            const orientation = { position, target, up };
+
             this.dispatchEvent({
                 type: 'cameraStart',
-                matrix
+                orientation
             });
         });
 
         this.controls.addEventListener('end', (event) => {
-            const matrix = this.camera.matrix.toArray();
+            const position = this.controls.object.position.toArray();
+            const target = this.controls.target.toArray();
+            const up = this.controls.object.up.toArray();
+            const orientation = { position, target, up };
+
             this.dispatchEvent({
                 type: 'cameraEnd',
-                matrix
+                orientation
             });
         });
     }
@@ -73,23 +84,17 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls.enabled = interactive;
     }
 
-    setCameraMatrix(matrix:number[]) {
-        const position = new THREE.Vector3();
-        const quaternion = new THREE.Quaternion();
-        const scale = new THREE.Vector3();
+    setControlOrientation(newOrientation:Orientation) { //:Orientation {
+        const oldPosition = this.controls.object.position;
+        const oldTarget = this.controls.target;
+        const oldUp = this.controls.object.up;
 
-        const oldMatrix = this.camera.matrix.toArray();
-        const c = this.camera;
-        const newMatrix = new THREE.Matrix4().fromArray(matrix);
+        this.controls.position0.set( newOrientation.position[0], newOrientation.position[1], newOrientation.position[2] );
+        this.controls.target0.set( newOrientation.target[0], newOrientation.target[1], newOrientation.target[2] );
+        this.controls.up0.set( newOrientation.up[0], newOrientation.up[1], newOrientation.up[2] );
+        this.controls.reset();
 
-        newMatrix.decompose(position, quaternion, scale);
-        c.position.copy(position);
-        c.quaternion.copy(quaternion);
-        c.scale.copy(scale);
-
-        c.updateMatrixWorld( true );
-
-        return oldMatrix;
+        // return {position:oldPosition, target:oldTarget, up:oldUp};
     }
 
     animate = () => {
