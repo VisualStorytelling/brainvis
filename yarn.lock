@@ -64,6 +64,16 @@
   dependencies:
     "@types/node" "*"
 
+"@types/three@^0.84.35":
+  version "0.84.35"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.84.35.tgz#df4645c542cbb93419786f2c49ecd0d85d037991"
+  dependencies:
+    "@types/webvr-api" "*"
+
+"@types/webvr-api@*":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/webvr-api/-/webvr-api-0.0.31.tgz#f6061fe88a035d34a8b6a0c55f8758901ec8a08e"
+
 "@types/whatwg-fetch@0.0.33":
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/@types/whatwg-fetch/-/whatwg-fetch-0.0.33.tgz#19c0d2863c8cb2380f21a1c736b79cbf7895bb13"
@@ -2093,9 +2103,9 @@ ieee754@^1.1.4:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/ieee754/-/ieee754-1.1.8.tgz#be33d40ac10ef1926701f6f08a2d86fbfd1ad3e4"
 
-"image-JPEG2000@github:ohif/image-JPEG2000#master":
+image-JPEG2000@OHIF/image-JPEG2000#master:
   version "0.3.1"
-  resolved "https://codeload.github.com/ohif/image-JPEG2000/tar.gz/ed628f6ef0c505377179ce5c952cd7265c87e065"
+  resolved "https://codeload.github.com/OHIF/image-JPEG2000/tar.gz/ed628f6ef0c505377179ce5c952cd7265c87e065"
 
 imports-loader@0.7.0:
   version "0.7.0"

@@ -5,17 +5,17 @@
  **************************************************************************** */
 
 //register all extensions in the registry following the given pattern
-module.exports = function(registry) {
-  //registry.push('extension-type', 'extension-id', function() { return System.import('./src/extension_impl'); }, {});
+module.exports = function (registry) {
   // generator-phovea:begin
-  registry.push('app', 'clue_dummy', null, {
-  'name': 'CLUE Demo'
- });
+  registry.push('app', 'brainvis', null, {
+    'name': 'BRAINVIS Demo'
+  });
 
-  registry.push('actionFactory', 'clue_demo', function() { return System.import('./src/cmds'); }, {
-  'factory': 'createCmd',
-  'creates': '(addClueElem|removeClueElem)'
- });
+  registry.push('actionFactory', 'brainvis', function () {
+    return System.import('./src/brainvisCmds');
+  }, {
+    'factory': 'createCmd',
+    'creates': '(setCameraMatrix)'
+  });
   // generator-phovea:end
 };
-

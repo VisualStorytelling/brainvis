@@ -12,4 +12,4 @@ import {register} from 'phovea_core/src/plugin';
 //other modules
 import 'phovea_clue/phovea_registry.js';
 //self
-register('clue_dummy',require('./phovea.js'));
+register('brainvis',require('./phovea.js'));
