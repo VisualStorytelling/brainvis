@@ -5,8 +5,8 @@ import * as views from 'phovea_core/src/layout_view';
 import { Rect } from 'phovea_core/src/geom';
 
 import BrainvisCanvas from './brainvisWebGLcanvas';
-import * as BrainvisCommands from './brainvisCmds';
-import { Orientation } from './brainvisTypes';
+import * as BrainvisCommands from './cmds';
+import { Orientation } from './types';
 
 class Brainvis extends views.AView {
     private dim: [number, number] = [100, 100];

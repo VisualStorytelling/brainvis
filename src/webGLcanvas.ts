@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
-import { Orientation } from './brainvisTypes';
+import { Orientation } from './types';
 
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
