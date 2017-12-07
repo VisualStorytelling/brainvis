@@ -13,7 +13,7 @@ class Brainvis extends views.AView {
     private bounds = new Rect(0, 0, 0, 0);
     private canvas: BrainvisCanvas;
     private orientationStart: Orientation;
-    private ref:prov.IObjectRef<Brainvis>;
+    private ref: prov.IObjectRef<Brainvis>;
 
     constructor(private elem: Element, private graph: prov.ProvenanceGraph) {
         super();
@@ -32,7 +32,6 @@ class Brainvis extends views.AView {
         this.bounds = new Rect(x, y, w, h);
         this.dim = [w, h];
         this.canvas.setSize(w, h);
-        this.update();
     }
 
     setInteractive(interactive: boolean) {
@@ -49,16 +48,14 @@ class Brainvis extends views.AView {
         this.setControlOrientation(this.orientationStart, orientationEnd);
     }
 
-    setControlOrientation(oldOrientation:Orientation, newOrientation:Orientation) {
-        const orientations = { old:oldOrientation, new:newOrientation };
+    setControlOrientation(oldOrientation: Orientation, newOrientation: Orientation) {
+        const orientations = { old: oldOrientation, new: newOrientation };
         return this.graph.push(BrainvisCommands.setControlOrientation(this.ref, orientations));
     }
 
-    setControlOrientationImpl(orientation:Orientation) {
+    setControlOrientationImpl(orientation: Orientation) {
         return this.canvas.setControlOrientation(orientation);
     }
-
-    private update() { }
 }
 
 export function create(parent: Element, provGraph: prov.ProvenanceGraph) {

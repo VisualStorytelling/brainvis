@@ -4,13 +4,13 @@ import { Orientation } from './brainvisTypes';
 
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
-    private width:number;
-    private height:number;
-    private elem:Element;
+    private width: number;
+    private height: number;
+    private elem: Element;
     private scene = new THREE.Scene();
-    private camera:THREE.PerspectiveCamera;
+    private camera: THREE.PerspectiveCamera;
     private renderer = new THREE.WebGLRenderer();
-    private controls:AMI.TrackballControl;
+    private controls: AMI.TrackballControl;
 
     constructor(elem, width, height) {
         super();
@@ -28,11 +28,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls = new AMI.TrackballControl(this.camera, this.elem);
 
         //Initial camera position
-        this.controls.position0.set(0,0,5);
+        this.controls.position0.set(0, 0, 5);
         this.controls.reset();
-
-        //Store camera matrix so we can manipulate it in the provenance graph
-        // this.cameraMatrix = this.camera.matrix.toArray();
 
         this.initScene();
         this.addEventListeners();
@@ -73,28 +70,22 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         });
     }
 
-    setSize(width:number, height:number) {
-        this.camera.aspect = width/height;
+    setSize(width: number, height: number) {
+        this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
 
-        this.renderer.setSize(width,height);
+        this.renderer.setSize(width, height);
     }
 
-    setInteractive(interactive:boolean) {
+    setInteractive(interactive: boolean) {
         this.controls.enabled = interactive;
     }
 
-    setControlOrientation(newOrientation:Orientation) { //:Orientation {
-        const oldPosition = this.controls.object.position;
-        const oldTarget = this.controls.target;
-        const oldUp = this.controls.object.up;
-
-        this.controls.position0.set( newOrientation.position[0], newOrientation.position[1], newOrientation.position[2] );
-        this.controls.target0.set( newOrientation.target[0], newOrientation.target[1], newOrientation.target[2] );
-        this.controls.up0.set( newOrientation.up[0], newOrientation.up[1], newOrientation.up[2] );
+    setControlOrientation(newOrientation: Orientation) {
+        this.controls.position0.set(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]);
+        this.controls.target0.set(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]);
+        this.controls.up0.set(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]);
         this.controls.reset();
-
-        // return {position:oldPosition, target:oldTarget, up:oldUp};
     }
 
     animate = () => {
