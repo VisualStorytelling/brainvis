@@ -4,7 +4,7 @@ import * as views from 'phovea_core/src/layout_view';
 
 import { Rect } from 'phovea_core/src/geom';
 
-import BrainvisCanvas from './brainvisWebGLcanvas';
+import BrainvisCanvas from './webGLcanvas';
 import * as BrainvisCommands from './cmds';
 import { Orientation } from './types';
 
