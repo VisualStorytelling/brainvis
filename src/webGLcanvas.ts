@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
-import { Orientation } from './types';
-
+import { IOrientation } from './types';
+import * as TWEEN from 'tween.js';
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
     private width: number;
@@ -34,6 +34,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.initScene();
         this.addEventListeners();
         this.animate();
+
+        // TWEEN.autoPlay(true);
     }
 
     initScene() {
@@ -81,15 +83,49 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls.enabled = interactive;
     }
 
-    setControlOrientation(newOrientation: Orientation) {
-        this.controls.position0.set(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]);
-        this.controls.target0.set(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]);
-        this.controls.up0.set(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]);
-        this.controls.reset();
+    setControlOrientation(newOrientation: IOrientation, within: number) {
+        if (within < 0) {
+            this.controls.position0.set(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]);
+            this.controls.target0.set(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]);
+            this.controls.up0.set(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]);
+            this.controls.reset();
+        } else {
+            const oldPosition = this.controls.object.position;
+            const oldTarget = this.controls.target;
+            const oldUp = this.controls.object.up;
+
+            const newPosition = this.controls.object.position;
+            const newTarget = this.controls.target;
+            const newUp = this.controls.object.up;
+
+            const tweenOrigin = {
+                positionX: oldPosition.x, positionY: oldPosition.y, positionZ: oldPosition.z,
+                targetX: oldTarget.x, targetY: oldTarget.y, targetZ: oldTarget.z,
+                upX: oldUp.x, upY: oldUp.y, upZ: oldUp.z
+            };
+            const tweenTarget = {
+                positionX: newPosition.x, positionY: newPosition.y, positionZ: newPosition.z,
+                targetX: newTarget.x, targetY: newTarget.y, targetZ: newTarget.z,
+                upX: newUp.x, upY: newUp.y, upZ: newUp.z
+            };
+
+            const controlTween = new TWEEN.Tween(tweenOrigin)
+                .to(tweenTarget, within)
+                .onUpdate(({
+                    positionX, positionY, positionZ,
+                    targetX, targetY, targetZ,
+                    upX, upY, upZ }) => {
+                    console.log(positionX);
+                });
+            controlTween.start();
+        }
     }
 
     animate = () => {
         requestAnimationFrame(this.animate);
+
+        TWEEN.update();
+
         this.controls.update();
 
         this.render();

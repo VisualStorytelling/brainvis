@@ -14,7 +14,7 @@ export function setControlOrientation(ref: prov.IObjectRef<any>, orientations) {
 export function setControlOrientationImpl(inputs, parameter, graph, within) {
     const brainvis: any = inputs[0].value;
     const orientations = parameter;
-    brainvis.setControlOrientationImpl(orientations.new);
+    brainvis.setControlOrientationImpl(orientations.new, within);
     const inverseOrientations = {
         old: orientations.new,
         new: orientations.old

@@ -4,15 +4,15 @@ import * as views from 'phovea_core/src/layout_view';
 
 import { Rect } from 'phovea_core/src/geom';
 
-import BrainvisCanvas from './brainvisWebGLcanvas';
+import BrainvisCanvas from './webGLcanvas';
 import * as BrainvisCommands from './cmds';
-import { Orientation } from './types';
+import { IOrientation } from './types';
 
 class Brainvis extends views.AView {
     private dim: [number, number] = [100, 100];
     private bounds = new Rect(0, 0, 0, 0);
     private canvas: BrainvisCanvas;
-    private orientationStart: Orientation;
+    private orientationStart: IOrientation;
     private ref: prov.IObjectRef<Brainvis>;
 
     constructor(private elem: Element, private graph: prov.ProvenanceGraph) {
@@ -48,13 +48,13 @@ class Brainvis extends views.AView {
         this.setControlOrientation(this.orientationStart, orientationEnd);
     }
 
-    setControlOrientation(oldOrientation: Orientation, newOrientation: Orientation) {
+    setControlOrientation(oldOrientation: IOrientation, newOrientation: IOrientation) {
         const orientations = { old: oldOrientation, new: newOrientation };
         return this.graph.push(BrainvisCommands.setControlOrientation(this.ref, orientations));
     }
 
-    setControlOrientationImpl(orientation: Orientation) {
-        return this.canvas.setControlOrientation(orientation);
+    setControlOrientationImpl(orientation: IOrientation, within:number) {
+        return this.canvas.setControlOrientation(orientation, within);
     }
 }
 

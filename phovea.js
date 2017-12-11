@@ -12,7 +12,7 @@ module.exports = function (registry) {
   });
 
   registry.push('actionFactory', 'brainvis', function () {
-    return System.import('./src/brainvisCmds');
+    return System.import('./src/cmds');
   }, {
     'factory': 'createCmd',
     'creates': '(setControlOrientation)'
