@@ -133,6 +133,9 @@ function generateWebpack(options) {
       ] : ['node_modules']
     },
     plugins: [
+      new webpack.ProvidePlugin({
+        THREE: "three"
+      }),
       new webpack.BannerPlugin({
         banner: banner,
         raw: true

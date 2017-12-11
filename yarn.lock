@@ -4514,6 +4514,10 @@ three@0.87.0:
   version "0.87.0"
   resolved "https://registry.yarnpkg.com/three/-/three-0.87.0.tgz#e38570daccafac86e7cf55718d00588a1a70b9a4"
 
+three@^0.88.0:
+  version "0.88.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.88.0.tgz#4256c2fc38e4fb23a0d23eba2b6cce4df8e466d5"
+
 through2@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.3.tgz#0004569b37c7c74ba39c43f3ced78d1ad94140be"

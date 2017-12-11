@@ -72,6 +72,7 @@
     "ami.js": "^0.0.22",
     "phovea_clue": "github:phovea/phovea_clue#develop",
     "phovea_d3": "github:phovea/phovea_d3#develop",
+    "three": "^0.88.0",
     "tween.js": "^16.6.0"
   },
   "name": "clue_dummy",

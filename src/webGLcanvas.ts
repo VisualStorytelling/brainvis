@@ -46,9 +46,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     initScene() {
 
         // Setup loader
-        var loader = new AMI.VolumeLoader(this.renderer.domElement);
+        const loader = new AMI.VolumeLoader(this.renderer.domElement);
 
-        var t1 = [
+        const t1 = [
             '36747136',
             '36747150',
             '36747164',
@@ -226,47 +226,45 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             '36749964'
         ];
 
-        var files = t1.map(function(v) {
+        const files = t1.map(function (v) {
             return 'https://cdn.rawgit.com/FNNDSC/data/master/dicom/adi_brain/' + v;
         });
 
-        let this_ = this;
-
         loader
-        .load(files)
-        .then(function() {
-            // merge files into clean series/stack/frame structure
-            var series = loader.data[0].mergeSeries(loader.data);
-            loader.free();
-            loader = null;
-    
-            // be carefull that series and target stack exist!
-            this_.stackHelper = new AMI.StackHelper(series[0].stack[0]);
-            this_.stackHelper.border.color = 0xffeb3b;
-            this_.scene.add(this_.stackHelper);
-   
-            // setup slice
-            var centerLPS = this_.stackHelper.stack.worldCenter();
-            this_.stackHelper.slice.aabbSpace = 'LPS';
-            this_.stackHelper.slice.planePosition.x = centerLPS.x;
-            this_.stackHelper.slice.planePosition.y = centerLPS.y;
-            this_.stackHelper.slice.planePosition.z = centerLPS.z;
-            this_.stackHelper.slice.planeDirection = new THREE.Vector3(1,0,0).normalize();
-            this_.stackHelper.border.helpersSlice = this_.stackHelper.slice;
-    
-            // slice manipulator
-            //this_.sliceManipulator = new SliceManipulatorWidget(this_.stackHelper,this_.elem,this_.camera);
-            //this_.scene.add(this_.sliceManipulator);
-            //this_.sliceManipulator.visible = false;
-            //this_.sliceManipulator.addEventListener('change',this_.onPlaneChange);
-    
-            // initialize controls last so it's event handelers will fire last
-            //this_.controls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
-        })
-        .catch(function(error) {
-            window.console.log('oops... something went wrong...');
-            window.console.log(error);
-        });
+            .load(files)
+            .then(function () {
+                // merge files into clean series/stack/frame structure
+                const series = loader.data[0].mergeSeries(loader.data);
+                loader.free();
+                // loader = null;
+
+                // be carefull that series and target stack exist!
+                this.stackHelper = new AMI.StackHelper(series[0].stack[0]);
+                this.stackHelper.border.color = 0xffeb3b;
+                this.scene.add(this.stackHelper);
+
+                // setup slice
+                const centerLPS = this.stackHelper.stack.worldCenter();
+                this.stackHelper.slice.aabbSpace = 'LPS';
+                this.stackHelper.slice.planePosition.x = centerLPS.x;
+                this.stackHelper.slice.planePosition.y = centerLPS.y;
+                this.stackHelper.slice.planePosition.z = centerLPS.z;
+                this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
+                this.stackHelper.border.helpersSlice = this.stackHelper.slice;
+
+                // slice manipulator
+                //this_.sliceManipulator = new SliceManipulatorWidget(this_.stackHelper,this_.elem,this_.camera);
+                //this_.scene.add(this_.sliceManipulator);
+                //this_.sliceManipulator.visible = false;
+                //this_.sliceManipulator.addEventListener('change',this_.onPlaneChange);
+
+                // initialize controls last so it's event handelers will fire last
+                //this_.controls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
+            }.bind(this))
+            .catch(function (error) {
+                window.console.log('oops... something went wrong...');
+                window.console.log(error);
+            });
     }
 
     addEventListeners() {
@@ -365,8 +363,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.renderer.render(this.scene, this.camera);
     };
 
-    onPlaneChange(event){
-        console.log('plane position: ' + event.position.x + " " + event.position.y + " " + event.position.z);
-        console.log('plane direction: ' + event.direction.x + " " + event.direction.y + " " + event.direction.z);
+    onPlaneChange(event) {
+        console.log('plane position: ' + event.position.x + ' ' + event.position.y + ' ' + event.position.z);
+        console.log('plane direction: ' + event.direction.x + ' ' + event.direction.y + ' ' + event.direction.z);
     }
 }
