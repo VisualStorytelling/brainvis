@@ -20,6 +20,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     private sphere: THREE.Mesh;
     private previousSelection;
 
+    private oldPosition: THREE.Vector3;
+    private oldDirection: THREE.Vector3;
+
     constructor(stackHelper, domElement, camera) {
         super();
 
@@ -103,6 +106,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
                 const offset = this.stackHelper.slice.planeDirection.clone();
                 offset.multiplyScalar(distance);
                 offset.add(this.originalSlicePosition);
+                // we need to find the position where the stack intersects the bounding box
                 // push the start of the ray a little back this helps with cases where ray
                 // starts at the edge of the volume and does not intersect it at all
                 const beginOffset = this.originalSlicePosition.clone();
@@ -117,20 +121,24 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             }
             this.stackHelper.slice._update();
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
-            // update line
-            this.geometryLine.vertices[0] = this.stackHelper.slice.planePosition.clone();
-
-            const endPosition = this.stackHelper.slice.planeDirection.clone();
-            endPosition.multiplyScalar(80.0);
-            endPosition.add(this.stackHelper.slice.planePosition);
-            this.geometryLine.vertices[1] = endPosition;
-            this.geometryLine.verticesNeedUpdate = true;
-            this.geometryLine.computeBoundingBox();
-            this.geometryLine.computeBoundingSphere();
-
-            // update sphere
-            this.sphere.position.copy(endPosition);
+            this.updateWidget();
         }
+    }
+
+    updateWidget() {
+        // update line
+        this.geometryLine.vertices[0] = this.stackHelper.slice.planePosition.clone();
+
+        const endPosition = this.stackHelper.slice.planeDirection.clone();
+        endPosition.multiplyScalar(80.0);
+        endPosition.add(this.stackHelper.slice.planePosition);
+        this.geometryLine.vertices[1] = endPosition;
+        this.geometryLine.verticesNeedUpdate = true;
+        this.geometryLine.computeBoundingBox();
+        this.geometryLine.computeBoundingSphere();
+
+        // update sphere
+        this.sphere.position.copy(endPosition);
     }
 
     // highlight a object and returns previous highlighted object to original color
@@ -162,6 +170,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         if (this.previousSelection) {
             event.stopImmediatePropagation();
             this.previousSelection.material.color.set(0x00ff00);
+            this.oldPosition = this.stackHelper.slice.planePosition.clone();
+            this.oldDirection = this.stackHelper.slice.planeDirection.clone();
             this.isDragging = true;
             this.setUpRaycaster(event);
             this.originalSlicePosition = this.stackHelper.slice.planePosition.clone();
@@ -177,7 +187,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             event.stopImmediatePropagation();
             this.previousSelection.material.color.set(0xff0000);
             this.isDragging = false;
-            this.dispatchEvent({ type: 'change', position: this.stackHelper.slice.planePosition.clone(), direction: this.stackHelper.slice.planeDirection.clone() });
+            this.dispatchEvent({ type: 'change', position: this.stackHelper.slice.planePosition.clone(), direction: this.stackHelper.slice.planeDirection.clone(), oldPosition: this.oldPosition, oldDirection: this.oldDirection });
         }
     }
 
@@ -197,6 +207,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         return intersections[0] ? intersections[0] : false;
     }
 
+    // gives intersection with the inside of the bounding box
+    // of the bounding box
     intersectStackHelper(beginpoint, endpoint) {
         const direction = endpoint.clone();
         direction.sub(beginpoint);
@@ -205,17 +217,12 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         this.raycaster.set(beginpoint, direction);
         // ray cast against bouding box
         const geometry = new THREE.Object3D();
-        //var mesh = this.stackHelper.children[0].children[0].clone();
-        /*  this.stackHelper.children[0].children[0].material = new THREE.MeshBasicMaterial({
-              wireframe: false,
-            });*/
-        //mesh._material
-        //var stack = this.stackHelper.children[0].meshStack;;
-        geometry.add(this.stackHelper.children[0]._meshStack.clone());
-        /* geometry.children[0].material = new THREE.MeshBasicMaterial({
-             wireframe: false,
-             side:THREE.BackSide,
-           });*/
+        const mesh = this.stackHelper.children[0]._meshStack.clone();
+        mesh.material = new THREE.MeshBasicMaterial({
+            wireframe: false,
+            side:THREE.BackSide,
+          });
+        geometry.add(mesh);
         const intersections = this.raycaster.intersectObjects(geometry.children, true);
         if (intersections[0] && intersections[0].distance <= length) {
             return intersections[0].point;

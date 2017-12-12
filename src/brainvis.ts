@@ -6,7 +6,7 @@ import { Rect } from 'phovea_core/src/geom';
 
 import BrainvisCanvas from './webGLcanvas';
 import * as BrainvisCommands from './cmds';
-import { IOrientation } from './types';
+import { IOrientation, ISlicePosition } from './types';
 
 class Brainvis extends views.AView {
     private dim: [number, number] = [100, 100];
@@ -22,6 +22,7 @@ class Brainvis extends views.AView {
         this.canvas = new BrainvisCanvas(elem, this.dim[0], this.dim[1]);
         this.canvas.addEventListener('cameraStart', this.cameraStart);
         this.canvas.addEventListener('cameraEnd', this.cameraEnd);
+        this.canvas.addEventListener('sliceChanged',this.sliceChanged);
     }
 
     getBounds() {
@@ -48,6 +49,16 @@ class Brainvis extends views.AView {
         this.setControlOrientation(this.orientationStart, orientationEnd);
     }
 
+    sliceChanged = (event) => {
+        const oldPosition: ISlicePosition = {position: event.changes.oldPosition, direction: event.changes.oldDirection};
+        const newPosition: ISlicePosition = {position: event.changes.position, direction: event.changes.direction};
+        this.setSlicePosition(oldPosition, newPosition);
+    }
+
+    setSlicePosition(oldSlicePosition: ISlicePosition, newSlicePosition: ISlicePosition) {
+        return this.graph.push(BrainvisCommands.setSlicePosition(this.ref, { old: oldSlicePosition, new: newSlicePosition }));
+    }
+
     setControlOrientation(oldOrientation: IOrientation, newOrientation: IOrientation) {
         const orientations = { old: oldOrientation, new: newOrientation };
         return this.graph.push(BrainvisCommands.setControlOrientation(this.ref, orientations));
@@ -55,6 +66,10 @@ class Brainvis extends views.AView {
 
     setControlOrientationImpl(orientation: IOrientation, within:number) {
         return this.canvas.setControlOrientation(orientation, within);
+    }
+
+    setSlicePositionImpl(newPosition: ISlicePosition) {
+        return this.canvas.setSlicePlanePosition(newPosition);
     }
 }
 

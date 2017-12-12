@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
 
-import { IOrientation } from './types';
+import { IOrientation, ISlicePosition } from './types';
 
 import Trackball from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
@@ -16,6 +16,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private controls: Trackball;
     private stackHelper: AMI.StackHelper;
     private sliceManipulator: SliceManipulatorWidget;
+
+    // store slice position values in case AMI is not ready with loading data
+    private storedSlicePosition: THREE.Vector3;
+    private storedSliceDirection: THREE.Vector3;
 
     constructor(elem, width, height) {
         super();
@@ -246,20 +250,24 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 // setup slice
                 const centerLPS = this.stackHelper.stack.worldCenter();
                 this.stackHelper.slice.aabbSpace = 'LPS';
-                this.stackHelper.slice.planePosition.x = centerLPS.x;
-                this.stackHelper.slice.planePosition.y = centerLPS.y;
-                this.stackHelper.slice.planePosition.z = centerLPS.z;
-                this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
+                if(this.storedSlicePosition) {
+                    this.stackHelper.slice.planePosition.copy(this.storedSlicePosition);
+                    this.stackHelper.slice.planeDirection.copy(this.storedSliceDirection);
+                } else {
+                    this.stackHelper.slice.planePosition.x = centerLPS.x;
+                    this.stackHelper.slice.planePosition.y = centerLPS.y;
+                    this.stackHelper.slice.planePosition.z = centerLPS.z;
+                    this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
+                }
+                this.stackHelper.slice._update();
                 this.stackHelper.border.helpersSlice = this.stackHelper.slice;
 
                 // slice manipulator
-                //this_.sliceManipulator = new SliceManipulatorWidget(this_.stackHelper,this_.elem,this_.camera);
-                //this_.scene.add(this_.sliceManipulator);
-                //this_.sliceManipulator.visible = false;
-                //this_.sliceManipulator.addEventListener('change',this_.onPlaneChange);
+                this.sliceManipulator = new SliceManipulatorWidget(this.stackHelper,this.renderer.domElement,this.camera);
+                this.scene.add(this.sliceManipulator);
+                //this.sliceManipulator.visible = false;
+                this.sliceManipulator.addEventListener('change',this.onSlicePlaneChange);
 
-                // initialize controls last so it's event handelers will fire last
-                //this_.controls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
             }.bind(this))
             .catch(function (error) {
                 window.console.log('oops... something went wrong...');
@@ -363,8 +371,29 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.renderer.render(this.scene, this.camera);
     };
 
-    onPlaneChange(event) {
-        console.log('plane position: ' + event.position.x + ' ' + event.position.y + ' ' + event.position.z);
-        console.log('plane direction: ' + event.direction.x + ' ' + event.direction.y + ' ' + event.direction.z);
+    onSlicePlaneChange = (event) => {
+        const position = event.position.toArray();
+        const direction = event.direction.toArray();
+        const oldPosition = event.oldPosition.toArray();
+        const oldDirection = event.oldDirection.toArray();
+        const changes = { position, direction, oldPosition, oldDirection };
+
+        this.dispatchEvent({
+            type: 'sliceChanged',
+            changes
+        });
+    }
+
+    setSlicePlanePosition(positions: ISlicePosition) {
+        if(this.stackHelper) {
+            this.stackHelper.slice.planePosition.set(positions.position[0],positions.position[1],positions.position[2]);
+            this.stackHelper.slice.planeDirection.set(positions.direction[0],positions.direction[1],positions.direction[2]);
+            this.stackHelper.slice._update();
+            this.stackHelper.border.helpersSlice = this.stackHelper.slice;
+            this.sliceManipulator.updateWidget();
+        } else {
+            this.storedSlicePosition = new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]);
+            this.storedSliceDirection = new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]);
+        }
     }
 }

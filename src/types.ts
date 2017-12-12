@@ -3,3 +3,8 @@ export interface IOrientation {
     target:number[];
     up:number[];
 }
+
+export interface ISlicePosition {
+    position:number[];
+    direction:number[];
+}
