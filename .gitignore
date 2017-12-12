@@ -4,6 +4,7 @@
 /dist/
 node_modules/
 /src/**/*.js
+!/src/clue_overrides/phovea.js
 /tests/**/*.js
 *.map
 *.css
