@@ -293,7 +293,7 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   };
 
-  changeCamera(newPosition, newTarget, newUp, smooth) {
+  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, smooth:boolean) {
     if (this.target.equals(newTarget) && this.camera.position.equals(newPosition) && this.camera.up.equals(newUp)) {
       return;
     }

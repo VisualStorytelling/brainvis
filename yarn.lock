@@ -1665,9 +1665,9 @@ flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
 
-font-awesome@4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.7.0.tgz#8fa8cf0411a1a31afd07b06d2902bb9fc815a133"
+font-awesome@4.6.3:
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/font-awesome/-/font-awesome-4.6.3.tgz#86933651540ee00874c664017f50f2172f6531a2"
 
 for-in@^1.0.1:
   version "1.0.2"
@@ -2684,10 +2684,6 @@ map-obj@^1.0.0, map-obj@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/map-obj/-/map-obj-1.0.1.tgz#d933ceb9205d82bdcf4886f6742bdc2b4dea146d"
 
-marked@0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.6.tgz#b2c6c618fccece4ef86c4fc6cb8a7cbf5aeda8d7"
-
 marked@^0.3.5:
   version "0.3.7"
   resolved "https://registry.yarnpkg.com/marked/-/marked-0.3.7.tgz#80ef3bbf1bd00d1c9cfebe42ba1b8c85da258d0d"
@@ -3296,17 +3292,12 @@ performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
 
-"phovea_clue@github:phovea/phovea_clue#develop":
-  version "0.1.1-SNAPSHOT"
-  resolved "https://codeload.github.com/phovea/phovea_clue/tar.gz/bb68b56c58d9ec29f6846aa1661d1d34078eafc8"
+phovea_core@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/phovea_core/-/phovea_core-0.1.0.tgz#448b9fbcde16aba6ee2d23a16b97b0a0adf693ef"
   dependencies:
-    "@types/d3" "3.5.36"
-    "@types/marked" "0.0.28"
-    d3 "3.5.17"
-    marked "0.3.6"
-    phovea_core "github:phovea/phovea_core#develop"
-    phovea_security_flask "github:phovea/phovea_security_flask#develop"
-    phovea_ui "github:phovea/phovea_ui#develop"
+    "@types/whatwg-fetch" "0.0.33"
+    tslib "1.5.0"
 
 "phovea_core@github:phovea/phovea_core#develop":
   version "0.1.1-SNAPSHOT"
@@ -3316,6 +3307,14 @@ performance-now@^2.1.0:
     "@types/whatwg-fetch" "0.0.33"
     tslib "1.5.0"
 
+phovea_d3@0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/phovea_d3/-/phovea_d3-0.1.0.tgz#303caaba8b538854c6966a1d1e7830ad46055383"
+  dependencies:
+    "@types/d3" "3.5.36"
+    d3 "3.5.17"
+    phovea_core "0.1.0"
+
 "phovea_d3@github:phovea/phovea_d3#develop":
   version "0.1.1-SNAPSHOT"
   resolved "https://codeload.github.com/phovea/phovea_d3/tar.gz/a8c17bc51d4d0c61671769bf8d11a7016197a219"
@@ -3324,22 +3323,31 @@ performance-now@^2.1.0:
     d3 "3.5.17"
     phovea_core "github:phovea/phovea_core#develop"
 
-"phovea_security_flask@github:phovea/phovea_security_flask#develop":
-  version "0.1.1-SNAPSHOT"
-  resolved "https://codeload.github.com/phovea/phovea_security_flask/tar.gz/81cc795ea3540b0418b2e650a38d421c03f28067"
+phovea_security_flask@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/phovea_security_flask/-/phovea_security_flask-0.1.0.tgz#c768fa0c595e46040011496e1e8cc4754295a241"
   dependencies:
-    phovea_core "github:phovea/phovea_core#develop"
+    phovea_core "0.1.0"
 
-"phovea_ui@github:phovea/phovea_ui#develop":
-  version "0.1.1-SNAPSHOT"
-  resolved "https://codeload.github.com/phovea/phovea_ui/tar.gz/73e304355f6d4fdfd7979c84b2b7b496180ecc93"
+phovea_ui@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/phovea_ui/-/phovea_ui-0.1.0.tgz#f44d67eded775a6b20a2b9947f5899aa08d1e7d5"
   dependencies:
     "@types/bootstrap" "3.3.32"
     "@types/jquery" "2.0.33"
     bootstrap-sass "3.3.7"
-    font-awesome "4.7.0"
+    font-awesome "4.6.3"
     jquery "3.1.1"
-    phovea_core "github:phovea/phovea_core#develop"
+    phovea_core "0.1.0"
+
+phovea_vis@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/phovea_vis/-/phovea_vis-0.1.0.tgz#f09eae50c49fe5364722ce3545fb76387639ead7"
+  dependencies:
+    "@types/d3" "3.5.36"
+    d3 "3.5.17"
+    phovea_core "0.1.0"
+    phovea_d3 "0.1.0"
 
 pify@^2.0.0, pify@^2.3.0:
   version "2.3.0"

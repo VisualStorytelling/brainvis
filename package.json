@@ -70,8 +70,10 @@
   },
   "dependencies": {
     "ami.js": "^0.0.22",
-    "phovea_clue": "github:phovea/phovea_clue#develop",
     "phovea_d3": "github:phovea/phovea_d3#develop",
+    "phovea_security_flask": "^0.1.0",
+    "phovea_ui": "^0.1.0",
+    "phovea_vis": "^0.1.0",
     "three": "^0.88.0",
     "tween.js": "^16.6.0"
   },
