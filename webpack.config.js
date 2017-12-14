@@ -9,6 +9,7 @@ const resolve = require('path').resolve;
 const pkg = require('./package.json');
 const webpack = require('webpack');
 const fs = require('fs');
+const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const buildInfo = require('./buildInfo.js');
 
@@ -125,7 +126,10 @@ function generateWebpack(options) {
     resolve: {
       // Add `.ts` and `.tsx` as a resolvable extension.
       extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js'],
-      alias: Object.assign({}, options.libs || {}),
+            
+      alias: Object.assign({ 'three': path.join(__dirname, './node_modules/three') }, 
+        options.libs || {}),
+
       //fallback to the directory above if they are siblings just in the workspace context
       modules: isWorkspaceContext ? [
         resolve(__dirname, '../'),
