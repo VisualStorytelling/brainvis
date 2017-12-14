@@ -293,11 +293,11 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   };
 
-  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, smooth:boolean) {
+  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, milliseconds: number) {
     if (this.target.equals(newTarget) && this.camera.position.equals(newPosition) && this.camera.up.equals(newUp)) {
       return;
     }
-    if (!smooth) {
+    if (milliseconds <= 0) {
       this.state = STATE.NONE;
       this.previousState = STATE.NONE;
 
@@ -318,10 +318,11 @@ export default class Trackball extends THREE.EventDispatcher {
         clearInterval(this.changeTimeout);
         this.changeTimeout = undefined;
       }
-      this.changeTime = 0;
+      let changeTime = 0;
+      const delta = 30/milliseconds;
       this.changeTimeout = setInterval((fromTarget, fromPosition, fromUp, toTarget, toPosition, toUp) => {
         this.enabled = false;
-        const t = this.changeTime;
+        const t = changeTime;
         const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in/out function
 
         const nextPosition = fromPosition.clone();
@@ -340,10 +341,10 @@ export default class Trackball extends THREE.EventDispatcher {
         nextUp.addScaledVector(distanceUp, interPolateTime);
         nextUp.normalize();
 
-        this.changeCamera(nextPosition, nextTarget, nextUp, false);
-        this.changeTime += 0.03;
-        if (this.changeTime > 1.0) {
-          this.changeCamera(toPosition, toTarget, toUp, false);
+        this.changeCamera(nextPosition, nextTarget, nextUp, 0);
+        changeTime += delta;
+        if (changeTime > 1.0) {
+          this.changeCamera(toPosition, toTarget, toUp, 0);
           //console.log('end anim');
           clearInterval(this.changeTimeout);
           this.changeTimeout = undefined;
@@ -354,7 +355,7 @@ export default class Trackball extends THREE.EventDispatcher {
   };
 
   reset() {
-    this.changeCamera(this.target0, this.position0, this.up0, false);
+    this.changeCamera(this.target0, this.position0, this.up0, 0);
     this.dispatchEvent({ type: 'change' });
   };
 

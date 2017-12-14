@@ -354,7 +354,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
             new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
             new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
-            true);
+            within >0? within : 1000);
     }
 
     animate = () => {
