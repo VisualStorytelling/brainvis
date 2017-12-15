@@ -384,13 +384,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         });
     }
 
-    setSlicePlanePosition(positions: ISlicePosition) {
+    setSlicePlanePosition(positions: ISlicePosition, within: number) {
         if(this.stackHelper) {
-            this.stackHelper.slice.planePosition.set(positions.position[0],positions.position[1],positions.position[2]);
-            this.stackHelper.slice.planeDirection.set(positions.direction[0],positions.direction[1],positions.direction[2]);
-            this.stackHelper.slice._update();
-            this.stackHelper.border.helpersSlice = this.stackHelper.slice;
-            this.sliceManipulator.updateWidget();
+            this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]),
+            new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]), within>0?within:1000);
         } else {
             this.storedSlicePosition = new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]);
             this.storedSliceDirection = new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]);

@@ -23,6 +23,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     private oldPosition: THREE.Vector3;
     private oldDirection: THREE.Vector3;
 
+    private changeTimeout = undefined;
+    public enabled: boolean = true;
+
     constructor(stackHelper, domElement, camera) {
         super();
 
@@ -230,4 +233,56 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             return endpoint;
         }
     }
+
+    /**
+     * Changes the slice to a new position
+     * @param newPosition new position of the slice
+     * @param newDirection of the slice
+     * @param milliseconds transition time
+     */
+    changeSlicePosition(newPosition: THREE.Vector3, newDirection: THREE.Vector3, milliseconds: number) {
+        if (this.stackHelper.slice.planePosition.equals(newPosition) && this.stackHelper.slice.planeDirection.equals(newDirection)) {
+          return;
+        }
+        if (milliseconds <= 0) {
+            this.stackHelper.slice.planePosition.copy(newPosition);
+            this.stackHelper.slice.planeDirection.copy(newDirection);
+            this.stackHelper.slice._update();
+            this.stackHelper.border.helpersSlice = this.stackHelper.slice;
+            this.updateWidget();
+        } else {
+          //cancel previous animation
+          if (this.changeTimeout !== undefined) {
+            clearInterval(this.changeTimeout);
+            this.changeTimeout = undefined;
+          }
+          let changeTime = 0;
+          const delta = 30/milliseconds;
+          this.changeTimeout = setInterval((fromPosition, fromDirection, toPosition, toDirection) => {
+            this.enabled = false;
+            const t = changeTime;
+            const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in/out function
+
+            const nextPosition = fromPosition.clone();
+            const distancePosition = toPosition.clone();
+            distancePosition.sub(fromPosition);
+            nextPosition.addScaledVector(distancePosition, interPolateTime);
+
+            const nextDirection = fromDirection.clone();
+            const distanceUp = toDirection.clone();
+            distanceUp.sub(fromDirection);
+            nextDirection.addScaledVector(distanceUp, interPolateTime);
+            nextDirection.normalize();
+
+            this.changeSlicePosition(nextPosition, nextDirection, 0);
+            changeTime += delta;
+            if (changeTime > 1.0) {
+                this.changeSlicePosition(toPosition, toDirection, 0);
+                clearInterval(this.changeTimeout);
+                this.changeTimeout = undefined;
+                this.enabled = true;
+            }
+          }, 30, this.stackHelper.slice.planePosition, this.stackHelper.slice.planeDirection, newPosition, newDirection);
+        }
+      };
 }

@@ -68,8 +68,8 @@ class Brainvis extends views.AView {
         return this.canvas.setControlOrientation(orientation, within);
     }
 
-    setSlicePositionImpl(newPosition: ISlicePosition) {
-        return this.canvas.setSlicePlanePosition(newPosition);
+    setSlicePositionImpl(newPosition: ISlicePosition, within:number) {
+        return this.canvas.setSlicePlanePosition(newPosition, within);
     }
 }
 
