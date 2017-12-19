@@ -486,8 +486,8 @@ export default class Trackball extends THREE.EventDispatcher {
       this.customStart.y += delta * 0.01;
     }
 
-    this.dispatchEvent({ type: 'start' });
-    this.dispatchEvent({ type: 'end', state: STATE.ZOOM, newTarget: this.target, newPosition: this.target, newUp: this.target });
+    this.dispatchEvent({ type: 'zoomstart' });
+    this.dispatchEvent({ type: 'zoomend', state: STATE.ZOOM, newTarget: this.target, newPosition: this.target, newUp: this.target });
   }
 
   touchstart(event) {

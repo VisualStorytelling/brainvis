@@ -190,7 +190,23 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             event.stopImmediatePropagation();
             this.previousSelection.material.color.set(0xff0000);
             this.isDragging = false;
-            this.dispatchEvent({ type: 'change', position: this.stackHelper.slice.planePosition.clone(), direction: this.stackHelper.slice.planeDirection.clone(), oldPosition: this.oldPosition, oldDirection: this.oldDirection });
+            if (this.previousSelection === this.line) {
+                this.dispatchEvent({
+                    type: 'zoomChange',
+                    position: this.stackHelper.slice.planePosition.clone(),
+                    direction: this.stackHelper.slice.planeDirection.clone(),
+                    oldPosition: this.oldPosition,
+                    oldDirection: this.oldDirection
+                });
+            } else {
+                this.dispatchEvent({
+                    type: 'orientationChange',
+                    position: this.stackHelper.slice.planePosition.clone(),
+                    direction: this.stackHelper.slice.planeDirection.clone(),
+                    oldPosition: this.oldPosition,
+                    oldDirection: this.oldDirection
+                 });
+            }
         }
     }
 
@@ -223,8 +239,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         const mesh = this.stackHelper.children[0]._meshStack.clone();
         mesh.material = new THREE.MeshBasicMaterial({
             wireframe: false,
-            side:THREE.BackSide,
-          });
+            side: THREE.BackSide,
+        });
         geometry.add(mesh);
         const intersections = this.raycaster.intersectObjects(geometry.children, true);
         if (intersections[0] && intersections[0].distance <= length) {
@@ -242,7 +258,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
      */
     changeSlicePosition(newPosition: THREE.Vector3, newDirection: THREE.Vector3, milliseconds: number) {
         if (this.stackHelper.slice.planePosition.equals(newPosition) && this.stackHelper.slice.planeDirection.equals(newDirection)) {
-          return;
+            return;
         }
         if (milliseconds <= 0) {
             this.stackHelper.slice.planePosition.copy(newPosition);
@@ -251,38 +267,38 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         } else {
-          //cancel previous animation
-          if (this.changeTimeout !== undefined) {
-            clearInterval(this.changeTimeout);
-            this.changeTimeout = undefined;
-          }
-          let changeTime = 0;
-          const delta = 30/milliseconds;
-          this.changeTimeout = setInterval((fromPosition, fromDirection, toPosition, toDirection) => {
-            this.enabled = false;
-            const t = changeTime;
-            const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in/out function
-
-            const nextPosition = fromPosition.clone();
-            const distancePosition = toPosition.clone();
-            distancePosition.sub(fromPosition);
-            nextPosition.addScaledVector(distancePosition, interPolateTime);
-
-            const nextDirection = fromDirection.clone();
-            const distanceUp = toDirection.clone();
-            distanceUp.sub(fromDirection);
-            nextDirection.addScaledVector(distanceUp, interPolateTime);
-            nextDirection.normalize();
-
-            this.changeSlicePosition(nextPosition, nextDirection, 0);
-            changeTime += delta;
-            if (changeTime > 1.0) {
-                this.changeSlicePosition(toPosition, toDirection, 0);
+            //cancel previous animation
+            if (this.changeTimeout !== undefined) {
                 clearInterval(this.changeTimeout);
                 this.changeTimeout = undefined;
-                this.enabled = true;
             }
-          }, 30, this.stackHelper.slice.planePosition, this.stackHelper.slice.planeDirection, newPosition, newDirection);
+            let changeTime = 0;
+            const delta = 30 / milliseconds;
+            this.changeTimeout = setInterval((fromPosition, fromDirection, toPosition, toDirection) => {
+                this.enabled = false;
+                const t = changeTime;
+                const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in/out function
+
+                const nextPosition = fromPosition.clone();
+                const distancePosition = toPosition.clone();
+                distancePosition.sub(fromPosition);
+                nextPosition.addScaledVector(distancePosition, interPolateTime);
+
+                const nextDirection = fromDirection.clone();
+                const distanceUp = toDirection.clone();
+                distanceUp.sub(fromDirection);
+                nextDirection.addScaledVector(distanceUp, interPolateTime);
+                nextDirection.normalize();
+
+                this.changeSlicePosition(nextPosition, nextDirection, 0);
+                changeTime += delta;
+                if (changeTime > 1.0) {
+                    this.changeSlicePosition(toPosition, toDirection, 0);
+                    clearInterval(this.changeTimeout);
+                    this.changeTimeout = undefined;
+                    this.enabled = true;
+                }
+            }, 30, this.stackHelper.slice.planePosition, this.stackHelper.slice.planeDirection, newPosition, newDirection);
         }
-      };
+    };
 }

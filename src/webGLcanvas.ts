@@ -266,7 +266,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 this.sliceManipulator = new SliceManipulatorWidget(this.stackHelper,this.renderer.domElement,this.camera);
                 this.scene.add(this.sliceManipulator);
                 //this.sliceManipulator.visible = false;
-                this.sliceManipulator.addEventListener('change',this.onSlicePlaneChange);
+                this.sliceManipulator.addEventListener('zoomChange',this.onSlicePlaneZoomChange);
+                this.sliceManipulator.addEventListener('orientationChange',this.onSlicePlaneOrientationChange);
 
             }.bind(this))
             .catch(function (error) {
@@ -276,6 +277,30 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     }
 
     addEventListeners() {
+        this.controls.addEventListener('zoomstart', (event) => {
+            const position = this.controls.camera.position.toArray();
+            const target = this.controls.target.toArray();
+            const up = this.controls.camera.up.toArray();
+            const orientation = { position, target, up };
+
+            this.dispatchEvent({
+                type: 'zoomStart',
+                orientation
+            });
+        });
+
+        this.controls.addEventListener('zoomend', (event) => {
+            const position = this.controls.camera.position.toArray();
+            const target = this.controls.target.toArray();
+            const up = this.controls.camera.up.toArray();
+            const orientation = { position, target, up };
+
+            this.dispatchEvent({
+                type: 'zoomEnd',
+                orientation
+            });
+        });
+
         this.controls.addEventListener('start', (event) => {
             const position = this.controls.camera.position.toArray();
             const target = this.controls.target.toArray();
@@ -312,43 +337,12 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls.enabled = interactive;
     }
 
-    // setControlOrientation(newOrientation: IOrientation, within: number) {
-    //     if (within < 0) {
-    //         this.controls.position0.set(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]);
-    //         this.controls.target0.set(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]);
-    //         this.controls.up0.set(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]);
-    //         this.controls.reset();
-    //     } else {
-    //         const oldPosition = this.controls.object.position;
-    //         const oldTarget = this.controls.target;
-    //         const oldUp = this.controls.object.up;
-
-    //         const newPosition = this.controls.object.position;
-    //         const newTarget = this.controls.target;
-    //         const newUp = this.controls.object.up;
-
-    //         const tweenOrigin = {
-    //             positionX: oldPosition.x, positionY: oldPosition.y, positionZ: oldPosition.z,
-    //             targetX: oldTarget.x, targetY: oldTarget.y, targetZ: oldTarget.z,
-    //             upX: oldUp.x, upY: oldUp.y, upZ: oldUp.z
-    //         };
-    //         const tweenTarget = {
-    //             positionX: newPosition.x, positionY: newPosition.y, positionZ: newPosition.z,
-    //             targetX: newTarget.x, targetY: newTarget.y, targetZ: newTarget.z,
-    //             upX: newUp.x, upY: newUp.y, upZ: newUp.z
-    //         };
-
-    //         const controlTween = new TWEEN.Tween(tweenOrigin)
-    //             .to(tweenTarget, within)
-    //             .onUpdate(({
-    //                 positionX, positionY, positionZ,
-    //                 targetX, targetY, targetZ,
-    //                 upX, upY, upZ }) => {
-    //                 console.log(positionX);
-    //             });
-    //         controlTween.start();
-    //     }
-    // }
+    setControlZoom(newOrientation: IOrientation, within: number) {
+        this.controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
+            new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
+            new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
+            within >0? within : 1000);
+    }
 
     setControlOrientation(newOrientation: IOrientation, within: number) {
         this.controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
@@ -371,15 +365,29 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.renderer.render(this.scene, this.camera);
     };
 
-    onSlicePlaneChange = (event) => {
+    getSlicePlaneChanges = (event) => {
         const position = event.position.toArray();
         const direction = event.direction.toArray();
         const oldPosition = event.oldPosition.toArray();
         const oldDirection = event.oldDirection.toArray();
-        const changes = { position, direction, oldPosition, oldDirection };
+
+        return { position, direction, oldPosition, oldDirection };
+    }
+
+    onSlicePlaneOrientationChange = (event) => {
+        const changes = this.getSlicePlaneChanges(event);
 
         this.dispatchEvent({
-            type: 'sliceChanged',
+            type: 'sliceOrientationChanged',
+            changes
+        });
+    }
+
+    onSlicePlaneZoomChange = (event) => {
+        const changes = this.getSlicePlaneChanges(event);
+
+        this.dispatchEvent({
+            type: 'sliceZoomChanged',
             changes
         });
     }

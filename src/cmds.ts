@@ -1,5 +1,32 @@
 import * as prov from 'phovea_core/src/provenance';
 
+// Camera zoom
+export function setControlZoom(ref: prov.IObjectRef<any>, orientations) {
+    return prov.action(
+        prov.meta(
+            'ZoomChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setControlZoom',setControlZoomImpl, [ref], orientations
+    );
+}
+
+export function setControlZoomImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const orientations = parameter;
+    brainvis.setControlZoomImpl(orientations.new, within);
+    const inverseOrientations = {
+        old: orientations.new,
+        new: orientations.old
+    };
+
+    return {
+        inverse: setControlZoom(inputs[0], inverseOrientations),
+        consumed: within
+    };
+};
+
 // Camera orientation
 export function setControlOrientation(ref: prov.IObjectRef<any>, orientations) {
     return prov.action(
@@ -27,39 +54,72 @@ export function setControlOrientationImpl(inputs, parameter, graph, within) {
     };
 };
 
-// Slice orientation
-export function setSlicePosition(ref: prov.IObjectRef<any>, positions) {
+// Slice zoom
+export function setSliceZoom(ref: prov.IObjectRef<any>, positions) {
     return prov.action(
         prov.meta(
-            'SliceChanged=' +
+            'SliceZoomChanged=' +
             prov.cat.visual, prov.op.update
         ),
 
-        'setSlicePosition',setSlicePositionImpl, [ref], positions
+        'setSliceZoom',setSliceZoomImpl, [ref], positions
     );
 }
 
-export function setSlicePositionImpl(inputs, parameter, graph, within) {
+export function setSliceZoomImpl(inputs, parameter, graph, within) {
     const brainvis: any = inputs[0].value;
     const positions = parameter;
-    brainvis.setSlicePositionImpl(positions.new, within);
+    brainvis.setSliceZoomImpl(positions.new, within);
     const inversePositions = {
         old: positions.new,
         new: positions.old
     };
 
     return {
-        inverse: setSlicePosition(inputs[0], inversePositions),
+        inverse: setSliceZoom(inputs[0], inversePositions),
         consumed: within
     };
 };
 
+//slice orientation
+export function setSliceOrientation(ref: prov.IObjectRef<any>, positions) {
+    return prov.action(
+        prov.meta(
+            'SliceOrientationChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setSliceOrientation',setSliceOrientationImpl, [ref], positions
+    );
+}
+
+export function setSliceOrientationImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const positions = parameter;
+    brainvis.setSliceOrientationImpl(positions.new, within);
+    const inversePositions = {
+        old: positions.new,
+        new: positions.old
+    };
+
+    return {
+        inverse: setSliceOrientation(inputs[0], inversePositions),
+        consumed: within
+    };
+};
+
+
+//commands
 export function createCmd(id) {
     switch (id) {
         case 'setControlOrientation':
             return setControlOrientationImpl;
-        case 'setSlicePosition':
-            return setSlicePositionImpl;
+        case 'setControlZoom':
+            return setControlZoomImpl;
+        case 'setSliceZoom':
+            return setSliceZoomImpl;
+        case 'setSliceOrientation':
+            return setSliceOrientationImpl;
     }
     return null;
 };

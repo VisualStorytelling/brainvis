@@ -15,7 +15,7 @@ module.exports = function (registry) {
     return System.import('./src/cmds');
   }, {
     'factory': 'createCmd',
-    'creates': '(setControlOrientation|setSlicePosition)'
+    'creates': '(setControlOrientation|setControlZoom|setSliceZoom|setSliceOrientation)'
   });
   // generator-phovea:end
 };
