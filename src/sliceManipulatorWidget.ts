@@ -16,6 +16,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
 
     private geometryLine: THREE.Geometry;
     private line: THREE.Line;
+    private cylinder: THREE.Mesh;
+    private arrowUp: THREE.Mesh;
+    private arrowDown: THREE.Mesh;
     private originalSlicePosition: THREE.Vector3;
     private sphere: THREE.Mesh;
     private previousSelection;
@@ -48,12 +51,26 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
 
         // line
 
-        const geometryCylinder = new THREE.CylinderGeometry(1, 1, 80, 8);
-        let material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
-        const cylinder = new THREE.Mesh(geometryCylinder, material);
-        cylinder.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
-        cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), stackHelper.slice.planeDirection);
-        //this.add( cylinder );
+        const geometryCylinder = new THREE.CylinderGeometry(1.5, 1.5, 40, 8);
+        let material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+        this.cylinder = new THREE.Mesh(geometryCylinder, material);
+        this.cylinder.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), stackHelper.slice.planeDirection);
+        this.add( this.cylinder );
+
+        const arrow = new THREE.ConeBufferGeometry(3.5, 10);
+        this.arrowUp = new THREE.Mesh(arrow, material);
+        this.arrowUp.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.arrowUp.position.addScaledVector(stackHelper.slice.planeDirection,25);
+        this.arrowUp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), stackHelper.slice.planeDirection);
+        this.add( this.arrowUp );
+
+        this.arrowDown = new THREE.Mesh(arrow, material);
+        this.arrowDown.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.arrowDown.position.addScaledVector(stackHelper.slice.planeDirection,-25);
+        this.arrowDown.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), stackHelper.slice.planeDirection);
+        this.add( this.arrowDown );
+
 
         const materialLine = new THREE.LineBasicMaterial();
         this.geometryLine = new THREE.Geometry();
@@ -92,7 +109,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
                 this.clearSelection();
                 return;
             }
-            this.highLightObject(intersection.object, 0xff0000);
+            if(intersection.object !== this.line) {
+                this.highLightObject(intersection.object, 0xff0000);
+            }
 
             // move intersection plane to intersection location
             this.plane.setFromNormalAndCoplanarPoint(this.camera.getWorldDirection(this.plane.normal), intersection.object.position);
@@ -105,7 +124,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             const distance = intersectionDirection.dot(this.stackHelper.slice.planeDirection);
             event.stopImmediatePropagation();
             // move the slice
-            if (this.previousSelection === this.line) {
+            if (this.previousSelection === this.line || this.previousSelection === this.cylinder
+                || this.previousSelection === this.arrowUp  || this.previousSelection === this.arrowDown) {
                 const offset = this.stackHelper.slice.planeDirection.clone();
                 offset.multiplyScalar(distance);
                 offset.add(this.originalSlicePosition);
@@ -132,6 +152,19 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         // update line
         this.geometryLine.vertices[0] = this.stackHelper.slice.planePosition.clone();
 
+        // update arrow
+        const middlePosition = this.stackHelper.slice.planeDirection.clone();
+        middlePosition.multiplyScalar(40.0);
+        middlePosition.add(this.stackHelper.slice.planePosition);
+        this.cylinder.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.stackHelper.slice.planeDirection);
+        this.arrowUp.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.arrowUp.position.addScaledVector(this.stackHelper.slice.planeDirection,25);
+        this.arrowUp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.stackHelper.slice.planeDirection);
+        this.arrowDown.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
+        this.arrowDown.position.addScaledVector(this.stackHelper.slice.planeDirection,-25);
+        this.arrowDown.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), this.stackHelper.slice.planeDirection);
+
         const endPosition = this.stackHelper.slice.planeDirection.clone();
         endPosition.multiplyScalar(80.0);
         endPosition.add(this.stackHelper.slice.planePosition);
@@ -147,16 +180,16 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     // highlight a object and returns previous highlighted object to original color
     highLightObject(newObject, newColor) {
         // store object previous color if we haven't done so
-        if (!newObject.previousColor) {
-            newObject.previousColor = newObject.material.color.clone();
-        }
-        newObject.material.color.set(newColor);
         if (this.previousSelection !== newObject) {
             if (this.previousSelection) {
                 this.previousSelection.material.color = this.previousSelection.previousColor.clone();
             }
             this.previousSelection = newObject;
         }
+        if (!newObject.previousColor) {
+            newObject.previousColor = newObject.material.color.clone();
+        }
+        newObject.material.color.set(newColor);
     }
 
     clearSelection() {
