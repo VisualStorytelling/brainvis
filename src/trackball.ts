@@ -83,6 +83,7 @@ export default class Trackball extends THREE.EventDispatcher {
 
   private changeTimeout = undefined;
   private changeTime = 0.0;
+  private isDragging: boolean = false;
 
   constructor(object: THREE.Camera, domElement) {
     super();
@@ -100,7 +101,16 @@ export default class Trackball extends THREE.EventDispatcher {
       event.preventDefault();
     }, false);
 
+    this.handleResize();
+
+    // force an update at start
+    this.update();
+  }
+
+  initEventListeners() {
     this.domElement.addEventListener('mousedown', this.mousedown, false);
+    document.addEventListener('mousemove', this.mousemove, false);
+    document.addEventListener('mouseup', this.mouseup, false);
 
     this.domElement.addEventListener('mousewheel', this.mousewheel, false);
     this.domElement.addEventListener('DOMMouseScroll', this.mousewheel, false); // firefox
@@ -111,11 +121,6 @@ export default class Trackball extends THREE.EventDispatcher {
 
     window.addEventListener('keydown', this.keydown, false);
     window.addEventListener('keyup', this.keyup, false);
-
-    this.handleResize();
-
-    // force an update at start
-    this.update();
   }
 
   // methods
@@ -402,6 +407,8 @@ export default class Trackball extends THREE.EventDispatcher {
   private mousedown = (event) => {
     if (this.enabled === false) { return; }
 
+    this.isDragging = true;
+
     event.preventDefault();
     event.stopPropagation();
 
@@ -423,14 +430,11 @@ export default class Trackball extends THREE.EventDispatcher {
       this.customEnd.copy(this.panStart);
     }
 
-    document.addEventListener('mousemove', this.mousemove, false);
-    document.addEventListener('mouseup', this.mouseup, false);
-
     this.dispatchEvent({ type: 'start' });
   }
 
   private mousemove = (event) => {
-    if (this.enabled === false) { return; }
+    if (this.enabled === false || !this.isDragging) { return; }
 
     event.preventDefault();
     event.stopPropagation();
@@ -448,7 +452,9 @@ export default class Trackball extends THREE.EventDispatcher {
   }
 
   private mouseup = (event) => {
-    if (this.enabled === false) { return; }
+    if (this.enabled === false || !this.isDragging) { return; }
+
+    this.isDragging = false;
 
     event.preventDefault();
     event.stopPropagation();
@@ -457,8 +463,6 @@ export default class Trackball extends THREE.EventDispatcher {
       this.state = STATE.NONE;
     }
 
-    document.removeEventListener('mousemove', this.mousemove);
-    document.removeEventListener('mouseup', this.mouseup);
     this.dispatchEvent({ type: 'end', state: previousState, newTarget: this.target, newPosition: this.camera.position, newUp: this.camera.up });
   }
 

@@ -16,6 +16,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private controls: Trackball;
     private stackHelper: AMI.StackHelper;
     private sliceManipulator: SliceManipulatorWidget;
+    private sliceHandleCheckbox: HTMLInputElement;
 
     // store slice position values in case AMI is not ready with loading data
     private storedSlicePosition: THREE.Vector3;
@@ -34,7 +35,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.elem.appendChild(this.renderer.domElement);
 
         // Setup controls
-        this.controls = new Trackball(this.camera, this.elem);
+        this.controls = new Trackball(this.camera, this.renderer.domElement);
 
         //Initial camera position
         this.controls.position0.set(0, 0, 5);
@@ -44,6 +45,27 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.addEventListeners();
         this.animate();
 
+        // div with buttons
+        let elem2 =  document.createElement('div');
+        elem2.classList.add('gui');
+        elem2.innerHTML = ` <div >
+                           <!--- <div class="noSelectText">
+                                Light direction
+                                <div>
+                                    <div class="circle" id="circle">
+                                        <div class='dot' id="dot"></div>
+                                    </div>
+                                </div>
+                            </div>-->
+                            <div>
+                                <input type="checkbox" checked id="sliceCheckbox">Show slice</input><br/>
+                                <input type="checkbox" id="sliceHandleCheckbox">Show slice handle</input>
+                            </div>
+                        </div>`;
+        this.elem.appendChild(elem2);
+        document.getElementById('sliceCheckbox').addEventListener('change',this.sliceToggled);
+        document.getElementById('sliceHandleCheckbox').addEventListener('change',this.sliceHandleToggled);
+        this.sliceHandleCheckbox = <HTMLInputElement>document.getElementById('sliceHandleCheckbox');
         // TWEEN.autoPlay(true);
     }
 
@@ -268,7 +290,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 //this.sliceManipulator.visible = false;
                 this.sliceManipulator.addEventListener('zoomChange',this.onSlicePlaneZoomChange);
                 this.sliceManipulator.addEventListener('orientationChange',this.onSlicePlaneOrientationChange);
+                this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
 
+                this.controls.initEventListeners();
             }.bind(this))
             .catch(function (error) {
                 window.console.log('oops... something went wrong...');
@@ -331,11 +355,14 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(width, height);
+        this.controls.handleResize();
     }
 
     setInteractive(interactive: boolean) {
         this.controls.enabled = interactive;
-        this.sliceManipulator.enabled = interactive;
+        if(this.sliceManipulator) {
+            this.sliceManipulator.enabled = interactive;
+        }
     }
 
     setControlZoom(newOrientation: IOrientation, within: number) {
@@ -401,5 +428,29 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.storedSlicePosition = new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]);
             this.storedSliceDirection = new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]);
         }
+    }
+
+    toggleSlice(state){
+        this.stackHelper._slice.visible = state;
+        this.stackHelper._border.visible = state;
+        this.sliceHandleCheckbox.disabled = !state;
+        if(state === false){
+            this.sliceManipulator.visible = state;
+        } else {
+            this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
+        }
+    }
+
+    toggleSliceHandle(state){
+        this.sliceManipulator.visible = state;
+    }
+
+    sliceToggled = (checkBox) => {
+        this.toggleSlice(checkBox.currentTarget.checked);
+        //this.onSliceToggled( checkBox.currentTarget.checked);
+    }
+    sliceHandleToggled  = (checkBox) => {
+        this.toggleSliceHandle(checkBox.currentTarget.checked);
+        //this.onSliceHandleToggled( checkBox.currentTarget.checked);
     }
 }
