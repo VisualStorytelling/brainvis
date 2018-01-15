@@ -335,6 +335,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     setInteractive(interactive: boolean) {
         this.controls.enabled = interactive;
+        this.sliceManipulator.enabled = interactive;
     }
 
     setControlZoom(newOrientation: IOrientation, within: number) {

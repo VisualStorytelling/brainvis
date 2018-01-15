@@ -100,7 +100,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     }
 
     onMouseMove(event) {
-        if (!this.visible) {
+        if (!this.visible || !this.enabled) {
             return;
         }
         if (!this.isDragging) {
@@ -200,7 +200,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     }
 
     onMouseDown(event) {
-        if (!this.visible) {
+        if (!this.visible || !this.enabled) {
             return;
         }
         if (this.previousSelection) {
@@ -216,7 +216,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     }
 
     onMouseUp(event) {
-        if (!this.visible) {
+        if (!this.visible || !this.enabled) {
             return;
         }
         if (this.previousSelection) {
