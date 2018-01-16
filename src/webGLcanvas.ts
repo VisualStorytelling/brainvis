@@ -5,6 +5,7 @@ import { IOrientation, ISlicePosition } from './types';
 
 import Trackball from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
+import STLLoader from './STLLoader';
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
     private width: number;
@@ -16,11 +17,18 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private controls: Trackball;
     private stackHelper: AMI.StackHelper;
     private sliceManipulator: SliceManipulatorWidget;
+    private sliceCheckbox: HTMLInputElement;
     private sliceHandleCheckbox: HTMLInputElement;
 
     // store slice position values in case AMI is not ready with loading data
     private storedSlicePosition: THREE.Vector3;
     private storedSliceDirection: THREE.Vector3;
+    // store stack visibility
+    private storedStackVisible: boolean;
+    private storedStackHandleVisible: boolean;
+
+    private directionalLight: THREE.DirectionalLight;
+    private lightRotation: THREE.Vector3 = new THREE.Vector3(0,0,0);
 
     constructor(elem, width, height) {
         super();
@@ -46,30 +54,68 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.animate();
 
         // div with buttons
-        let elem2 =  document.createElement('div');
+        const elem2 =  document.createElement('div');
         elem2.classList.add('gui');
         elem2.innerHTML = ` <div >
-                           <!--- <div class="noSelectText">
+                            <div class="noSelectText">
                                 Light direction
                                 <div>
                                     <div class="circle" id="circle">
                                         <div class='dot' id="dot"></div>
                                     </div>
                                 </div>
-                            </div>-->
+                            </div>
                             <div>
                                 <input type="checkbox" checked id="sliceCheckbox">Show slice</input><br/>
                                 <input type="checkbox" id="sliceHandleCheckbox">Show slice handle</input>
                             </div>
                         </div>`;
         this.elem.appendChild(elem2);
-        document.getElementById('sliceCheckbox').addEventListener('change',this.sliceToggled);
-        document.getElementById('sliceHandleCheckbox').addEventListener('change',this.sliceHandleToggled);
+        this.sliceCheckbox = <HTMLInputElement>document.getElementById('sliceCheckbox');
+        this.sliceCheckbox.addEventListener('change',this.sliceToggled);
         this.sliceHandleCheckbox = <HTMLInputElement>document.getElementById('sliceHandleCheckbox');
-        // TWEEN.autoPlay(true);
+        this.sliceHandleCheckbox.addEventListener('change',this.sliceHandleToggled);
+
+        const circleElement = document.getElementById('circle');
+        let isDragging;
+        circleElement.addEventListener('mousedown', function(e) {
+            return isDragging = true;
+        });
+        document.addEventListener('mouseup', function(e) {
+            return isDragging = false;
+        });
+        document.addEventListener('mousemove', function(e) {
+        let  centerX, centerY, circle, deltaX, deltY, posX, posY, dot;
+            if (isDragging) {
+                circle = document.getElementById('circle');
+                const boundRect = circle.getBoundingClientRect();
+                centerX = boundRect.x + boundRect.width/2;
+                centerY = boundRect.y + boundRect.height/2;
+                posX = e.pageX;
+                posY = e.pageY;
+                deltaX = centerX - posX;
+                deltY = centerY - posY;
+                const posFromCenter = new THREE.Vector3(deltaX,deltY,0);
+                posFromCenter.clampLength(0,boundRect.width/2);
+                dot = document.getElementById('dot');
+                const dotWidth = dot.getBoundingClientRect().width;
+                dot.style.transform = 'translate(' + (boundRect.width/2 - posFromCenter.x - dotWidth) + 'px,' + (boundRect.height/2 - posFromCenter.y - dotWidth/2)+'px)';
+                posFromCenter.divideScalar(50.0);
+                this.lightRotation = posFromCenter.clone();
+                this.lightRotation.setX(-this.lightRotation.x);
+                return true;
+            }
+        }.bind(this));
     }
 
     initScene() {
+
+        // Setup lights
+        this.scene.add(new THREE.AmbientLight(0x222222));
+
+        this.directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        this.directionalLight.position.set(1, 1, 1).normalize();
+        this.scene.add(this.directionalLight);
 
         // Setup loader
         const loader = new AMI.VolumeLoader(this.renderer.domElement);
@@ -292,12 +338,32 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 this.sliceManipulator.addEventListener('orientationChange',this.onSlicePlaneOrientationChange);
                 this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
 
+                if(this.storedStackVisible !== undefined) {
+                    this.toggleSlice(this.storedStackVisible);
+                }
+
+                if(this.storedStackHandleVisible !== undefined) {
+                    this.toggleSliceHandle(this.storedStackHandleVisible);
+                }
+
                 this.controls.initEventListeners();
             }.bind(this))
             .catch(function (error) {
                 window.console.log('oops... something went wrong...');
                 window.console.log(error);
             });
+
+            // Load STL model
+        const loaderSTL = new STLLoader();
+        loaderSTL.load('https://cdn.rawgit.com/FNNDSC/data/master/stl/adi_brain/WM.stl', function(geometry) {
+            const material = new THREE.MeshPhongMaterial({ color: 0xf44336, specular: 0x111111, shininess: 200 });
+            const mesh = new THREE.Mesh(geometry, material);
+            // to LPS space
+            const rasToLPS = new THREE.Matrix4();
+            rasToLPS.set(-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+            mesh.applyMatrix(rasToLPS);
+            this.scene.add(mesh);
+        }.bind(this));
     }
 
     addEventListeners() {
@@ -382,7 +448,19 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     animate = () => {
         requestAnimationFrame(this.animate);
 
-        // TWEEN.update();
+        // update light position
+        if(this.stackHelper) {
+            const lightDir = this.camera.position.clone();
+            lightDir.sub(this.stackHelper.stack.worldCenter());
+            lightDir.normalize();
+
+            const lightRotationTemp = this.lightRotation.clone();
+            lightRotationTemp.applyQuaternion(this.camera.quaternion);
+
+            this.directionalLight.position.set(lightDir.x,lightDir.y,lightDir.z);
+            this.directionalLight.position.add(new THREE.Vector3(lightRotationTemp.x,lightRotationTemp.y,lightRotationTemp.z));
+            this.directionalLight.position.normalize();
+        }
 
         this.controls.update();
 
@@ -420,6 +498,22 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         });
     }
 
+    onSliceVisibilityChange = (event) => {
+
+        this.dispatchEvent({
+            type: 'sliceVisibilityChanged',
+            change: event
+        });
+    }
+
+    onSliceHandleVisibilityChange = (event) => {
+
+        this.dispatchEvent({
+            type: 'sliceHandleVisibilityChanged',
+            change: event
+        });
+    }
+
     setSlicePlanePosition(positions: ISlicePosition, within: number) {
         if(this.stackHelper) {
             this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]),
@@ -431,26 +525,36 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     }
 
     toggleSlice(state){
-        this.stackHelper._slice.visible = state;
-        this.stackHelper._border.visible = state;
-        this.sliceHandleCheckbox.disabled = !state;
-        if(state === false){
-            this.sliceManipulator.visible = state;
+        if(this.stackHelper){
+            this.stackHelper._slice.visible = state;
+            this.stackHelper._border.visible = state;
+            this.sliceHandleCheckbox.disabled = !state;
+            this.sliceCheckbox.checked = state;
+            if(state === false){
+                this.sliceManipulator.visible = state;
+            } else {
+                this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
+            }
         } else {
-            this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
+            this.storedStackVisible = state;
         }
     }
 
     toggleSliceHandle(state){
-        this.sliceManipulator.visible = state;
+        if(this.sliceManipulator){
+            this.sliceManipulator.visible = state;
+            this.sliceHandleCheckbox.checked = state;
+        } else {
+            this.storedStackHandleVisible = state;
+        }
     }
 
     sliceToggled = (checkBox) => {
         this.toggleSlice(checkBox.currentTarget.checked);
-        //this.onSliceToggled( checkBox.currentTarget.checked);
+        this.onSliceVisibilityChange( checkBox.currentTarget.checked);
     }
     sliceHandleToggled  = (checkBox) => {
         this.toggleSliceHandle(checkBox.currentTarget.checked);
-        //this.onSliceHandleToggled( checkBox.currentTarget.checked);
+        this.onSliceHandleVisibilityChange( checkBox.currentTarget.checked);
     }
 }

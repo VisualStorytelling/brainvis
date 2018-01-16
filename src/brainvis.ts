@@ -26,6 +26,8 @@ class Brainvis extends views.AView {
         this.canvas.addEventListener('cameraEnd', this.cameraEnd);
         this.canvas.addEventListener('sliceZoomChanged',this.sliceZoomChanged);
         this.canvas.addEventListener('sliceOrientationChanged',this.sliceOrientationChanged);
+        this.canvas.addEventListener('sliceVisibilityChanged',this.sliceVisibilityChanged);
+        this.canvas.addEventListener('sliceHandleVisibilityChanged',this.sliceHandleVisibilityChanged);
     }
 
     getBounds() {
@@ -90,6 +92,31 @@ class Brainvis extends views.AView {
 
     setSliceOrientationImpl(orientation: ISlicePosition, within:number) {
         return this.canvas.setSlicePlanePosition(orientation, within);
+    }
+
+    //Slice visibility
+    sliceVisibilityChanged = (event) => {
+        this.setSliceVisibility(!event.change,event.change);
+    }
+
+    setSliceVisibility(oldVisibility: boolean, newVisibility: boolean) {
+        return this.graph.push(BrainvisCommands.setSliceVisibility(this.ref, { old: oldVisibility, new: newVisibility }));
+    }
+
+    setSliceVisibilityImpl(newVisibility: boolean, within:number) {
+        return this.canvas.toggleSlice(newVisibility);
+    }
+
+    // slice handle visibility
+    sliceHandleVisibilityChanged = (event) => {
+        this.setSliceHandleVisibility(!event.change,event.change);
+    }
+    setSliceHandleVisibility(oldVisibility: boolean, newVisibility: boolean) {
+        return this.graph.push(BrainvisCommands.setSliceHandleVisibility(this.ref, { old: oldVisibility, new: newVisibility }));
+    }
+
+    setSliceHandleVisibilityImpl(newVisibility: boolean, within:number) {
+        return this.canvas.toggleSliceHandle(newVisibility);
     }
 
     //Control zoom

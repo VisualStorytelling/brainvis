@@ -108,6 +108,59 @@ export function setSliceOrientationImpl(inputs, parameter, graph, within) {
     };
 };
 
+// slice visibility
+export function setSliceVisibility(ref: prov.IObjectRef<any>, visibility) {
+    return prov.action(
+        prov.meta(
+            'SliceVisibilityChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setSliceVisibility',setSliceVisibilityImpl, [ref], visibility
+    );
+}
+
+export function setSliceVisibilityImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const visibility = parameter;
+    brainvis.setSliceVisibilityImpl(visibility.new, within);
+    const inverseVisibilities = {
+        old: visibility.new,
+        new: visibility.old
+    };
+
+    return {
+        inverse: setSliceVisibility(inputs[0], inverseVisibilities),
+        consumed: within
+    };
+}
+
+// slice handle visibility
+export function setSliceHandleVisibility(ref: prov.IObjectRef<any>, visibility) {
+    return prov.action(
+        prov.meta(
+            'SliceHandleVisibilityChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setSliceHandleVisibility',setSliceHandleVisibilityImpl, [ref], visibility
+    );
+}
+
+export function setSliceHandleVisibilityImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const visibility = parameter;
+    brainvis.setSliceHandleVisibilityImpl(visibility.new, within);
+    const inverseVisibilities = {
+        old: visibility.new,
+        new: visibility.old
+    };
+
+    return {
+        inverse: setSliceHandleVisibility(inputs[0], inverseVisibilities),
+        consumed: within
+    };
+}
 
 //commands
 export function createCmd(id) {
@@ -120,6 +173,10 @@ export function createCmd(id) {
             return setSliceZoomImpl;
         case 'setSliceOrientation':
             return setSliceOrientationImpl;
+        case 'setSliceVisibility':
+            return setSliceVisibilityImpl;
+        case 'setSliceHandleVisibility':
+            return setSliceHandleVisibilityImpl;
     }
     return null;
 };
