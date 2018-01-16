@@ -32,6 +32,9 @@
 
 import * as THREE from 'three';
 
+// We actually use bitwise operators to pack/unpack data
+// tslint:disable:no-bitwise
+
 export default class STLLoader {
     private manager: THREE.LoadingManager;
     constructor(manager?) {
@@ -65,8 +68,8 @@ export default class STLLoader {
 
 	parseBinary( data ) {
 
-		let reader = new DataView( data );
-		let faces = reader.getUint32( 80, true );
+		const reader = new DataView( data );
+		const faces = reader.getUint32( 80, true );
 
 		let r, g, b, hasColors = false, colors;
 		let defaultR, defaultG, defaultB, alpha;
@@ -76,9 +79,9 @@ export default class STLLoader {
 
 		for ( let index = 0; index < 80 - 10; index ++ ) {
 
-			if ( ( reader.getUint32( index, false ) == 0x434F4C4F /*COLO*/ ) &&
-				( reader.getUint8( index + 4 ) == 0x52 /*'R'*/ ) &&
-				( reader.getUint8( index + 5 ) == 0x3D /*'='*/ ) ) {
+			if ( ( reader.getUint32( index, false ) === 0x434F4C4F /*COLO*/ ) &&
+				( reader.getUint8( index + 4 ) === 0x52 /*'R'*/ ) &&
+				( reader.getUint8( index + 5 ) === 0x3D /*'='*/ ) ) {
 
 				hasColors = true;
 				colors = [];
@@ -168,11 +171,11 @@ export default class STLLoader {
 
 		function isBinary( data ) {
 
-			let expect, face_size, n_faces, reader;
+			let expect, faceSize, nFaces, reader;
 			reader = new DataView( data );
-			face_size = ( 32 / 8 * 3 ) + ( ( 32 / 8 * 3 ) * 3 ) + ( 16 / 8 );
-			n_faces = reader.getUint32( 80, true );
-			expect = 80 + ( 32 / 8 ) + ( n_faces * face_size );
+			faceSize = ( 32 / 8 * 3 ) + ( ( 32 / 8 * 3 ) * 3 ) + ( 16 / 8 );
+			nFaces = reader.getUint32( 80, true );
+			expect = 80 + ( 32 / 8 ) + ( nFaces * faceSize );
 
 			if ( expect === reader.byteLength ) {
 
@@ -186,14 +189,16 @@ export default class STLLoader {
 
 			// US-ASCII ordinal values for 's', 'o', 'l', 'i', 'd'
 
-			let solid = [ 115, 111, 108, 105, 100 ];
+			const solid = [ 115, 111, 108, 105, 100 ];
 
 			for ( let i = 0; i < 5; i ++ ) {
 
 				// If solid[ i ] does not match the i-th byte, then it is not an
 				// ASCII STL; hence, it is binary and return true.
 
-				if ( solid[ i ] != reader.getUint8( i, false ) ) return true;
+				if ( solid[ i ] !== reader.getUint8( i, false ) ) {
+					 return true;
+				}
 
  			}
 
@@ -275,13 +280,15 @@ export default class STLLoader {
 
 			if ( typeof buffer !== 'string' ) {
 
-				const array_buffer = new Uint8Array( buffer );
+				const arrayBuffer = new Uint8Array( buffer );
 
 				let str = '';
 
-				for ( let i = 0, il = buffer.byteLength; i < il; i ++ ) {
+				const  il = buffer.byteLength;
 
-					str += String.fromCharCode( array_buffer[ i ] ); // implicitly assumes little-endian
+				for ( let i = 0; i < il; i ++ ) {
+
+					str += String.fromCharCode( arrayBuffer[ i ] ); // implicitly assumes little-endian
 
 				}
 
@@ -299,13 +306,13 @@ export default class STLLoader {
 
 			if ( typeof buffer === 'string' ) {
 
-				const array_buffer = new Uint8Array( buffer.length );
+				const arrayBuffer = new Uint8Array( buffer.length );
 				for ( let i = 0; i < buffer.length; i ++ ) {
 
-					array_buffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
+					arrayBuffer[ i ] = buffer.charCodeAt( i ) & 0xff; // implicitly assumes little-endian
 
 				}
-				return array_buffer.buffer || array_buffer;
+				return arrayBuffer.buffer || arrayBuffer;
 
 			} else {
 

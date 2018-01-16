@@ -524,13 +524,13 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         }
     }
 
-    toggleSlice(state){
-        if(this.stackHelper){
+    toggleSlice(state) {
+        if(this.stackHelper) {
             this.stackHelper._slice.visible = state;
             this.stackHelper._border.visible = state;
             this.sliceHandleCheckbox.disabled = !state;
             this.sliceCheckbox.checked = state;
-            if(state === false){
+            if(state === false) {
                 this.sliceManipulator.visible = state;
             } else {
                 this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
@@ -540,8 +540,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         }
     }
 
-    toggleSliceHandle(state){
-        if(this.sliceManipulator){
+    toggleSliceHandle(state) {
+        if(this.sliceManipulator) {
             this.sliceManipulator.visible = state;
             this.sliceHandleCheckbox.checked = state;
         } else {
