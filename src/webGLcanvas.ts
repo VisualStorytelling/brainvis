@@ -12,6 +12,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private height: number;
     private elem: Element;
     private scene = new THREE.Scene();
+    private objects = new THREE.Object3D(); // all the loaded objects go in here
     private camera: THREE.PerspectiveCamera;
     private renderer = new THREE.WebGLRenderer();
     private controls: Trackball;
@@ -30,6 +31,14 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private directionalLight: THREE.DirectionalLight;
     private lightRotation: THREE.Vector3 = new THREE.Vector3(0,0,0);
 
+    // for the 2D slice
+    private alignButton: HTMLInputElement;
+    // stored gui state to recoveren when swithing back from 2D view
+    private cachedCameraOrigin: THREE.Vector3;
+    private cachedCameraTarget: THREE.Vector3;
+    private cachedCameraUp: THREE.Vector3;
+    private cachedSliceHandleVisibility: boolean;
+
     constructor(elem, width, height) {
         super();
         this.width = width;
@@ -44,6 +53,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
         // Setup controls
         this.controls = new Trackball(this.camera, this.renderer.domElement);
+
+        this.scene.add(this.objects);
 
         //Initial camera position
         this.controls.position0.set(0, 0, 5);
@@ -68,6 +79,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                             <div>
                                 <input type="checkbox" checked id="sliceCheckbox">Show slice</input><br/>
                                 <input type="checkbox" id="sliceHandleCheckbox">Show slice handle</input>
+                                <input type="button" id="alignButton" value="Alight to slice" class="btn" style="color: black">
                             </div>
                         </div>`;
         this.elem.appendChild(elem2);
@@ -75,6 +87,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.sliceCheckbox.addEventListener('change',this.sliceToggled);
         this.sliceHandleCheckbox = <HTMLInputElement>document.getElementById('sliceHandleCheckbox');
         this.sliceHandleCheckbox.addEventListener('change',this.sliceHandleToggled);
+
+        this.alignButton = <HTMLInputElement>document.getElementById('alignButton');
+        this.alignButton.addEventListener('click',this.moveCameraTo2DSlice);
 
         const circleElement = document.getElementById('circle');
         let isDragging;
@@ -362,7 +377,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             const rasToLPS = new THREE.Matrix4();
             rasToLPS.set(-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
             mesh.applyMatrix(rasToLPS);
-            this.scene.add(mesh);
+            this.objects.add(mesh);
         }.bind(this));
     }
 
@@ -429,6 +444,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         if(this.sliceManipulator) {
             this.sliceManipulator.enabled = interactive;
         }
+        this.sliceCheckbox.disabled = !interactive;
+        this.sliceHandleCheckbox.disabled = !interactive || !this.sliceCheckbox.checked;
+        this.alignButton.disabled = !interactive || !this.sliceCheckbox.checked;
     }
 
     setControlZoom(newOrientation: IOrientation, within: number) {
@@ -529,6 +547,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.stackHelper._slice.visible = state;
             this.stackHelper._border.visible = state;
             this.sliceHandleCheckbox.disabled = !state;
+            this.alignButton.disabled = !state;
             this.sliceCheckbox.checked = state;
             if(state === false) {
                 this.sliceManipulator.visible = state;
@@ -556,5 +575,36 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     sliceHandleToggled  = (checkBox) => {
         this.toggleSliceHandle(checkBox.currentTarget.checked);
         this.onSliceHandleVisibilityChange( checkBox.currentTarget.checked);
+    }
+
+    // slice alignment
+    moveCameraTo2DSlice = () => {
+        if(this.stackHelper) {
+            this.cachedCameraOrigin = this.controls.camera.position.clone();
+            this.cachedCameraTarget = this.controls.target.clone();
+            this.cachedCameraUp = this.controls.camera.up.clone();
+            this.cachedSliceHandleVisibility = this.sliceManipulator.visible;
+            this.sliceManipulator.visible = false;
+            const cameraPosition : THREE.Vector3 = this.stackHelper.slice.planePosition.clone();
+            cameraPosition.addScaledVector(this.stackHelper.slice.planeDirection,150.0);
+            this.controls.changeCamera(cameraPosition,this.stackHelper.slice.planePosition.clone(),new THREE.Vector3(1,0,0),500);
+            this.alignButton.removeEventListener('click',this.moveCameraTo2DSlice);
+            this.alignButton.addEventListener('click',this.moveCameraFrom2DSlice);
+            this.alignButton.value = 'Back to 3D';
+            this.sliceCheckbox.disabled = true;
+            this.sliceHandleCheckbox.disabled = true;
+        }
+    }
+
+    moveCameraFrom2DSlice = () => {
+        if(this.stackHelper) {
+            this.controls.changeCamera(this.cachedCameraOrigin,this.cachedCameraTarget,this.cachedCameraUp,500);
+            this.alignButton.removeEventListener('click',this.moveCameraFrom2DSlice);
+            this.alignButton.addEventListener('click',this.moveCameraTo2DSlice);
+            this.alignButton.value = 'Alight to slice';
+            this.sliceCheckbox.disabled = false;
+            this.sliceHandleCheckbox.disabled = false;
+            this.sliceManipulator.visible = this.cachedSliceHandleVisibility;
+        }
     }
 }
