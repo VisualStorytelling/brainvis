@@ -298,7 +298,7 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   };
 
-  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, milliseconds: number) {
+  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, milliseconds: number, done?: () => void) {
     if (this.target.equals(newTarget) && this.camera.position.equals(newPosition) && this.camera.up.equals(newUp)) {
       return;
     }
@@ -354,6 +354,9 @@ export default class Trackball extends THREE.EventDispatcher {
           clearInterval(this.changeTimeout);
           this.changeTimeout = undefined;
           this.enabled = true;
+          if(done) {
+            done();
+          }
         }
       }, 30, this.target.clone(), this.camera.position.clone(), this.camera.up.clone(), newTarget, newPosition, newUp);
     }

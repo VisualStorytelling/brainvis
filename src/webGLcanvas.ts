@@ -587,7 +587,14 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.sliceManipulator.visible = false;
             const cameraPosition : THREE.Vector3 = this.stackHelper.slice.planePosition.clone();
             cameraPosition.addScaledVector(this.stackHelper.slice.planeDirection,150.0);
-            this.controls.changeCamera(cameraPosition,this.stackHelper.slice.planePosition.clone(),new THREE.Vector3(1,0,0),500);
+            // choose a up vector that does not point in the same way as the target plane
+            const upVector = new THREE.Vector3(0,0,1);
+            if(Math.abs(this.stackHelper.slice.planeDirection.x) < 0.001 &&  Math.abs(this.stackHelper.slice.planeDirection.y) < 0.001){
+                upVector.set(0,1,0);
+            }
+            this.controls.changeCamera(cameraPosition,this.stackHelper.slice.planePosition.clone(),upVector,500, () => {
+                this.controls.enabled = false;
+            });
             this.alignButton.removeEventListener('click',this.moveCameraTo2DSlice);
             this.alignButton.addEventListener('click',this.moveCameraFrom2DSlice);
             this.alignButton.value = 'Back to 3D';
@@ -598,6 +605,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     moveCameraFrom2DSlice = () => {
         if(this.stackHelper) {
+            this.controls.enabled = true;
             this.controls.changeCamera(this.cachedCameraOrigin,this.cachedCameraTarget,this.cachedCameraUp,500);
             this.alignButton.removeEventListener('click',this.moveCameraFrom2DSlice);
             this.alignButton.addEventListener('click',this.moveCameraTo2DSlice);
