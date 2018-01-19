@@ -15,11 +15,11 @@ class Brainvis extends views.AView {
     private orientationStart: IOrientation;
     private ref: prov.IObjectRef<Brainvis>;
 
-    constructor(private elem: Element, private graph: prov.ProvenanceGraph) {
+    constructor(private elem: Element, private graph: prov.ProvenanceGraph, loadCompeletedCallback? : () => void) {
         super();
         this.ref = this.graph.findOrAddObject(this, 'Brainvis', 'visual');
 
-        this.canvas = new BrainvisCanvas(elem, this.dim[0], this.dim[1]);
+        this.canvas = new BrainvisCanvas(elem, this.dim[0], this.dim[1], loadCompeletedCallback);
         this.canvas.addEventListener('zoomStart', this.zoomStart);
         this.canvas.addEventListener('zoomEnd', this.zoomEnd);
         this.canvas.addEventListener('cameraStart', this.cameraStart);
@@ -28,6 +28,7 @@ class Brainvis extends views.AView {
         this.canvas.addEventListener('sliceOrientationChanged',this.sliceOrientationChanged);
         this.canvas.addEventListener('sliceVisibilityChanged',this.sliceVisibilityChanged);
         this.canvas.addEventListener('sliceHandleVisibilityChanged',this.sliceHandleVisibilityChanged);
+        this.canvas.addEventListener('sliceModeChanged',this.sliceModeChanged);
     }
 
     getBounds() {
@@ -138,8 +139,24 @@ class Brainvis extends views.AView {
     setControlOrientationImpl(orientation: IOrientation, within:number) {
         return this.canvas.setControlOrientation(orientation, within);
     }
+
+    // Slice mode (2D/3D)
+    sliceModeChanged = (event) => {
+        this.setSliceMode(!event.mode2D,event.mode2D);
+    }
+    setSliceMode(oldUse2DSlice: boolean, newUse2DSlice: boolean) {
+        return this.graph.push(BrainvisCommands.setSliceMode(this.ref, { old: oldUse2DSlice, new: newUse2DSlice }));
+    }
+
+    setSliceModeImpl(newUse2DSlice: boolean, within:number) {
+        if(newUse2DSlice) {
+            return this.canvas.moveCameraTo2DSlice();
+        } else {
+            return this.canvas.moveCameraFrom2DSlice();
+        }
+    }
 }
 
-export function create(parent: Element, provGraph: prov.ProvenanceGraph) {
-    return new Brainvis(parent, provGraph);
+export function create(parent: Element, provGraph: prov.ProvenanceGraph, loadCompeletedCallback? : () => void) {
+    return new Brainvis(parent, provGraph, loadCompeletedCallback);
 }

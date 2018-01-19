@@ -21,13 +21,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private sliceCheckbox: HTMLInputElement;
     private sliceHandleCheckbox: HTMLInputElement;
 
-    // store slice position values in case AMI is not ready with loading data
-    private storedSlicePosition: THREE.Vector3;
-    private storedSliceDirection: THREE.Vector3;
-    // store stack visibility
-    private storedStackVisible: boolean;
-    private storedStackHandleVisible: boolean;
-
     private directionalLight: THREE.DirectionalLight;
     private lightRotation: THREE.Vector3 = new THREE.Vector3(0,0,0);
 
@@ -39,8 +32,12 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private cachedCameraUp: THREE.Vector3;
     private cachedSliceHandleVisibility: boolean;
 
-    constructor(elem, width, height) {
+    // callback to call when loading is completed
+    private loadCompeletedCallback : () => void;
+
+    constructor(elem, width, height, loadCompeletedCallback? : () => void) {
         super();
+        this.loadCompeletedCallback = loadCompeletedCallback;
         this.width = width;
         this.height = height;
         this.elem = elem;
@@ -333,15 +330,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 // setup slice
                 const centerLPS = this.stackHelper.stack.worldCenter();
                 this.stackHelper.slice.aabbSpace = 'LPS';
-                if(this.storedSlicePosition) {
-                    this.stackHelper.slice.planePosition.copy(this.storedSlicePosition);
-                    this.stackHelper.slice.planeDirection.copy(this.storedSliceDirection);
-                } else {
-                    this.stackHelper.slice.planePosition.x = centerLPS.x;
-                    this.stackHelper.slice.planePosition.y = centerLPS.y;
-                    this.stackHelper.slice.planePosition.z = centerLPS.z;
-                    this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
-                }
+                this.stackHelper.slice.planePosition.x = centerLPS.x;
+                this.stackHelper.slice.planePosition.y = centerLPS.y;
+                this.stackHelper.slice.planePosition.z = centerLPS.z;
+                this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
                 this.stackHelper.slice._update();
                 this.stackHelper.border.helpersSlice = this.stackHelper.slice;
 
@@ -353,15 +345,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 this.sliceManipulator.addEventListener('orientationChange',this.onSlicePlaneOrientationChange);
                 this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
 
-                if(this.storedStackVisible !== undefined) {
-                    this.toggleSlice(this.storedStackVisible);
-                }
-
-                if(this.storedStackHandleVisible !== undefined) {
-                    this.toggleSliceHandle(this.storedStackHandleVisible);
-                }
-
                 this.controls.initEventListeners();
+                this.loadCompeletedCallback();
             }.bind(this))
             .catch(function (error) {
                 window.console.log('oops... something went wrong...');
@@ -536,9 +521,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         if(this.stackHelper) {
             this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]),
             new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]), within>0?within:1000);
-        } else {
-            this.storedSlicePosition = new THREE.Vector3(positions.position[0],positions.position[1],positions.position[2]);
-            this.storedSliceDirection = new THREE.Vector3(positions.direction[0],positions.direction[1],positions.direction[2]);
         }
     }
 
@@ -554,8 +536,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             } else {
                 this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
             }
-        } else {
-            this.storedStackVisible = state;
         }
     }
 
@@ -563,8 +543,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         if(this.sliceManipulator) {
             this.sliceManipulator.visible = state;
             this.sliceHandleCheckbox.checked = state;
-        } else {
-            this.storedStackHandleVisible = state;
         }
     }
 
@@ -578,8 +556,19 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     }
 
     // slice alignment
-    moveCameraTo2DSlice = () => {
+    moveCameraTo2DSlice = (event?) => {
         if(this.stackHelper) {
+            // if this comes from the button we dispach an event to the provenance graph
+            // the graph will then call this function again
+            if(event) {
+                this.dispatchEvent({
+                    type: 'sliceModeChanged',
+                    mode2D: true
+                });
+                return;
+            }
+            this.controls.finishCurrentTransition();
+            this.sliceManipulator.finishCurrentTransition();
             this.cachedCameraOrigin = this.controls.camera.position.clone();
             this.cachedCameraTarget = this.controls.target.clone();
             this.cachedCameraUp = this.controls.camera.up.clone();
@@ -589,24 +578,37 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             cameraPosition.addScaledVector(this.stackHelper.slice.planeDirection,150.0);
             // choose a up vector that does not point in the same way as the target plane
             const upVector = new THREE.Vector3(0,0,1);
-            if(Math.abs(this.stackHelper.slice.planeDirection.x) < 0.001 &&  Math.abs(this.stackHelper.slice.planeDirection.y) < 0.001){
+            if(Math.abs(this.stackHelper.slice.planeDirection.x) < 0.001 &&  Math.abs(this.stackHelper.slice.planeDirection.y) < 0.001) {
                 upVector.set(0,1,0);
             }
-            this.controls.changeCamera(cameraPosition,this.stackHelper.slice.planePosition.clone(),upVector,500, () => {
-                this.controls.enabled = false;
-            });
+            this.controls.changeCamera(cameraPosition,this.stackHelper.slice.planePosition.clone(),upVector,0);
             this.alignButton.removeEventListener('click',this.moveCameraTo2DSlice);
             this.alignButton.addEventListener('click',this.moveCameraFrom2DSlice);
             this.alignButton.value = 'Back to 3D';
             this.sliceCheckbox.disabled = true;
             this.sliceHandleCheckbox.disabled = true;
+            this.controls.enabled = false;
+        } else {
+            this.cachedCameraOrigin = this.controls.camera.position.clone();
+            this.cachedCameraTarget = this.controls.target.clone();
+            this.cachedCameraUp = this.controls.camera.up.clone();
+            this.cachedSliceHandleVisibility = this.sliceManipulator.visible;
         }
     }
 
-    moveCameraFrom2DSlice = () => {
+    moveCameraFrom2DSlice = (event?) => {
         if(this.stackHelper) {
+            // if this comes from the button we dispach an event to the provenance graph
+            // the graph will then call this function again
+            if(event) {
+                this.dispatchEvent({
+                    type: 'sliceModeChanged',
+                    mode2D: false
+                });
+                return;
+            }
             this.controls.enabled = true;
-            this.controls.changeCamera(this.cachedCameraOrigin,this.cachedCameraTarget,this.cachedCameraUp,500);
+            this.controls.changeCamera(this.cachedCameraOrigin,this.cachedCameraTarget,this.cachedCameraUp,0);
             this.alignButton.removeEventListener('click',this.moveCameraFrom2DSlice);
             this.alignButton.addEventListener('click',this.moveCameraTo2DSlice);
             this.alignButton.value = 'Alight to slice';

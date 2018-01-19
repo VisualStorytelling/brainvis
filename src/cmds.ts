@@ -162,6 +162,33 @@ export function setSliceHandleVisibilityImpl(inputs, parameter, graph, within) {
     };
 }
 
+// 2D slice switching
+export function setSliceMode(ref: prov.IObjectRef<any>, mode) {
+    return prov.action(
+        prov.meta(
+            'SliceModeChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setSliceMode',setSliceModeImpl, [ref], mode
+    );
+}
+
+export function setSliceModeImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const mode = parameter;
+    brainvis.setSliceModeImpl(mode.new, within);
+    const inverseModes = {
+        old: mode.new,
+        new: mode.old
+    };
+
+    return {
+        inverse: setSliceMode(inputs[0], inverseModes),
+        consumed: within
+    };
+}
+
 //commands
 export function createCmd(id) {
     switch (id) {
@@ -177,6 +204,8 @@ export function createCmd(id) {
             return setSliceVisibilityImpl;
         case 'setSliceHandleVisibility':
             return setSliceHandleVisibilityImpl;
+        case 'setSliceMode':
+            return setSliceModeImpl;
     }
     return null;
 };

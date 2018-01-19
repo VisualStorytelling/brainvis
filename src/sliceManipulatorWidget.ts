@@ -29,6 +29,10 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
     private changeTimeout = undefined;
     public enabled: boolean = true;
 
+    // values we are transitioning too
+    private toPosition: THREE.Vector3;
+    private toDirection: THREE.Vector3;
+
     constructor(stackHelper, domElement, camera) {
         super();
 
@@ -283,6 +287,14 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         }
     }
 
+    finishCurrentTransition() {
+        if (this.changeTimeout !== undefined) {
+            clearInterval(this.changeTimeout);
+            this.changeTimeout = undefined;
+            this.changeSlicePosition(this.toPosition, this.toDirection, 0);
+          }
+    }
+
     /**
      * Changes the slice to a new position
      * @param newPosition new position of the slice
@@ -307,6 +319,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             }
             let changeTime = 0;
             const delta = 30 / milliseconds;
+            this.toPosition = newPosition;
+            this.toDirection = newDirection;
             this.changeTimeout = setInterval((fromPosition, fromDirection, toPosition, toDirection) => {
                 this.enabled = false;
                 const t = changeTime;

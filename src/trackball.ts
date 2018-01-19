@@ -85,6 +85,11 @@ export default class Trackball extends THREE.EventDispatcher {
   private changeTime = 0.0;
   private isDragging: boolean = false;
 
+  // the valaues we are transition too when aminating to a certain state
+  private toTarget : THREE.Vector3;
+  private toPosition : THREE.Vector3;
+  private toUp : THREE.Vector3;
+
   constructor(object: THREE.Camera, domElement) {
     super();
 
@@ -298,6 +303,14 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   };
 
+  finishCurrentTransition() {
+    if (this.changeTimeout !== undefined) {
+      clearInterval(this.changeTimeout);
+      this.changeTimeout = undefined;
+      this.changeCamera(this.toPosition, this.toTarget, this.toUp, 0);
+    }
+  }
+
   changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, milliseconds: number, done?: () => void) {
     if (this.target.equals(newTarget) && this.camera.position.equals(newPosition) && this.camera.up.equals(newUp)) {
       return;
@@ -323,6 +336,9 @@ export default class Trackball extends THREE.EventDispatcher {
         clearInterval(this.changeTimeout);
         this.changeTimeout = undefined;
       }
+      this.toTarget = newTarget;
+      this.toPosition = newPosition;
+      this.toUp = newUp;
       let changeTime = 0;
       const delta = 30/milliseconds;
       this.changeTimeout = setInterval((fromTarget, fromPosition, fromUp, toTarget, toPosition, toUp) => {
