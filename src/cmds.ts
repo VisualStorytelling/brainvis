@@ -189,6 +189,33 @@ export function setSliceModeImpl(inputs, parameter, graph, within) {
     };
 }
 
+// objects visibility
+export function setObjectsVisibility(ref: prov.IObjectRef<any>, visibility) {
+    return prov.action(
+        prov.meta(
+            'ObjectsVisibilityChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setObjectsVisibility',setObjectsVisibilityImpl, [ref], visibility
+    );
+}
+
+export function setObjectsVisibilityImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const visibility = parameter;
+    brainvis.setObjectsVisibilityImpl(visibility.new, within);
+    const inverseVisibilities = {
+        old: visibility.new,
+        new: visibility.old
+    };
+
+    return {
+        inverse: setObjectsVisibility(inputs[0], inverseVisibilities),
+        consumed: within
+    };
+}
+
 //commands
 export function createCmd(id) {
     switch (id) {
@@ -206,6 +233,8 @@ export function createCmd(id) {
             return setSliceHandleVisibilityImpl;
         case 'setSliceMode':
             return setSliceModeImpl;
+        case 'setObjectsVisibility':
+            return setObjectsVisibilityImpl;
     }
     return null;
 };

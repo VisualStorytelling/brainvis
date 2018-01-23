@@ -29,6 +29,7 @@ class Brainvis extends views.AView {
         this.canvas.addEventListener('sliceVisibilityChanged',this.sliceVisibilityChanged);
         this.canvas.addEventListener('sliceHandleVisibilityChanged',this.sliceHandleVisibilityChanged);
         this.canvas.addEventListener('sliceModeChanged',this.sliceModeChanged);
+        this.canvas.addEventListener('objectsVisibilityChanged',this.objectsVisibilityChanged);
     }
 
     getBounds() {
@@ -154,6 +155,18 @@ class Brainvis extends views.AView {
         } else {
             return this.canvas.moveCameraFrom2DSlice();
         }
+    }
+
+    // Object visibility
+    objectsVisibilityChanged = (event) => {
+        this.setObjectsVisibility(!event.change,event.change);
+    }
+    setObjectsVisibility(oldVisibility: boolean, newVisibility: boolean) {
+        return this.graph.push(BrainvisCommands.setObjectsVisibility(this.ref, { old: oldVisibility, new: newVisibility }));
+    }
+
+    setObjectsVisibilityImpl(newVisibility: boolean, within:number) {
+        return this.canvas.toggleObjects(newVisibility);
     }
 }
 

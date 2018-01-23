@@ -595,6 +595,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.alignButton.value = 'Back to 3D';
             this.sliceCheckbox.disabled = true;
             this.sliceHandleCheckbox.disabled = true;
+            this.showObjectCheckbox.disabled = true;
             this.controls.enabled = false;
         }
     }
@@ -617,6 +618,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.alignButton.value = 'Alight to slice';
             this.sliceCheckbox.disabled = false;
             this.sliceHandleCheckbox.disabled = false;
+            this.showObjectCheckbox.disabled = false;
             this.sliceManipulator.visible = this.cachedSliceHandleVisibility;
             this.objects.visible = this.cachedObjectsShown;
         }
@@ -624,10 +626,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     onShowObjectsChange = (visible) => {
 
-        /*this.dispatchEvent({
-            type: 'sliceHandleVisibilityChanged',
-            change: event
-        });*/
+        this.dispatchEvent({
+            type: 'objectsVisibilityChanged',
+            change: visible
+        });
     }
 
     showObjectsToggled  = (checkBox) => {
@@ -637,6 +639,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     toggleObjects(visible) {
         this.objects.visible = visible;
+        this.showObjectCheckbox.checked = visible;
     }
 
 }
