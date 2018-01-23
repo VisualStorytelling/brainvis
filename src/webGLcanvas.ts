@@ -20,6 +20,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private sliceManipulator: SliceManipulatorWidget;
     private sliceCheckbox: HTMLInputElement;
     private sliceHandleCheckbox: HTMLInputElement;
+    private showObjectCheckbox: HTMLInputElement;
 
     private directionalLight: THREE.DirectionalLight;
     private lightRotation: THREE.Vector3 = new THREE.Vector3(0,0,0);
@@ -31,6 +32,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     private cachedCameraTarget: THREE.Vector3;
     private cachedCameraUp: THREE.Vector3;
     private cachedSliceHandleVisibility: boolean;
+    private cachedObjectsShown: boolean;
 
     // callback to call when loading is completed
     private loadCompeletedCallback : () => void;
@@ -75,8 +77,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                             </div>
                             <div>
                                 <input type="checkbox" checked id="sliceCheckbox">Show slice</input><br/>
-                                <input type="checkbox" id="sliceHandleCheckbox">Show slice handle</input>
-                                <input type="button" id="alignButton" value="Alight to slice" class="btn" style="color: black">
+                                <input type="checkbox" id="sliceHandleCheckbox">Show slice handle</input><br/>
+                                <input type="button" id="alignButton" value="Alight to slice" class="btn" style="color: black"><br/>
+                                </br>
+                                <input type="checkbox" checked id="showObjectCheckbox">Show segmented objects</input><br/>
                             </div>
                         </div>`;
         this.elem.appendChild(elem2);
@@ -84,6 +88,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.sliceCheckbox.addEventListener('change',this.sliceToggled);
         this.sliceHandleCheckbox = <HTMLInputElement>document.getElementById('sliceHandleCheckbox');
         this.sliceHandleCheckbox.addEventListener('change',this.sliceHandleToggled);
+        this.showObjectCheckbox = <HTMLInputElement>document.getElementById('showObjectCheckbox');
+        this.showObjectCheckbox.addEventListener('change',this.showObjectsToggled);
 
         this.alignButton = <HTMLInputElement>document.getElementById('alignButton');
         this.alignButton.addEventListener('click',this.moveCameraTo2DSlice);
@@ -573,7 +579,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.cachedCameraTarget = this.controls.target.clone();
             this.cachedCameraUp = this.controls.camera.up.clone();
             this.cachedSliceHandleVisibility = this.sliceManipulator.visible;
+            this.cachedObjectsShown = this.objects.visible;
             this.sliceManipulator.visible = false;
+            this.objects.visible = false;
             const cameraPosition : THREE.Vector3 = this.stackHelper.slice.planePosition.clone();
             cameraPosition.addScaledVector(this.stackHelper.slice.planeDirection,150.0);
             // choose a up vector that does not point in the same way as the target plane
@@ -588,11 +596,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.sliceCheckbox.disabled = true;
             this.sliceHandleCheckbox.disabled = true;
             this.controls.enabled = false;
-        } else {
-            this.cachedCameraOrigin = this.controls.camera.position.clone();
-            this.cachedCameraTarget = this.controls.target.clone();
-            this.cachedCameraUp = this.controls.camera.up.clone();
-            this.cachedSliceHandleVisibility = this.sliceManipulator.visible;
         }
     }
 
@@ -615,6 +618,25 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
             this.sliceCheckbox.disabled = false;
             this.sliceHandleCheckbox.disabled = false;
             this.sliceManipulator.visible = this.cachedSliceHandleVisibility;
+            this.objects.visible = this.cachedObjectsShown;
         }
     }
+
+    onShowObjectsChange = (visible) => {
+
+        /*this.dispatchEvent({
+            type: 'sliceHandleVisibilityChanged',
+            change: event
+        });*/
+    }
+
+    showObjectsToggled  = (checkBox) => {
+        this.toggleObjects(checkBox.currentTarget.checked);
+        this.onShowObjectsChange( checkBox.currentTarget.checked);
+    }
+
+    toggleObjects(visible) {
+        this.objects.visible = visible;
+    }
+
 }
