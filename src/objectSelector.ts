@@ -12,6 +12,9 @@ export default class ObjectSelector implements IIntersectionListener {
     }
 
     onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
+        if(intersection !== undefined) {
+            event.stopImmediatePropagation();
+        }
         if(intersection !== undefined && this.previosSelectedObject !== intersection.object && intersection.object instanceof THREE.Mesh) {
             const asMesh = <THREE.Mesh>intersection.object;
             if(asMesh.material instanceof THREE.MeshPhongMaterial) {

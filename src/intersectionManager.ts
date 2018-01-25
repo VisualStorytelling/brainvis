@@ -5,7 +5,7 @@ All subsytems gets mouse up/down/move messages but the substem with the closest 
 */
 
 import * as THREE from 'three';
-import { Event } from 'three';
+import { Event, Object3D } from 'three';
 import { list } from 'phovea_core/src/plugin';
 
 export interface IIntersectionListener {
@@ -14,6 +14,35 @@ export interface IIntersectionListener {
     onMouseMove: (intersection: THREE.Intersection, pointer : MouseEvent) => void;
     getObjects: () => THREE.Object3D[];
     isEnabled: () => boolean;
+}
+
+export class StaticGeometryListener implements IIntersectionListener {
+    object: THREE.Object3D;
+
+    constructor(object: THREE.Object3D) {
+        this.object = object;
+    }
+
+    onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
+        //
+    }
+
+    onMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
+        //
+    }
+
+    onMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
+        //
+    }
+
+    getObjects() {
+        return this.object.children;
+    }
+
+    isEnabled() {
+        return this.object.visible;
+    }
+
 }
 
 export class IntersectionManager {
@@ -78,9 +107,6 @@ export class IntersectionManager {
 
     onMouseDown = (event : MouseEvent) => {
         const intersection = this.getClosestObject(event);
-        if(intersection[0] !== undefined) {
-            event.stopImmediatePropagation();
-        }
         for(const listener of this.listeners) {
             if(intersection[0] === listener) {
                 listener.onMouseDown(intersection[1],event);
@@ -92,9 +118,6 @@ export class IntersectionManager {
 
     onMouseMove = (event) => {
         const intersection = this.getClosestObject(event);
-        if(intersection[0] !== undefined) {
-            event.stopImmediatePropagation();
-        }
         for(const listener of this.listeners) {
             if(intersection[0] === listener) {
                 listener.onMouseMove(intersection[1],event);
@@ -106,9 +129,6 @@ export class IntersectionManager {
 
     onMouseUp = (event) => {
         const intersection = this.getClosestObject(event);
-        if(intersection[0] !== undefined) {
-            event.stopImmediatePropagation();
-        }
         for(const listener of this.listeners) {
             if(intersection[0] === listener) {
                 listener.onMouseUp(intersection[1],event);

@@ -97,6 +97,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         if (!this.visible || !this.enabled) {
             return;
         }
+        if(intersection !== undefined) {
+            event.stopImmediatePropagation();
+        }
         if (this.previousSelection) {
             this.previousSelection.material.color.set(0x00ff00);
             this.oldPosition = this.stackHelper.slice.planePosition.clone();
@@ -111,7 +114,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         if (!this.visible || !this.enabled) {
             return;
         }
-        if (this.previousSelection) {
+        if (this.previousSelection && this.isDragging) {
             event.stopImmediatePropagation();
             this.previousSelection.material.color.set(0xff0000);
             this.isDragging = false;
@@ -138,6 +141,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
     onMouseMove(intersection: THREE.Intersection, pointer : MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
+        }
+        if(intersection !== undefined) {
+            event.stopImmediatePropagation();
         }
         if (!this.isDragging) {
             if (intersection === undefined) {

@@ -6,7 +6,7 @@ import { IOrientation, ISlicePosition } from './types';
 import Trackball from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
 import STLLoader from './STLLoader';
-import {IntersectionManager} from './intersectionManager';
+import {IntersectionManager, StaticGeometryListener} from './intersectionManager';
 import ObjectSelector from './objectSelector';
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
@@ -351,6 +351,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
                 this.stackHelper.slice._update();
                 this.stackHelper.border.helpersSlice = this.stackHelper.slice;
+
+                const sliceGeometry = new StaticGeometryListener(this.stackHelper.slice);
+                this.intersectionManager.addListener(sliceGeometry);
 
                 // slice manipulator
                 this.sliceManipulator = new SliceManipulatorWidget(this.stackHelper,this.renderer.domElement,this.camera);
