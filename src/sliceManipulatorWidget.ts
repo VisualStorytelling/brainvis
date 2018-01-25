@@ -4,8 +4,9 @@
 
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
+import {IntersectionManager, IIntersectionListener} from './intersectionManager';
 
-export default class SliceManipulatorWidget extends THREE.Object3D {
+export default class SliceManipulatorWidget extends THREE.Object3D implements IIntersectionListener {
     private camera: THREE.Camera;
     private domElement: Element;
     private stackHelper: AMI.StackHelper;
@@ -90,26 +91,56 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         this.sphere = new THREE.Mesh(geometrySphere, material);
         this.sphere.position.copy(endPosition);
         this.add(this.sphere);
-
-        // add event listeners
-        domElement.addEventListener('mousemove', (event) => {
-            this.onMouseMove(event);
-        }, false);
-        domElement.addEventListener('mousedown', (event) => {
-            this.onMouseDown(event);
-        }, false);
-        domElement.addEventListener('mouseup', (event) => {
-            this.onMouseUp(event);
-        }, false);
     }
 
-    onMouseMove(event) {
+    onMouseDown(intersection: THREE.Intersection, pointer : MouseEvent) {
+        if (!this.visible || !this.enabled) {
+            return;
+        }
+        if (this.previousSelection) {
+            this.previousSelection.material.color.set(0x00ff00);
+            this.oldPosition = this.stackHelper.slice.planePosition.clone();
+            this.oldDirection = this.stackHelper.slice.planeDirection.clone();
+            this.isDragging = true;
+            this.setUpRaycaster(pointer);
+            this.originalSlicePosition = this.stackHelper.slice.planePosition.clone();
+            this.raycaster.ray.intersectPlane(this.plane, this.startIntersection);
+        }
+    };
+    onMouseUp(intersection: THREE.Intersection, pointer : MouseEvent) {
+        if (!this.visible || !this.enabled) {
+            return;
+        }
+        if (this.previousSelection) {
+            event.stopImmediatePropagation();
+            this.previousSelection.material.color.set(0xff0000);
+            this.isDragging = false;
+            if (this.previousSelection === this.line) {
+                this.dispatchEvent({
+                    type: 'zoomChange',
+                    position: this.stackHelper.slice.planePosition.clone(),
+                    direction: this.stackHelper.slice.planeDirection.clone(),
+                    oldPosition: this.oldPosition,
+                    oldDirection: this.oldDirection
+                });
+            } else {
+                this.dispatchEvent({
+                    type: 'orientationChange',
+                    position: this.stackHelper.slice.planePosition.clone(),
+                    direction: this.stackHelper.slice.planeDirection.clone(),
+                    oldPosition: this.oldPosition,
+                    oldDirection: this.oldDirection
+                 });
+            }
+        }
+    };
+
+    onMouseMove(intersection: THREE.Intersection, pointer : MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
         }
         if (!this.isDragging) {
-            const intersection = this.intersectObjects(event, this.children);
-            if (intersection === false) {
+            if (intersection === undefined) {
                 this.clearSelection();
                 return;
             }
@@ -150,6 +181,14 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         }
+    };
+
+    getObjects() {
+        return this.children;
+    }
+
+    isEnabled() {
+        return this.visible;
     }
 
     updateWidget() {
@@ -203,50 +242,6 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
         this.previousSelection = null;
     }
 
-    onMouseDown(event) {
-        if (!this.visible || !this.enabled) {
-            return;
-        }
-        if (this.previousSelection) {
-            event.stopImmediatePropagation();
-            this.previousSelection.material.color.set(0x00ff00);
-            this.oldPosition = this.stackHelper.slice.planePosition.clone();
-            this.oldDirection = this.stackHelper.slice.planeDirection.clone();
-            this.isDragging = true;
-            this.setUpRaycaster(event);
-            this.originalSlicePosition = this.stackHelper.slice.planePosition.clone();
-            this.raycaster.ray.intersectPlane(this.plane, this.startIntersection);
-        }
-    }
-
-    onMouseUp(event) {
-        if (!this.visible || !this.enabled) {
-            return;
-        }
-        if (this.previousSelection) {
-            event.stopImmediatePropagation();
-            this.previousSelection.material.color.set(0xff0000);
-            this.isDragging = false;
-            if (this.previousSelection === this.line) {
-                this.dispatchEvent({
-                    type: 'zoomChange',
-                    position: this.stackHelper.slice.planePosition.clone(),
-                    direction: this.stackHelper.slice.planeDirection.clone(),
-                    oldPosition: this.oldPosition,
-                    oldDirection: this.oldDirection
-                });
-            } else {
-                this.dispatchEvent({
-                    type: 'orientationChange',
-                    position: this.stackHelper.slice.planePosition.clone(),
-                    direction: this.stackHelper.slice.planeDirection.clone(),
-                    oldPosition: this.oldPosition,
-                    oldDirection: this.oldDirection
-                 });
-            }
-        }
-    }
-
     setUpRaycaster(pointer) {
         const rect = this.domElement.getBoundingClientRect();
         const x = (pointer.clientX - rect.left) / rect.width;
@@ -254,13 +249,6 @@ export default class SliceManipulatorWidget extends THREE.Object3D {
 
         const pointerVector = new THREE.Vector2((x * 2) - 1, - (y * 2) + 1);
         this.raycaster.setFromCamera(pointerVector, this.camera);
-    }
-
-    intersectObjects(pointer, objects) {
-        this.setUpRaycaster(pointer);
-
-        const intersections = this.raycaster.intersectObjects(objects, true);
-        return intersections[0] ? intersections[0] : false;
     }
 
     // gives intersection with the inside of the bounding box

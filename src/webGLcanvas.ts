@@ -6,6 +6,8 @@ import { IOrientation, ISlicePosition } from './types';
 import Trackball from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
 import STLLoader from './STLLoader';
+import {IntersectionManager} from './intersectionManager';
+import ObjectSelector from './objectSelector';
 
 export default class BrainvisCanvas extends THREE.EventDispatcher {
     private width: number;
@@ -36,6 +38,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
 
     // callback to call when loading is completed
     private loadCompeletedCallback : () => void;
+
+    private intersectionManager: IntersectionManager;
+    private objectSelector: ObjectSelector;
 
     constructor(elem, width, height, loadCompeletedCallback? : () => void) {
         super();
@@ -124,6 +129,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 return true;
             }
         }.bind(this));
+
+        this.objectSelector = new ObjectSelector(this.objects);
+        this.intersectionManager = new IntersectionManager(this.renderer.domElement,this.camera);
+        this.intersectionManager.addListener(this.objectSelector);
     }
 
     initScene() {
@@ -350,6 +359,8 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 this.sliceManipulator.addEventListener('zoomChange',this.onSlicePlaneZoomChange);
                 this.sliceManipulator.addEventListener('orientationChange',this.onSlicePlaneOrientationChange);
                 this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
+
+                this.intersectionManager.addListener(this.sliceManipulator);
 
                 this.controls.initEventListeners();
                 this.loadCompeletedCallback();
