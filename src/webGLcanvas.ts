@@ -65,8 +65,6 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.controls.reset();
 
         this.initScene();
-        this.addEventListeners();
-        this.animate();
 
         // div with buttons
         const elem2 =  document.createElement('div');
@@ -133,6 +131,9 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         this.objectSelector = new ObjectSelector(this.objects);
         this.intersectionManager = new IntersectionManager(this.renderer.domElement,this.camera);
         this.intersectionManager.addListener(this.objectSelector);
+
+        this.addEventListeners();
+        this.animate();
     }
 
     initScene() {
@@ -378,6 +379,7 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
         loaderSTL.load('https://cdn.rawgit.com/FNNDSC/data/master/stl/adi_brain/WM.stl', function(geometry) {
             const material = new THREE.MeshPhongMaterial({ color: 0xf44336, specular: 0x111111, shininess: 200 });
             const mesh = new THREE.Mesh(geometry, material);
+            mesh.name = 'wm.stl';
             // to LPS space
             const rasToLPS = new THREE.Matrix4();
             rasToLPS.set(-1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -433,6 +435,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
                 type: 'cameraEnd',
                 orientation
             });
+        });
+
+        this.objectSelector.addEventListener('objectSelection', (event) => {
+            this.dispatchEvent(event);
         });
     }
 
@@ -654,6 +660,10 @@ export default class BrainvisCanvas extends THREE.EventDispatcher {
     toggleObjects(visible) {
         this.objects.visible = visible;
         this.showObjectCheckbox.checked = visible;
+    }
+
+    setSelection(newSelection) {
+        this.objectSelector.setSelection(newSelection);
     }
 
 }

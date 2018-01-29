@@ -216,6 +216,34 @@ export function setObjectsVisibilityImpl(inputs, parameter, graph, within) {
     };
 }
 
+// object selection
+export function setSelection(ref: prov.IObjectRef<any>, selection) {
+    return prov.action(
+        prov.meta(
+            'ObjectsSelectionChanged=' +
+            prov.cat.visual, prov.op.update
+        ),
+
+        'setSelection',setSelectionImpl, [ref], selection
+    );
+}
+
+export function setSelectionImpl(inputs, parameter, graph, within) {
+    const brainvis: any = inputs[0].value;
+    const selection = parameter;
+    brainvis.setSelectionImpl(selection.new, within);
+    const inverseSelections = {
+        old: selection.new,
+        new: selection.old
+    };
+
+    return {
+        inverse: setSelection(inputs[0], inverseSelections),
+        consumed: within
+    };
+}
+
+
 //commands
 export function createCmd(id) {
     switch (id) {
@@ -235,6 +263,8 @@ export function createCmd(id) {
             return setSliceModeImpl;
         case 'setObjectsVisibility':
             return setObjectsVisibilityImpl;
+        case 'setSelection':
+            return setSelectionImpl;
     }
     return null;
 };

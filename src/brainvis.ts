@@ -30,6 +30,7 @@ class Brainvis extends views.AView {
         this.canvas.addEventListener('sliceHandleVisibilityChanged',this.sliceHandleVisibilityChanged);
         this.canvas.addEventListener('sliceModeChanged',this.sliceModeChanged);
         this.canvas.addEventListener('objectsVisibilityChanged',this.objectsVisibilityChanged);
+        this.canvas.addEventListener('objectSelection',this.selectionChanged);
     }
 
     getBounds() {
@@ -167,6 +168,18 @@ class Brainvis extends views.AView {
 
     setObjectsVisibilityImpl(newVisibility: boolean, within:number) {
         return this.canvas.toggleObjects(newVisibility);
+    }
+
+    // object selection
+    selectionChanged = (event) => {
+        this.setSelection(event.newObjectName,event.previousObjectName);
+    }
+    setSelection(newObjectName: string, previousObjectName: string) {
+        return this.graph.push(BrainvisCommands.setSelection(this.ref, { old: previousObjectName, new: newObjectName }));
+    }
+
+    setSelectionImpl(newSelection: string, within:number) {
+        return this.canvas.setSelection(newSelection);
     }
 }
 
