@@ -14,12 +14,12 @@ import { addCanvasListeners } from "./provenance/listeners";
 
 import './style.scss';
 
-// import {
-//   ProvenanceSlide,
-//   ProvenanceSlidedeck,
-//   ProvenanceSlidedeckVisualization,
-//   ProvenanceSlidePlayer,
-// } from '@visualstorytelling/provenance-slide-deck';
+import {
+  ProvenanceSlide,
+  ProvenanceSlidedeck,
+  ProvenanceSlidedeckVisualization,
+  ProvenanceSlidePlayer,
+} from '@visualstorytelling/provenance-slide-deck';
 
 
 const canvas = new BrainvisCanvas(
@@ -41,3 +41,7 @@ const provenanceTreeVisualization = new ProvenanceTreeVisualization(
   traverser,
   document.getElementById('provviz_root') as HTMLDivElement,
 );
+
+const slideDeck = new ProvenanceSlidedeck({ name: 'calculator', version: '1.0.0' }, traverser);
+const provenanceSlidedeckVis =
+  new ProvenanceSlidedeckVisualization(slideDeck, document.getElementById('slidedeck_root') as HTMLDivElement);
