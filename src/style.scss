@@ -1,0 +1,56 @@
+html, * {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  position: relative;
+}
+
+body {
+  margin: 1em 1em 1em 1em;
+}
+
+#provviz_root {
+  height: 300px;
+  width: 300px;
+}
+
+.node {
+  fill: lightsteelblue;
+  stroke: steelblue;
+  cursor: pointer;
+
+  circle {
+    stroke-width: .3px;
+  }
+
+  &.branch-active {
+    fill: yellow;
+    background-color: #ccc;
+    text {
+      display: block;
+    }
+  }
+
+  &.node-active {
+    fill: blue;
+    stroke: darkblue;
+  }
+
+  text {
+    display: none;
+    fill: black;
+    stroke-width: 0px;
+    font-family: sans-serif;
+  }
+}
+
+.link {
+  fill: none;
+  stroke: black;
+  stroke-width: .5px;
+  &.active {
+    stroke: black;
+  }
+}

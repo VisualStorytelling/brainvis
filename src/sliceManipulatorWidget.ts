@@ -1,6 +1,7 @@
 /**
  * Original author: Pjotr Svetachov
  */
+
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
 import {IntersectionManager, IIntersectionListener} from './intersectionManager';
@@ -8,7 +9,6 @@ import {IntersectionManager, IIntersectionListener} from './intersectionManager'
 export default class SliceManipulatorWidget extends THREE.Object3D implements IIntersectionListener {
     private camera: THREE.Camera;
     private domElement: Element;
-    // @ts-ignore
     private stackHelper: AMI.StackHelper;
     private plane = new THREE.Plane();
     private raycaster = new THREE.Raycaster();
@@ -109,7 +109,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.originalSlicePosition = this.stackHelper.slice.planePosition.clone();
             this.raycaster.ray.intersectPlane(this.plane, this.startIntersection);
         }
-    }
+    };
     onMouseUp(intersection: THREE.Intersection, pointer : MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
@@ -136,7 +136,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                  });
             }
         }
-    }
+    };
 
     onMouseMove(intersection: THREE.Intersection, pointer : MouseEvent) {
         if (!this.visible || !this.enabled) {
@@ -187,7 +187,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         }
-    }
+    };
 
     getObjects() {
         return this.children;
@@ -306,7 +306,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         } else {
-            // cancel previous animation
+            //cancel previous animation
             if (this.changeTimeout !== undefined) {
                 clearInterval(this.changeTimeout);
                 this.changeTimeout = undefined;
@@ -341,5 +341,5 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                 }
             }, 30, this.stackHelper.slice.planePosition, this.stackHelper.slice.planeDirection, newPosition, newDirection);
         }
-    }
+    };
 }

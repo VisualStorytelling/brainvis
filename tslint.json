@@ -12,6 +12,9 @@
     "semicolon": [true, "always"],
     "indent": [true, "spaces", 4]
   },
+  "linterOptions": {
+    "exclude": [ "src_old/**/*" ]
+  },
 
   "rulesDirectory": []
 }
