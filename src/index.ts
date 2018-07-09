@@ -9,6 +9,9 @@ import {
 
 import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
 
+import { registerCanvasActions } from "./provenance/actions";
+import { addCanvasListeners } from "./provenance/listeners";
+
 import './style.scss';
 
 // import {
@@ -31,35 +34,10 @@ const registry = new ActionFunctionRegistry();
 const tracker = new ProvenanceTracker(registry, graph);
 const traverser = new ProvenanceGraphTraverser(registry, graph);
 
-(window as any).graph = graph;
-
-registry.register('setControlZoom', (args) =>
-  Promise.resolve(canvas.setControlZoom(args, 500))
-);
-
-canvas.addEventListener('cameraStart', (startEvent) => {
-  const cameraEndListener = (event) => {
-    tracker.applyAction({
-      do: 'setControlZoom',
-      doArguments: [(event as any).orientation],
-      undo: 'setControlZoom',
-      undoArguments: [(startEvent as any).orientation],
-    });
-    canvas.removeEventListener('cameraEnd', cameraEndListener);
-  };
-  canvas.addEventListener('cameraEnd', cameraEndListener);
-});
+registerCanvasActions(registry, canvas);
+addCanvasListeners(tracker, canvas);
 
 const provenanceTreeVisualization = new ProvenanceTreeVisualization(
   traverser,
   document.getElementById('provviz_root') as HTMLDivElement,
 );
-
-
-// canvas.addEventListener('sliceZoomChanged',this.sliceZoomChanged);
-// canvas.addEventListener('sliceOrientationChanged',this.sliceOrientationChanged);
-// canvas.addEventListener('sliceVisibilityChanged',this.sliceVisibilityChanged);
-// canvas.addEventListener('sliceHandleVisibilityChanged',this.sliceHandleVisibilityChanged);
-// canvas.addEventListener('sliceModeChanged',this.sliceModeChanged);
-// canvas.addEventListener('objectsVisibilityChanged',this.objectsVisibilityChanged);
-// canvas.addEventListener('objectSelection',this.selectionChanged);
