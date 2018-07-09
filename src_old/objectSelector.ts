@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { IIntersectionListener } from 'brainvis/src/intersectionManager';
+import { IIntersectionListener } from 'intersectionManager';
 import { Object3D } from 'three';
 
 export default class ObjectSelector  extends THREE.EventDispatcher implements IIntersectionListener {

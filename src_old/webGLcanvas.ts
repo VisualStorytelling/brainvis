@@ -5,7 +5,7 @@ import { IOrientation, ISlicePosition } from './types';
 
 import Trackball from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
-import STLLoader from './STLLoader';
+import STLLoader from './stlLoader';
 import {IntersectionManager, StaticGeometryListener} from './intersectionManager';
 import ObjectSelector from './objectSelector';
 

@@ -1,25 +1,17 @@
 {
   "compilerOptions": {
-    "module": "es6",
-    "target": "es5",
-    "importHelpers": true,
-    "sourceMap": true,
     "moduleResolution": "node",
+    "lib": ["es2015", "dom"],
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "sourceRoot": "./src",
+    "module": "commonjs",
+    "target": "es5",
     "jsx": "react",
-    "experimentalDecorators": true,
-    "lib": [
-      "dom",
-      "es2015"
-    ],
-    "baseUrl": "../",
-    "noImplicitAny": false,
-    "skipLibCheck": true
+    "allowJs": true,
+    "typeRoots": ["./node_modules/@types"],
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "tests/**/*.ts",
-    "index.ts",
-    "tsd.d.ts"
-  ]
+  "include": ["src"]
 }
