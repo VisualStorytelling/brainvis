@@ -1,0 +1,19 @@
+<div class="noSelectText">
+  Light direction
+  <div>
+    <div class="circle" id="circle">
+      <div class='dot' id="dot"></div>
+    </div>
+  </div>
+</div>
+<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle">
+  Show slice handle
+</mat-slide-toggle>
+<mat-slide-toggle [(ngModel)]="canvas.showSlice">
+  Show slice
+</mat-slide-toggle>
+<mat-slide-toggle [(ngModel)]="canvas.showObjects">
+  Show segmented objects
+</mat-slide-toggle>
+<button mat-button color="primary" id="alignButton">Align to slice</button>
+

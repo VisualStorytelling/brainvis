@@ -1,0 +1,9 @@
+app-brainvis-canvas {
+  flex: 1;
+}
+#bottom-container {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: rgba(0,0,0,.8);
+}
