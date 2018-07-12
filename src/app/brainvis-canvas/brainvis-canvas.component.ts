@@ -10,7 +10,9 @@ import SliceManipulatorWidget from './sliceManipulatorWidget';
 import STLLoader from './stlLoader';
 import { IntersectionManager, StaticGeometryListener } from './intersectionManager';
 import ObjectSelector from './objectSelector';
-
+import { ProvenanceService } from '../provenance.service';
+import { registerActions } from './provenanceActions';
+import { addListeners } from './provenanceListeners';
 
 @Component({
   selector: 'app-brainvis-canvas',
@@ -77,8 +79,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private intersectionManager: IntersectionManager;
   private objectSelector: ObjectSelector;
 
-  constructor(elem: ElementRef) {
+  constructor(elem: ElementRef, provenance: ProvenanceService) {
     super();
+    registerActions(provenance.registry, this);
+    addListeners(provenance.tracker, this);
     this.elem = elem.nativeElement;
   }
 

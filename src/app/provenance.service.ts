@@ -21,7 +21,26 @@ import {
   providedIn: 'root'
 })
 export class ProvenanceService {
+  public graph: ProvenanceGraph;
+  public registry: ActionFunctionRegistry;
+  public tracker: ProvenanceTracker;
+  public traverser: ProvenanceGraphTraverser;
+
   constructor() {
-    console.log('creating provenance service');
+    this.graph = new ProvenanceGraph({ name: 'brainvis', version: '1.0.0' });
+    this.registry = new ActionFunctionRegistry();
+    this.tracker = new ProvenanceTracker(this.registry, this.graph);
+    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph);
+
+    // todo: remove objects from window (used for dev / debug)
+    const w = window as any;
+    w.graph = this.graph;
+    w.registry = this.registry;
+    w.tracker = this.tracker;
+    w.traverser = this.traverser;
+  }
+
+  tester() {
+    console.log('test ok');
   }
 }

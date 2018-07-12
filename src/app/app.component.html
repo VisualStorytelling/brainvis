@@ -1,4 +1,17 @@
-<app-brainvis-canvas #canvas [showSliceHandle]="true"></app-brainvis-canvas>
-<div id="bottom-container">
-  <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
-</div>
+<mat-sidenav-container hasBackdrop="false">
+  <mat-sidenav #sidenav mode="over" [opened]="true" hasBackdrop="false">
+    <button id="sidenav-trigger" color="white`" mat-button (click)="sidenav.toggle()"><mat-icon>home</mat-icon></button>
+
+    Sidenav content
+  </mat-sidenav>
+
+
+  <mat-sidenav-content>
+    <app-brainvis-canvas #canvas [showSliceHandle]="true"></app-brainvis-canvas>
+    <div id="bottom-container">
+      <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
+    </div>
+    <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
+    <!--<p></p>-->
+  </mat-sidenav-content>
+</mat-sidenav-container>
