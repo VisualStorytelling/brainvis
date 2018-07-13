@@ -20,8 +20,8 @@ import { addListeners } from './provenanceListeners';
   styleUrls: ['./brainvis-canvas.component.css']
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
-  private _showSlice: boolean;
-  private _showSliceHandle: boolean;
+  private _showSlice = true;
+  private _showSliceHandle = true;
   private _showObjects: boolean;
 
   @Input() set showSlice(showSlice: boolean) {
@@ -87,7 +87,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   ngOnInit() {
-    console.log(this);
+    // todo: remove object from window
+    (window as any).canvas = this;
     this.width = this.elem.clientWidth;
     this.height = this.elem.clientHeight;
 
@@ -433,13 +434,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     if (this.stackHelper) {
       this.stackHelper._slice.visible = state;
       this.stackHelper._border.visible = state;
-      this.sliceHandleCheckbox.disabled = !state;
-      this.alignButton.disabled = !state;
-      this.sliceCheckbox.checked = state;
+      // this.sliceHandleCheckbox.disabled = !state;
+      // this.alignButton.disabled = !state;
+      // this.sliceCheckbox.checked = state;
       if (state === false) {
         this.sliceManipulator.visible = state;
       } else {
-        this.sliceManipulator.visible = this.sliceHandleCheckbox.checked;
+        this.sliceManipulator.visible = this._showSlice;
       }
     }
   }
@@ -447,7 +448,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   toggleSliceHandle(state) {
     if (this.sliceManipulator) {
       this.sliceManipulator.visible = state;
-      this.sliceHandleCheckbox.checked = state;
+      // this.sliceHandleCheckbox.checked = state;
     }
   }
 

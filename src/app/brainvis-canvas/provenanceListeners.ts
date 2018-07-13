@@ -43,6 +43,23 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     });
   });
 
+  canvas.onShowSlice.subscribe(val => {
+    tracker.applyAction({
+      do: 'showSlice',
+      doArguments: [val],
+      undo: 'showSlice',
+      undoArguments: [!val],
+    }, true);
+  });
+
+  canvas.onShowSliceHandle.subscribe(val => {
+    tracker.applyAction({
+      do: 'showSliceHandle',
+      doArguments: [val],
+      undo: 'showSliceHandle',
+      undoArguments: [!val],
+    }, true);
+  });
 
   // canvas.addEventListener('sliceZoomChanged', console.log);
   // canvas.addEventListener('sliceVisibilityChanged', console.log);

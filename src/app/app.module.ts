@@ -12,6 +12,7 @@ import { BrainvisCanvasControlsComponent } from './brainvis-canvas-controls/brai
 import { MatIconModule, MatSidenavModule, MatSlideToggleModule, MatButtonModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
+import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
 
 
 @NgModule({
@@ -19,7 +20,8 @@ import { ProvenanceVisualizationComponent } from './provenance-visualization/pro
     AppComponent,
     BrainvisCanvasComponent,
     BrainvisCanvasControlsComponent,
-    ProvenanceVisualizationComponent
+    ProvenanceVisualizationComponent,
+    ProvenanceSlidesComponent
   ],
   imports: [
     BrowserModule,

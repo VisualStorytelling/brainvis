@@ -1,13 +1,17 @@
 <mat-sidenav-container hasBackdrop="false">
-  <mat-sidenav #sidenav mode="over" [opened]="true" hasBackdrop="false">
-    <button id="sidenav-trigger" color="white`" mat-button (click)="sidenav.toggle()"><mat-icon>home</mat-icon></button>
+  <mat-sidenav position="end" #sidenav mode="over" [opened]="false" hasBackdrop="false">
+    <button id="sidenav-trigger" color="primary" style="color: white" mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
 
     Sidenav content
+    <app-provenance-visualization></app-provenance-visualization>
+    <app-provenance-slides></app-provenance-slides>
   </mat-sidenav>
 
 
   <mat-sidenav-content>
-    <app-brainvis-canvas #canvas [showSliceHandle]="true"></app-brainvis-canvas>
+    <app-brainvis-canvas #canvas></app-brainvis-canvas>
     <div id="bottom-container">
       <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
     </div>

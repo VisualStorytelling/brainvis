@@ -10,12 +10,14 @@ app-brainvis-canvas {
 mat-sidenav {
   overflow: visible;
   visibility: visible !important;
+  background-color: rgba(0, 0, 0, .8)
 }
 mat-sidenav-container, mat-sidenav-content {
   display: flex;
   flex: 1;
 }
+
 #sidenav-trigger {
   position: absolute;
-  right: -50px;
+  left: -50px;
 }

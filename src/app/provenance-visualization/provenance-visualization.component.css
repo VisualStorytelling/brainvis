@@ -1,0 +1,46 @@
+app-provenance-visualization {
+    height: 300px;
+    width: 300px;
+    display: block;
+}
+
+.node {
+    fill: lightsteelblue;
+    stroke: steelblue;
+    cursor: pointer;
+}
+
+.node circle {
+    stroke-width: .3px;
+}
+
+.node.branch-active {
+    fill: yellow;
+    background-color: #ccc;
+}
+
+.node.branch-active text {
+    display: block;
+}
+
+.node.node-active {
+    fill: blue;
+    stroke: darkblue;
+}
+
+.node text {
+    display: none;
+    fill: white;
+    stroke-width: 0;
+    font-family: sans-serif;
+}
+
+.link {
+    fill: none;
+    stroke: white;
+    stroke-width: .5px;
+}
+
+.link.active {
+    stroke: white;
+}
