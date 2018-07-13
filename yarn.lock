@@ -445,8 +445,8 @@
   resolved "https://registry.yarnpkg.com/@types/webvr-api/-/webvr-api-0.0.34.tgz#8fa49028de925c7b8bce3d559d3374ce2c89ee28"
 
 "@visualstorytelling/provenance-core@*":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@visualstorytelling/provenance-core/-/provenance-core-1.1.2.tgz#51524b232e4b1482fb868b8e8b87fee3bc7b0865"
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@visualstorytelling/provenance-core/-/provenance-core-1.1.4.tgz#d2d8be23303e29b0e4b54e0b4db4ce19d0e6c21a"
 
 "@visualstorytelling/provenance-tree-visualization@*":
   version "1.0.3"

@@ -20,7 +20,7 @@ export class ProvenanceService {
     this.graph = new ProvenanceGraph({ name: 'brainvis', version: '1.0.0' });
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
-    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph);
+    this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
 
     // todo: remove objects from window (used for dev / debug)
     const w = window as any;
