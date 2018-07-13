@@ -220,7 +220,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         // be carefull that series and target stack exist!
         this.stackHelper = new AMI.StackHelper(series[0].stack[0]);
         this.stackHelper.border.color = 0xffeb3b;
-
+        this.scene.add(this.stackHelper);
+        
         // setup slice
         const centerLPS = this.stackHelper.stack.worldCenter();
         this.stackHelper.slice.aabbSpace = 'LPS';
