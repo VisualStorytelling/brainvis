@@ -13,7 +13,7 @@ jobs:
       install: yarn
       script:
         - rm -rf dist
-        - yarn build
+        - yarn build --base-href /brainvis/
     - stage: deploy to GH pages
       if: (branch = master)
       install: true
