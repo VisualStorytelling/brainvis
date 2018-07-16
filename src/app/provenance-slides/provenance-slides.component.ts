@@ -1,13 +1,9 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
-import { ProvenanceService } from '../provenance.service';
 
-import {
-  ProvenanceSlide,
-  ProvenanceSlidedeck,
-  ProvenanceSlidedeckVisualization,
-  ProvenanceSlidePlayer,
-} from '../../../../provenance-slide-deck';
-// todo: update to normal node_modules path when published
+import { ProvenanceSlide, ProvenanceSlidedeck } from '@visualstorytelling/provenance-core';
+import { SlideDeckVisualization } from '@visualstorytelling/slide-deck-visualization';
+
+import { ProvenanceService } from '../provenance.service';
 
 @Component({
   selector: 'app-provenance-slides',
@@ -17,7 +13,7 @@ import {
 })
 export class ProvenanceSlidesComponent implements OnInit {
   private _deck: ProvenanceSlidedeck;
-  private _deckViz: ProvenanceSlidedeckVisualization;
+  private _deckViz: SlideDeckVisualization;
   constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
 
   }
@@ -28,7 +24,7 @@ export class ProvenanceSlidesComponent implements OnInit {
 
   ngOnInit() {
     this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
-    this._deckViz = new ProvenanceSlidedeckVisualization(this._deck, this.elementRef.nativeElement.children[1]);
+    this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[1]);
   }
 
 }

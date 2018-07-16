@@ -24,6 +24,7 @@
     "@angular/router": "^6.0.7",
     "@visualstorytelling/provenance-core": "*",
     "@visualstorytelling/provenance-tree-visualization": "*",
+    "@visualstorytelling/slide-deck-visualization": "^1.0.0",
     "ami.js": "^0.0.22",
     "core-js": "^2.5.4",
     "d3": "^5.4.0",
