@@ -10,13 +10,6 @@ cache:
 jobs:
   include:
     - stage: build
-      before_install:
-        - BUILD_DIR=`pwd`
-        - git clone https://github.com/VisualStorytelling/provenance-slide-deck.git ../provenance-slide-deck
-        - cd ../provenance-slide-deck
-        - yarn install
-        - yarn build
-        - cd $BUILD_DIR
       install: yarn
       script:
         - rm -rf dist
