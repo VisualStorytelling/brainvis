@@ -4,7 +4,7 @@
 
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
-import {IntersectionManager, IIntersectionListener} from './intersectionManager';
+import { IntersectionManager, IIntersectionListener } from './intersectionManager';
 
 export default class SliceManipulatorWidget extends THREE.Object3D implements IIntersectionListener {
     private camera: THREE.Camera;
@@ -13,7 +13,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
     private plane = new THREE.Plane();
     private raycaster = new THREE.Raycaster();
     private startIntersection = new THREE.Vector3();
-    private isDragging: boolean = false;
+    private isDragging = false;
 
     private geometryLine: THREE.Geometry;
     private line: THREE.Line;
@@ -28,7 +28,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
     private oldDirection: THREE.Vector3;
 
     private changeTimeout = undefined;
-    public enabled: boolean = true;
+    public enabled = true;
 
     // values we are transitioning too
     private toPosition: THREE.Vector3;
@@ -61,20 +61,20 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         this.cylinder = new THREE.Mesh(geometryCylinder, material);
         this.cylinder.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
         this.cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), stackHelper.slice.planeDirection);
-        this.add( this.cylinder );
+        this.add(this.cylinder);
 
         const arrow = new THREE.ConeBufferGeometry(3.5, 10);
         this.arrowUp = new THREE.Mesh(arrow, material);
         this.arrowUp.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
-        this.arrowUp.position.addScaledVector(stackHelper.slice.planeDirection,25);
+        this.arrowUp.position.addScaledVector(stackHelper.slice.planeDirection, 25);
         this.arrowUp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), stackHelper.slice.planeDirection);
-        this.add( this.arrowUp );
+        this.add(this.arrowUp);
 
         this.arrowDown = new THREE.Mesh(arrow, material);
         this.arrowDown.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
-        this.arrowDown.position.addScaledVector(stackHelper.slice.planeDirection,-25);
+        this.arrowDown.position.addScaledVector(stackHelper.slice.planeDirection, -25);
         this.arrowDown.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), stackHelper.slice.planeDirection);
-        this.add( this.arrowDown );
+        this.add(this.arrowDown);
 
 
         const materialLine = new THREE.LineBasicMaterial();
@@ -93,11 +93,11 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         this.add(this.sphere);
     }
 
-    onMouseDown(intersection: THREE.Intersection, pointer : MouseEvent) {
+    onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
         }
-        if(intersection !== undefined) {
+        if (intersection !== undefined) {
             event.stopImmediatePropagation();
         }
         if (this.previousSelection) {
@@ -109,8 +109,9 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.originalSlicePosition = this.stackHelper.slice.planePosition.clone();
             this.raycaster.ray.intersectPlane(this.plane, this.startIntersection);
         }
-    };
-    onMouseUp(intersection: THREE.Intersection, pointer : MouseEvent) {
+    }
+
+    onMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
         }
@@ -133,16 +134,16 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                     direction: this.stackHelper.slice.planeDirection.clone(),
                     oldPosition: this.oldPosition,
                     oldDirection: this.oldDirection
-                 });
+                });
             }
         }
-    };
+    }
 
-    onMouseMove(intersection: THREE.Intersection, pointer : MouseEvent) {
+    onMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
         if (!this.visible || !this.enabled) {
             return;
         }
-        if(intersection !== undefined) {
+        if (intersection !== undefined) {
             event.stopImmediatePropagation();
         }
         if (!this.isDragging) {
@@ -150,7 +151,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                 this.clearSelection();
                 return;
             }
-            if(intersection.object !== this.line) {
+            if (intersection.object !== this.line) {
                 this.highLightObject(intersection.object, 0xff0000);
             }
 
@@ -166,7 +167,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             event.stopImmediatePropagation();
             // move the slice
             if (this.previousSelection === this.line || this.previousSelection === this.cylinder
-                || this.previousSelection === this.arrowUp  || this.previousSelection === this.arrowDown) {
+                || this.previousSelection === this.arrowUp || this.previousSelection === this.arrowDown) {
                 const offset = this.stackHelper.slice.planeDirection.clone();
                 offset.multiplyScalar(distance);
                 offset.add(this.originalSlicePosition);
@@ -187,7 +188,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         }
-    };
+    }
 
     getObjects() {
         return this.children;
@@ -208,10 +209,10 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
         this.cylinder.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
         this.cylinder.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.stackHelper.slice.planeDirection);
         this.arrowUp.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
-        this.arrowUp.position.addScaledVector(this.stackHelper.slice.planeDirection,25);
+        this.arrowUp.position.addScaledVector(this.stackHelper.slice.planeDirection, 25);
         this.arrowUp.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), this.stackHelper.slice.planeDirection);
         this.arrowDown.position.set(middlePosition.x, middlePosition.y, middlePosition.z);
-        this.arrowDown.position.addScaledVector(this.stackHelper.slice.planeDirection,-25);
+        this.arrowDown.position.addScaledVector(this.stackHelper.slice.planeDirection, -25);
         this.arrowDown.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), this.stackHelper.slice.planeDirection);
 
         const endPosition = this.stackHelper.slice.planeDirection.clone();
@@ -286,7 +287,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             clearInterval(this.changeTimeout);
             this.changeTimeout = undefined;
             this.changeSlicePosition(this.toPosition, this.toDirection, 0);
-          }
+        }
     }
 
     /**
@@ -306,7 +307,7 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
             this.updateWidget();
         } else {
-            //cancel previous animation
+            // cancel previous animation
             if (this.changeTimeout !== undefined) {
                 clearInterval(this.changeTimeout);
                 this.changeTimeout = undefined;
@@ -341,5 +342,5 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                 }
             }, 30, this.stackHelper.slice.planePosition, this.stackHelper.slice.planeDirection, newPosition, newDirection);
         }
-    };
+    }
 }

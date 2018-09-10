@@ -1,9 +1,9 @@
 /**
  * Original authors from THREEJS repo
- * @author Eberhard Graether / http://egraether.com/
- * @author Mark Lundin  / http://mark-lundin.com
- * @author Simone Manini / http://daron1337.github.io
- * @author Luca Antiga  / http://lantiga.github.io
+ * @author Eberhard Graether / http:// egraether.com/
+ * @author Mark Lundin  / http:// mark-lundin.com
+ * @author Simone Manini / http:// daron1337.github.io
+ * @author Luca Antiga  / http:// lantiga.github.io
  */
 
 /*
@@ -32,15 +32,15 @@ export default class Trackball extends THREE.EventDispatcher {
   private domElement;
   private screen = { left: 0, top: 0, width: 0, height: 0 };
 
-  public enabled: boolean = true;
-  public rotateSpeed: number = 1.0;
-  public zoomSpeed: number = 1.2;
-  public panSpeed: number = 0.3;
+  public enabled = true;
+  public rotateSpeed = 1.0;
+  public zoomSpeed = 1.2;
+  public panSpeed = 0.3;
 
-  public noRotate: boolean = false;
-  public noZoom: boolean = false;
-  public noPan: boolean = false;
-  public noCustom: boolean = false;
+  public noRotate = false;
+  public noZoom = false;
+  public noPan = false;
+  public noCustom = false;
 
   private forceState = -1;
 
@@ -52,10 +52,10 @@ export default class Trackball extends THREE.EventDispatcher {
 
   private keys = [65 /* A*/, 83 /* S*/, 68];
 
-  // internals
+  //  internals
   public target = new THREE.Vector3();
   private lastPosition = new THREE.Vector3();
-  private EPS: number = 0.000001;
+  private EPS = 0.000001;
 
   private eye = new THREE.Vector3();
 
@@ -83,87 +83,38 @@ export default class Trackball extends THREE.EventDispatcher {
 
   private changeTimeout = undefined;
   private changeTime = 0.0;
-  private isDragging: boolean = false;
+  private isDragging = false;
 
-  // the valaues we are transition too when aminating to a certain state
-  private toTarget : THREE.Vector3;
-  private toPosition : THREE.Vector3;
-  private toUp : THREE.Vector3;
+  //  the valaues we are transition too when aminating to a certain state
+  private toTarget: THREE.Vector3;
+  private toPosition: THREE.Vector3;
+  private toUp: THREE.Vector3;
 
-  constructor(object: THREE.Camera, domElement) {
-    super();
+  panCamera = (function() {
+    const mouseChange = new THREE.Vector2(),
+      objectUp = new THREE.Vector3(),
+      pan = new THREE.Vector3();
 
-    this.camera = object;
-    this.domElement = (domElement !== undefined) ? domElement : document;
+    return function () {
+      mouseChange.copy(this.panEnd).sub(this.panStart);
 
-    // for reset
-    this.target0 = this.target.clone();
-    this.position0 = this.camera.position.clone();
-    this.up0 = this.camera.up.clone();
+      if (mouseChange.lengthSq()) {
+        mouseChange.multiplyScalar(this.eye.length() * this.panSpeed);
 
+        pan.copy(this.eye).cross(this.camera.up).setLength(mouseChange.x);
+        pan.add(objectUp.copy(this.camera.up).setLength(mouseChange.y));
 
-    this.domElement.addEventListener('contextmenu', function (event) {
-      event.preventDefault();
-    }, false);
+        this.camera.position.add(pan);
+        this.target.add(pan);
 
-    this.handleResize();
-
-    // force an update at start
-    this.update();
-  }
-
-  initEventListeners() {
-    this.domElement.addEventListener('mousedown', this.mousedown, false);
-    document.addEventListener('mousemove', this.mousemove, false);
-    document.addEventListener('mouseup', this.mouseup, false);
-
-    this.domElement.addEventListener('mousewheel', this.mousewheel, false);
-    this.domElement.addEventListener('DOMMouseScroll', this.mousewheel, false); // firefox
-
-    this.domElement.addEventListener('touchstart', this.touchstart, false);
-    this.domElement.addEventListener('touchend', this.touchend, false);
-    this.domElement.addEventListener('touchmove', this.touchmove, false);
-
-    window.addEventListener('keydown', this.keydown, false);
-    window.addEventListener('keyup', this.keyup, false);
-  }
-
-  // methods
-
-  handleResize() {
-    if (this.domElement === document) {
-      this.screen.left = 0;
-      this.screen.top = 0;
-      this.screen.width = window.innerWidth;
-      this.screen.height = window.innerHeight;
-    } else {
-      const box = this.domElement.getBoundingClientRect();
-      // adjustments come from similar code in the jquery offset() function
-      const d = this.domElement.ownerDocument.documentElement;
-      this.screen.left = box.left + window.pageXOffset - d.clientLeft;
-      this.screen.top = box.top + window.pageYOffset - d.clientTop;
-      this.screen.width = box.width;
-      this.screen.height = box.height;
-    }
-  };
-
-  handleEvent(event) {
-    if (typeof this[event.type] === 'function') {
-      this[event.type](event);
-    }
-  };
-
-  getMouseOnScreen(pageX: number, pageY: number) {
-    return new THREE.Vector2((pageX - this.screen.left) / this.screen.width,
-      (pageY - this.screen.top) / this.screen.height);
-  }
-
-  getMouseOnCircle(pageX, pageY) {
-    return new THREE.Vector2(
-      ((pageX - this.screen.width * 0.5 - this.screen.left) / (this.screen.width * 0.5)),
-      ((this.screen.height + 2 * (this.screen.top - pageY)) / this.screen.width) // screen.width intentional
-    );
-  }
+        if (this.staticMoving) {
+          this.panStart.copy(this.panEnd);
+        } else {
+          this.panStart.add(mouseChange.subVectors(this.panEnd, this.panStart).multiplyScalar(this.dynamicDampingFactor));
+        }
+      }
+    };
+  }());
 
   rotateCamera = (function () {
     const axis = new THREE.Vector3(),
@@ -211,7 +162,84 @@ export default class Trackball extends THREE.EventDispatcher {
     };
   }());
 
-  zoomCamera = function () {
+  constructor(object: THREE.Camera, domElement) {
+    super();
+
+    this.camera = object;
+    this.domElement = (domElement !== undefined) ? domElement : document;
+
+    //  for reset
+    this.target0 = this.target.clone();
+    this.position0 = this.camera.position.clone();
+    this.up0 = this.camera.up.clone();
+
+
+    this.domElement.addEventListener('contextmenu', function (event) {
+      event.preventDefault();
+    }, false);
+
+    this.handleResize();
+
+    this.init();
+
+    //  force an update at start
+    this.update();
+  }
+
+  initEventListeners() {
+    this.domElement.addEventListener('mousedown', this.mousedown, false);
+    document.addEventListener('mousemove', this.mousemove, false);
+    document.addEventListener('mouseup', this.mouseup, false);
+
+    this.domElement.addEventListener('mousewheel', this.mousewheel, false);
+    this.domElement.addEventListener('DOMMouseScroll', this.mousewheel, false); //  firefox
+
+    this.domElement.addEventListener('touchstart', this.touchstart, false);
+    this.domElement.addEventListener('touchend', this.touchend, false);
+    this.domElement.addEventListener('touchmove', this.touchmove, false);
+
+    window.addEventListener('keydown', this.keydown, false);
+    window.addEventListener('keyup', this.keyup, false);
+  }
+
+  //  methods
+
+  handleResize() {
+    if (this.domElement === document) {
+      this.screen.left = 0;
+      this.screen.top = 0;
+      this.screen.width = window.innerWidth;
+      this.screen.height = window.innerHeight;
+    } else {
+      const box = this.domElement.getBoundingClientRect();
+      //  adjustments come from similar code in the jquery offset() function
+      const d = this.domElement.ownerDocument.documentElement;
+      this.screen.left = box.left + window.pageXOffset - d.clientLeft;
+      this.screen.top = box.top + window.pageYOffset - d.clientTop;
+      this.screen.width = box.width;
+      this.screen.height = box.height;
+    }
+  }
+
+  handleEvent(event) {
+    if (typeof this[event.type] === 'function') {
+      this[event.type](event);
+    }
+  }
+
+  getMouseOnScreen(pageX: number, pageY: number) {
+    return new THREE.Vector2((pageX - this.screen.left) / this.screen.width,
+      (pageY - this.screen.top) / this.screen.height);
+  }
+
+  getMouseOnCircle(pageX, pageY) {
+    return new THREE.Vector2(
+      ((pageX - this.screen.width * 0.5 - this.screen.left) / (this.screen.width * 0.5)),
+      ((this.screen.height + 2 * (this.screen.top - pageY)) / this.screen.width) //  screen.width intentional
+    );
+  }
+
+  zoomCamera() {
     let factor;
 
     if (this.state === STATE.TOUCH_ZOOM) {
@@ -231,33 +259,7 @@ export default class Trackball extends THREE.EventDispatcher {
         }
       }
     }
-  };
-
-  panCamera = (function () {
-    const mouseChange = new THREE.Vector2(),
-      objectUp = new THREE.Vector3(),
-      pan = new THREE.Vector3();
-
-    return function () {
-      mouseChange.copy(this.panEnd).sub(this.panStart);
-
-      if (mouseChange.lengthSq()) {
-        mouseChange.multiplyScalar(this.eye.length() * this.panSpeed);
-
-        pan.copy(this.eye).cross(this.camera.up).setLength(mouseChange.x);
-        pan.add(objectUp.copy(this.camera.up).setLength(mouseChange.y));
-
-        this.camera.position.add(pan);
-        this.target.add(pan);
-
-        if (this.staticMoving) {
-          this.panStart.copy(this.panEnd);
-        } else {
-          this.panStart.add(mouseChange.subVectors(this.panEnd, this.panStart).multiplyScalar(this.dynamicDampingFactor));
-        }
-      }
-    };
-  }());
+  }
 
   checkDistances() {
     if (!this.noZoom || !this.noPan) {
@@ -269,7 +271,12 @@ export default class Trackball extends THREE.EventDispatcher {
         this.camera.position.addVectors(this.target, this.eye.setLength(this.minDistance));
       }
     }
-  };
+  }
+
+  init() {
+    this.rotateCamera();
+    this.panCamera();
+  }
 
   update() {
     this.eye.subVectors(this.camera.position, this.target);
@@ -301,7 +308,7 @@ export default class Trackball extends THREE.EventDispatcher {
 
       this.lastPosition.copy(this.camera.position);
     }
-  };
+  }
 
   finishCurrentTransition() {
     if (this.changeTimeout !== undefined) {
@@ -311,7 +318,7 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   }
 
-  changeCamera(newPosition:THREE.Vector3, newTarget:THREE.Vector3, newUp:THREE.Vector3, milliseconds: number, done?: () => void) {
+  changeCamera(newPosition: THREE.Vector3, newTarget: THREE.Vector3, newUp: THREE.Vector3, milliseconds: number, done?: () => void) {
     if (this.target.equals(newTarget) && this.camera.position.equals(newPosition) && this.camera.up.equals(newUp)) {
       return;
     }
@@ -327,11 +334,11 @@ export default class Trackball extends THREE.EventDispatcher {
 
       this.camera.lookAt(this.target);
 
-      //_this.dispatchEvent(changeEvent);
+      // _this.dispatchEvent(changeEvent);
 
       this.lastPosition.copy(this.camera.position);
     } else {
-      //cancel previous animation
+      // cancel previous animation
       if (this.changeTimeout !== undefined) {
         clearInterval(this.changeTimeout);
         this.changeTimeout = undefined;
@@ -340,11 +347,11 @@ export default class Trackball extends THREE.EventDispatcher {
       this.toPosition = newPosition;
       this.toUp = newUp;
       let changeTime = 0;
-      const delta = 30/milliseconds;
+      const delta = 30 / milliseconds;
       this.changeTimeout = setInterval((fromTarget, fromPosition, fromUp, toTarget, toPosition, toUp) => {
         this.enabled = false;
         const t = changeTime;
-        const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; // ease in/out function
+        const interPolateTime = t < .5 ? 2 * t * t : -1 + (4 - 2 * t) * t; //  ease in/out function
 
         const nextPosition = fromPosition.clone();
         const distancePosition = toPosition.clone();
@@ -366,34 +373,34 @@ export default class Trackball extends THREE.EventDispatcher {
         changeTime += delta;
         if (changeTime > 1.0) {
           this.changeCamera(toPosition, toTarget, toUp, 0);
-          //console.log('end anim');
+          // console.log('end anim');
           clearInterval(this.changeTimeout);
           this.changeTimeout = undefined;
           this.enabled = true;
-          if(done) {
+          if (done) {
             done();
           }
         }
       }, 30, this.target.clone(), this.camera.position.clone(), this.camera.up.clone(), newTarget, newPosition, newUp);
     }
-  };
+  }
 
   reset() {
     this.changeCamera(this.target0, this.position0, this.up0, 0);
     this.dispatchEvent({ type: 'change' });
-  };
+  }
 
   setState(targetState) {
     this.forceState = targetState;
     this.previousState = targetState;
     this.state = targetState;
-  };
+  }
 
   custom(customStart, customEnd) {
-    //TODO Nothing yet
-  };
+    // TODO Nothing yet
+  }
 
-  // listeners
+  //  listeners
 
   keydown(event) {
     if (this.enabled === false) {
@@ -482,7 +489,13 @@ export default class Trackball extends THREE.EventDispatcher {
       this.state = STATE.NONE;
     }
 
-    this.dispatchEvent({ type: 'end', state: previousState, newTarget: this.target, newPosition: this.camera.position, newUp: this.camera.up });
+    this.dispatchEvent({
+      type: 'end',
+      state: previousState,
+      newTarget: this.target,
+      newPosition: this.camera.position,
+      newUp: this.camera.up
+    });
   }
 
   private mousewheel = (event) => {
@@ -494,11 +507,11 @@ export default class Trackball extends THREE.EventDispatcher {
     let delta = 0;
 
     if (event.wheelDelta) {
-      // WebKit / Opera / Explorer 9
+      //  WebKit / Opera / Explorer 9
 
       delta = event.wheelDelta / 40;
     } else if (event.detail) {
-      // Firefox
+      //  Firefox
 
       delta = -event.detail / 3;
     }
@@ -514,6 +527,8 @@ export default class Trackball extends THREE.EventDispatcher {
   }
 
   touchstart(event) {
+    let x, y;
+
     if (this.enabled === false) { return; }
 
     if (this.forceState === -1) {
@@ -530,8 +545,8 @@ export default class Trackball extends THREE.EventDispatcher {
           const dy = event.touches[0].pageY - event.touches[1].pageY;
           this.touchZoomDistanceEnd = this.touchZoomDistanceStart = Math.sqrt(dx * dx + dy * dy);
 
-          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+          x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+          y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
           this.panStart.copy(this.getMouseOnScreen(x, y));
           this.panEnd.copy(this.panStart);
           break;
@@ -540,10 +555,10 @@ export default class Trackball extends THREE.EventDispatcher {
           this.state = STATE.NONE;
       }
     } else {
-      // { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4, CUSTOM: 99 };
+      //  { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4, CUSTOM: 99 };
       switch (this.state) {
         case 0:
-          // 1 or 2 fingers, smae behavior
+          //  1 or 2 fingers, smae behavior
           this.state = STATE.TOUCH_ROTATE;
           this.moveCurr.copy(this.getMouseOnCircle(event.touches[0].pageX, event.touches[0].pageY));
           this.movePrev.copy(this.moveCurr);
@@ -567,8 +582,8 @@ export default class Trackball extends THREE.EventDispatcher {
         case 5:
           if (event.touches.length >= 2) {
             this.state = STATE.TOUCH_PAN;
-            const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-            const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+            x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+            y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
             this.panStart.copy(this.getMouseOnScreen(x, y));
             this.panEnd.copy(this.panStart);
           } else {
@@ -580,8 +595,8 @@ export default class Trackball extends THREE.EventDispatcher {
 
         case 99:
           this.state = STATE.CUSTOM;
-          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+          x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+          y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
           this.customStart.copy(this.getMouseOnScreen(x, y));
           this.customEnd.copy(this.customStart);
           break;
@@ -623,7 +638,7 @@ export default class Trackball extends THREE.EventDispatcher {
     } else {
       let x, y;
 
-      // { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4, CUSTOM: 99 };
+      //  { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2, TOUCH_ROTATE: 3, TOUCH_ZOOM_PAN: 4, CUSTOM: 99 };
       switch (this.state) {
         case 0:
           this.movePrev.copy(this.moveCurr);
@@ -639,16 +654,16 @@ export default class Trackball extends THREE.EventDispatcher {
           break;
 
         case 4:
-          // 2 fingers!
-          // TOUCH ZOOM
+          //  2 fingers!
+          //  TOUCH ZOOM
           const dx = event.touches[0].pageX - event.touches[1].pageX;
           const dy = event.touches[0].pageY - event.touches[1].pageY;
           this.touchZoomDistanceEnd = Math.sqrt(dx * dx + dy * dy);
           break;
 
         case 5:
-          // 2 fingers
-          // TOUCH_PAN
+          //  2 fingers
+          //  TOUCH_PAN
           x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
           y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
           this.panEnd.copy(this.getMouseOnScreen(x, y));
@@ -667,6 +682,8 @@ export default class Trackball extends THREE.EventDispatcher {
   }
 
   touchend(event) {
+    let x, y;
+
     if (this.enabled === false) { return; }
 
     if (this.forceState === -1) {
@@ -679,8 +696,8 @@ export default class Trackball extends THREE.EventDispatcher {
         case 2:
           this.touchZoomDistanceStart = this.touchZoomDistanceEnd = 0;
 
-          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+          x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+          y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
           this.panEnd.copy(this.getMouseOnScreen(x, y));
           this.panStart.copy(this.panEnd);
           break;
@@ -699,16 +716,16 @@ export default class Trackball extends THREE.EventDispatcher {
           break;
 
         case 4:
-          // TOUCH ZOOM
+          //  TOUCH ZOOM
           this.touchZoomDistanceStart = this.touchZoomDistanceEnd = 0;
           this.state = STATE.ZOOM;
           break;
 
         case 5:
-          // TOUCH ZOOM
+          //  TOUCH ZOOM
           if (event.touches.length >= 2) {
-            const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-            const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+            x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+            y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
             this.panEnd.copy(this.getMouseOnScreen(x, y));
             this.panStart.copy(this.panEnd);
           }
@@ -716,8 +733,8 @@ export default class Trackball extends THREE.EventDispatcher {
           break;
 
         case 99:
-          const x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
-          const y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
+          x = (event.touches[0].pageX + event.touches[1].pageX) / 2;
+          y = (event.touches[0].pageY + event.touches[1].pageY) / 2;
           this.customEnd.copy(this.getMouseOnScreen(x, y));
           this.customStart.copy(this.customEnd);
           break;

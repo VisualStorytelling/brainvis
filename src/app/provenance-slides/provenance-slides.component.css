@@ -1,1 +1,31 @@
 @import "~@visualstorytelling/slide-deck-visualization/dist/bundle.css";
+
+app-provenance-slides {
+    height: 300px;
+    width: 300px;
+    display: block;
+}
+
+.slides_background_rect {
+    fill: #FFFFFF;
+    opacity: .01;
+    stroke: #aaaaaa;
+}
+
+.slides_rect {
+    fill: #aaaaaa;
+    opacity: .7;
+    stroke: #dddddd;
+}
+
+.slides_delay_rect {
+    fill: #dddddd;
+    opacity: .7;
+    stroke: #dddddd;
+}
+
+.slides_rect[selected=true] {
+    fill: #00b8d9;
+    opacity: .7;
+    stroke: #dddddd;
+}

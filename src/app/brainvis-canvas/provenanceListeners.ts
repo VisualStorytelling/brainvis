@@ -43,7 +43,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     });
   });
 
-  canvas.onShowSlice.subscribe(val => {
+  canvas.showSliceChange.subscribe(val => {
     tracker.applyAction({
       do: 'showSlice',
       doArguments: [val],
@@ -52,12 +52,30 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.onShowSliceHandle.subscribe(val => {
+  canvas.showSliceHandleChange.subscribe(val => {
     tracker.applyAction({
       do: 'showSliceHandle',
       doArguments: [val],
       undo: 'showSliceHandle',
       undoArguments: [!val],
+    }, true);
+  });
+
+  canvas.showObjectsChange.subscribe(val => {
+    tracker.applyAction({
+      do: 'showObjects',
+      doArguments: [val],
+      undo: 'showObjects',
+      undoArguments: [!val],
+    }, true);
+  });
+
+  canvas.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
+    tracker.applyAction({
+      do: 'selectedObjects',
+      doArguments: [newObjects],
+      undo: 'selectedObjects',
+      undoArguments: [oldObjects],
     }, true);
   });
 

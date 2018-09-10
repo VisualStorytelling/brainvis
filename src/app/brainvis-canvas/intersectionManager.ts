@@ -8,9 +8,9 @@ import * as THREE from 'three';
 // const { Event, Object3D } = THREE;
 
 export interface IIntersectionListener {
-    onMouseDown: (intersection: THREE.Intersection, pointer : MouseEvent) => void;
-    onMouseUp: (intersection: THREE.Intersection, pointer : MouseEvent) => void;
-    onMouseMove: (intersection: THREE.Intersection, pointer : MouseEvent) => void;
+    onMouseDown: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
+    onMouseUp: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
+    onMouseMove: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
     getObjects: () => THREE.Object3D[];
     isEnabled: () => boolean;
 }
@@ -65,12 +65,12 @@ export class IntersectionManager {
 
     removeListener(listener: IIntersectionListener) {
         const index = this.listeners.indexOf(listener);
-        if(index > -1) {
-            this.listeners.splice(index,1);
+        if (index > -1) {
+            this.listeners.splice(index, 1);
         }
     }
 
-    setUpRaycaster(pointer : MouseEvent) {
+    setUpRaycaster(pointer: MouseEvent) {
         const rect = this.domElement.getBoundingClientRect();
         const x = (pointer.clientX - rect.left) / rect.width;
         const y = (pointer.clientY - rect.top) / rect.height;
@@ -79,22 +79,22 @@ export class IntersectionManager {
         this.raycaster.setFromCamera(pointerVector, this.camera);
     }
 
-    intersectObjects(pointer : MouseEvent, objects : THREE.Object3D[]) {
+    intersectObjects(pointer: MouseEvent, objects: THREE.Object3D[]) {
         this.setUpRaycaster(pointer);
 
         const intersections = this.raycaster.intersectObjects(objects, true);
         return intersections[0] ? intersections[0] : false;
     }
 
-    getClosestObject(event : MouseEvent) : [IIntersectionListener, THREE.Intersection] {
+    getClosestObject(event: MouseEvent): [IIntersectionListener, THREE.Intersection] {
         this.setUpRaycaster(event);
-        let closestListener : IIntersectionListener;
-        let closestIntersection : THREE.Intersection;
-        for(const listener of this.listeners) {
-            if(listener.isEnabled()) {
+        let closestListener: IIntersectionListener;
+        let closestIntersection: THREE.Intersection;
+        for (const listener of this.listeners) {
+            if (listener.isEnabled()) {
                 const intersection = this.intersectObjects(event, listener.getObjects());
-                if(intersection !== false) {
-                    if(closestIntersection === undefined || (intersection.distance < closestIntersection.distance)) {
+                if (intersection !== false) {
+                    if (closestIntersection === undefined || (intersection.distance < closestIntersection.distance)) {
                         closestIntersection = intersection;
                         closestListener = listener;
                     }
@@ -104,35 +104,35 @@ export class IntersectionManager {
         return [closestListener, closestIntersection];
     }
 
-    onMouseDown = (event : MouseEvent) => {
+    onMouseDown = (event: MouseEvent) => {
         const intersection = this.getClosestObject(event);
-        for(const listener of this.listeners) {
-            if(intersection[0] === listener) {
-                listener.onMouseDown(intersection[1],event);
+        for (const listener of this.listeners) {
+            if (intersection[0] === listener) {
+                listener.onMouseDown(intersection[1], event);
             } else {
-                listener.onMouseDown(undefined,event);
+                listener.onMouseDown(undefined, event);
             }
         }
     }
 
     onMouseMove = (event) => {
         const intersection = this.getClosestObject(event);
-        for(const listener of this.listeners) {
-            if(intersection[0] === listener) {
-                listener.onMouseMove(intersection[1],event);
+        for (const listener of this.listeners) {
+            if (intersection[0] === listener) {
+                listener.onMouseMove(intersection[1], event);
             } else {
-                listener.onMouseMove(undefined,event);
+                listener.onMouseMove(undefined, event);
             }
         }
     }
 
     onMouseUp = (event) => {
         const intersection = this.getClosestObject(event);
-        for(const listener of this.listeners) {
-            if(intersection[0] === listener) {
-                listener.onMouseUp(intersection[1],event);
+        for (const listener of this.listeners) {
+            if (intersection[0] === listener) {
+                listener.onMouseUp(intersection[1], event);
             } else {
-                listener.onMouseUp(undefined,event);
+                listener.onMouseUp(undefined, event);
             }
         }
     }

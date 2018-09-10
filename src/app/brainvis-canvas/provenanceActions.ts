@@ -6,6 +6,8 @@ const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunc
   setSlicePlaneOrientation: (position, direction) => Promise.resolve(canvas.setSlicePlanePosition({position, direction}, 500)),
   showSlice: (value: boolean) => Promise.resolve(canvas.showSlice = value),
   showSliceHandle: (value: boolean) => Promise.resolve(canvas.showSliceHandle = value),
+  showSegmentedObjects: (value: boolean) => Promise.resolve(canvas.showObjects = value),
+  selectedObjects: (value: THREE.Object3D[]) => Promise.resolve(canvas.selectedObjects = value),
 });
 
 export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent) => {

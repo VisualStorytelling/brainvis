@@ -2,9 +2,9 @@ import * as THREE from 'three';
 // const { Object3D } = THREE;
 import { IIntersectionListener } from './intersectionManager';
 
-export default class ObjectSelector  extends THREE.EventDispatcher implements IIntersectionListener {
+export default class ObjectSelector extends THREE.EventDispatcher implements IIntersectionListener {
     private objects: THREE.Object3D;
-    private previosSelectedObject: THREE.Mesh;
+    private previousSelectedObject: THREE.Mesh;
     private previousColor: number;
 
     constructor(objects: THREE.Object3D) {
@@ -13,20 +13,24 @@ export default class ObjectSelector  extends THREE.EventDispatcher implements II
     }
 
     onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
-        if(intersection !== undefined) {
+        if (intersection !== undefined) {
             event.stopImmediatePropagation();
         }
-        if(intersection !== undefined && this.previosSelectedObject !== intersection.object && intersection.object instanceof THREE.Mesh) {
+        if (intersection !== undefined &&
+            this.previousSelectedObject !== intersection.object &&
+            intersection.object instanceof THREE.Mesh) {
+
             const asMesh = <THREE.Mesh>intersection.object;
-            if(asMesh.material instanceof THREE.MeshPhongMaterial) {
-                let previousName: string = '';
-                if(this.previosSelectedObject ) {
-                    const asMeshPongMaterial = this.previosSelectedObject.material as THREE.MeshPhongMaterial;
+            if (asMesh.material instanceof THREE.MeshPhongMaterial) {
+                let previousName = '';
+                let asMeshPongMaterial = null;
+                if (this.previousSelectedObject) {
+                    asMeshPongMaterial = this.previousSelectedObject.material as THREE.MeshPhongMaterial;
                     asMeshPongMaterial.color.setHex(this.previousColor);
-                    previousName = this.previosSelectedObject.name;
+                    previousName = this.previousSelectedObject.name;
                 }
-                const asMeshPongMaterial = asMesh.material as THREE.MeshPhongMaterial;
-                this.previosSelectedObject = asMesh;
+                asMeshPongMaterial = asMesh.material as THREE.MeshPhongMaterial;
+                this.previousSelectedObject = asMesh;
                 this.previousColor = asMeshPongMaterial.color.getHex();
                 asMeshPongMaterial.color.setHex(0x0000ff);
                 this.dispatchEvent({
@@ -35,15 +39,15 @@ export default class ObjectSelector  extends THREE.EventDispatcher implements II
                     previousObjectName: previousName
                 });
             }
-        } else if(this.previosSelectedObject) {
-            const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previosSelectedObject.material;
+        } else if (this.previousSelectedObject) {
+            const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
             this.dispatchEvent({
                 type: 'objectSelection',
                 newObjectName: '',
-                previousObjectName: this.previosSelectedObject.name
+                previousObjectName: this.previousSelectedObject.name
             });
-            this.previosSelectedObject = undefined;
+            this.previousSelectedObject = undefined;
         }
     }
 
@@ -63,23 +67,23 @@ export default class ObjectSelector  extends THREE.EventDispatcher implements II
     }
 
     setSelection(newSelection) {
-        let objectToSelect = undefined;
-        for(const object of this.objects.children) {
-            if(object.name === newSelection) {
+        let objectToSelect = null;
+        for (const object of this.objects.children) {
+            if (object.name === newSelection) {
                 objectToSelect = object;
                 break;
             }
         }
-        if(this.previosSelectedObject) {
-            const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previosSelectedObject.material;
+        if (this.previousSelectedObject) {
+            const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
-            this.previosSelectedObject = undefined;
+            this.previousSelectedObject = undefined;
         }
-        if(objectToSelect) {
+        if (objectToSelect) {
             const asMesh = <THREE.Mesh>objectToSelect;
-            if(asMesh.material instanceof THREE.MeshPhongMaterial) {
+            if (asMesh.material instanceof THREE.MeshPhongMaterial) {
                 const asMeshPongMaterial = <THREE.MeshPhongMaterial>asMesh.material;
-                this.previosSelectedObject = asMesh;
+                this.previousSelectedObject = asMesh;
                 this.previousColor = asMeshPongMaterial.color.getHex();
                 asMeshPongMaterial.color.setHex(0x0000ff);
             }
