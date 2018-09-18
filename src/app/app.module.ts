@@ -9,7 +9,7 @@ import { ProvenanceService } from './provenance.service';
 import { BrainvisCanvasComponent } from './brainvis-canvas/brainvis-canvas.component';
 import { BrainvisCanvasControlsComponent } from './brainvis-canvas-controls/brainvis-canvas-controls.component';
 
-import { MatIconModule, MatSidenavModule, MatSlideToggleModule, MatButtonModule } from '@angular/material';
+import { MatIconModule, MatSidenavModule, MatSlideToggleModule, MatButtonModule, MatFormFieldModule } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
@@ -32,6 +32,7 @@ import { SlideAnnotationsComponent } from './slide-annotations/slide-annotations
     MatButtonModule,
     MatSlideToggleModule,
     MatSidenavModule,
+    MatFormFieldModule,
     MatIconModule,
   ],
   providers: [ProvenanceService],

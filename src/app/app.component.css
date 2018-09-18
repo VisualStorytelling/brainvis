@@ -21,9 +21,3 @@ mat-sidenav-container, mat-sidenav-content {
   position: absolute;
   left: -50px;
 }
-
-app-slide-annotations {
-  position: absolute;
-  top:0;
-  left: 0;
-}

@@ -1,1 +1,7 @@
-bla
+<button mat-button color="primary" id="alignButton" (click)="newAnnotation()">
+  Add annotation
+</button>
+<div *ngFor="let annotation of annotations">
+  <input mat-form-field value="bla" />
+</div>
+
