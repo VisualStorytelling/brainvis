@@ -10,8 +10,16 @@ import { SlideAnnotation } from '@visualstorytelling/provenance-core';
 export class SlideAnnotationsComponent implements OnInit {
   @Input() slides: ProvenanceSlidesComponent;
   public JSON: any;
+  public console: any;
+  public anchors: any;
   constructor() {
     this.JSON = JSON;
+    this.console = console;
+    this.anchors = [
+      [100, 100],
+      [100, 200],
+      [300, 400]
+    ];
   }
 
   ngOnInit() {
@@ -20,12 +28,16 @@ export class SlideAnnotationsComponent implements OnInit {
 
   get annotations() {
     const selectedSlide = this.slides.deck.selectedSlide;
-    return  selectedSlide ? selectedSlide.annotations : [];
+    return selectedSlide ? selectedSlide.annotations : [];
+  }
+
+  updateAnnotation(annotation: SlideAnnotation, value: string) {
+    annotation.data = { ...annotation.data, text: value };
   }
 
   newAnnotation() {
     console.log('creating new annotation');
-    const a = new SlideAnnotation({text: 'bladiebla'});
+    const a = new SlideAnnotation({text: ''});
     this.slides.deck.selectedSlide.addAnnotation(a);
   }
 

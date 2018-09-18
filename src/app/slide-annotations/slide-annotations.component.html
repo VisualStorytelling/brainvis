@@ -2,6 +2,18 @@
   Add annotation
 </button>
 <div *ngFor="let annotation of annotations">
-  <input mat-form-field value="bla" />
-</div>
+  <input
+    [value]="annotation.data.text || ''"
+    placeholder="Change me"
+    (change)="updateAnnotation(annotation, $event.target.value)"
+  />
 
+</div>
+<div *ngFor="let anchor of anchors">
+  <div
+    class="anchor"
+    [style.left.px]="anchor[0]"
+    [style.top.px]="anchor[1]"
+  ></div>
+
+</div>
