@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ProvenanceSlidesComponent } from '../provenance-slides/provenance-slides.component';
 import { SlideAnnotation } from '@visualstorytelling/provenance-core';
+import { toScreenCoordinates, registry, fromScreenCoordinates } from '../annotate';
 
 @Component({
   selector: 'app-slide-annotations',
@@ -11,15 +12,11 @@ export class SlideAnnotationsComponent implements OnInit {
   @Input() slides: ProvenanceSlidesComponent;
   public JSON: any;
   public console: any;
-  public anchors: any;
   constructor() {
+    // console.log(registry[0].fromScreenCoordinates({x: 100, y: 100}));
+    // console.log(toScreenCoordinates({name: 'dummyAnnotator', x: 100, y: 100}));
     this.JSON = JSON;
     this.console = console;
-    this.anchors = [
-      [100, 100],
-      [100, 200],
-      [300, 400]
-    ];
   }
 
   ngOnInit() {
@@ -35,10 +32,24 @@ export class SlideAnnotationsComponent implements OnInit {
     annotation.data = { ...annotation.data, text: value };
   }
 
+  dragEnd(annotation, event) {
+    const annotatedCoordinates = fromScreenCoordinates({x: event.clientX, y: event.clientY});
+    if (annotatedCoordinates) {
+      annotation.data.coordinates = annotatedCoordinates;
+    }
+  }
+
+  annotationXY(annotation: SlideAnnotation) {
+    if (annotation.data.coordinates) {
+      return toScreenCoordinates(annotation.data.coordinates);
+    }
+    return ({x: 0, y: 0});
+  }
+
   newAnnotation() {
-    console.log('creating new annotation');
-    const a = new SlideAnnotation({text: ''});
-    this.slides.deck.selectedSlide.addAnnotation(a);
+    this.slides.deck.selectedSlide.addAnnotation(
+      new SlideAnnotation({text: ''})
+    );
   }
 
 }
