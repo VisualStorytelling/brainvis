@@ -17,7 +17,10 @@ interface AnnotatedCoords {
 
 export class Annotator<T extends AnnotatedCoords> {
   public name: string;
-  public fromScreenCoordinates: (coords: Coords) => T;
+
+  // false if anchor is not accepted for current x,y
+  public fromScreenCoordinates: (coords: Coords) => T | false;
+
   public toScreenCoordinates: (T) => Coords;
 
   public constructor(init?: Partial<Annotator<T>>) {
