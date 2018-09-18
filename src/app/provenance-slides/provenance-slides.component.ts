@@ -14,8 +14,14 @@ import { ProvenanceService } from '../provenance.service';
 export class ProvenanceSlidesComponent implements OnInit {
   private _deck: ProvenanceSlidedeck;
   private _deckViz: SlideDeckVisualization;
+  private _currentSlide: ProvenanceSlide;
+
   constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
 
+  }
+
+  get deck() {
+    return this._deck;
   }
 
   addSlide() {

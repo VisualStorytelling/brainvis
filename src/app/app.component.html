@@ -6,7 +6,7 @@
 
     <!-- Sidenav content -->
     <app-provenance-visualization></app-provenance-visualization>
-    <app-provenance-slides></app-provenance-slides>
+    <app-provenance-slides #slides></app-provenance-slides>
   </mat-sidenav>
 
 
@@ -15,6 +15,9 @@
     <div id="bottom-container">
       <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
     </div>
+    <app-slide-annotations id="annotation-overlay" [slides]="slides">
+      bladiebla
+    </app-slide-annotations>
     <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
     <!--<p></p>-->
   </mat-sidenav-content>

@@ -13,6 +13,7 @@ import { MatIconModule, MatSidenavModule, MatSlideToggleModule, MatButtonModule 
 import { FormsModule } from '@angular/forms';
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
+import { SlideAnnotationsComponent } from './slide-annotations/slide-annotations.component';
 
 
 @NgModule({
@@ -21,7 +22,8 @@ import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides
     BrainvisCanvasComponent,
     BrainvisCanvasControlsComponent,
     ProvenanceVisualizationComponent,
-    ProvenanceSlidesComponent
+    ProvenanceSlidesComponent,
+    SlideAnnotationsComponent
   ],
   imports: [
     BrowserModule,
