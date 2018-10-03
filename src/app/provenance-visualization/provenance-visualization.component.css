@@ -1,62 +1,59 @@
 app-provenance-visualization {
-    height: 300px;
+    height: 50%;
     width: 300px;
     display: block;
+    background-color: #FFF;
 }
 
 .node {
-    fill: rgb(252,252,252);
-    stroke: rgb(37,69,95);
+    fill: lightsteelblue;
+    stroke: steelblue;
     cursor: pointer;
 }
 
 .node circle {
-    stroke-width: .7px;
+    stroke-width: .3px;
+    opacity: 0.6;
 }
 
 .node.branch-active {
-    fill: white;
+    fill:#F3BB45;
     background-color: #ccc;
-}
-
-.node.branch-active circle {
-    r:2;
 }
 
 .node.branch-active text {
     display: block;
 }
-
+.node.branch-active.node circle {
+    opacity: 1;
+    
+}
 .node.node-active {
-    fill: yellow;
-    stroke: rgb(37,69,95);
+    fill: #DD272F;
+    stroke: #4ba3bd;
+    
 }
-
 .node.node-active circle {
-    stroke-width: .25px;
-    stroke: rgb(37,69,95);
-    r:5;
-}
-
-g:first-of-type {
-    stroke-width: .25px;
-    stroke: red;
+    r: 3;
 }
 
 .node text {
     display: none;
-    fill: white;
+    /* fill: white; */
+    fill: rgb(0, 0, 0);;
     stroke-width: 0;
     font-family: sans-serif;
 }
 
 .link {
     fill: none;
-    stroke: rgba(255, 255, 255, 0.8);
-    stroke-width: .25px;
+    /* stroke: white; */
+    stroke: #949DA8;
+    stroke-width: .2px;
 }
 
 .link.active {
-    stroke: rgba(187, 187, 187);
-    stroke-width: 1px;
+    /* stroke: white; */
+    stroke: #949DA8;
+    stroke-width: 0.8px;
 }
