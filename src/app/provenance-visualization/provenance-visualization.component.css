@@ -12,6 +12,7 @@ app-provenance-visualization {
 
 .node circle {
     stroke-width: .3px;
+    opacity: 0.6;
 }
 
 .node.branch-active {
@@ -22,10 +23,17 @@ app-provenance-visualization {
 .node.branch-active text {
     display: block;
 }
-
+.node.branch-active.node circle {
+    opacity: 1;
+    
+}
 .node.node-active {
     fill: #DD272F;
     stroke: #4ba3bd;
+    
+}
+.node.node-active circle {
+    r: 3;
 }
 
 .node text {
@@ -40,10 +48,11 @@ app-provenance-visualization {
     fill: none;
     /* stroke: white; */
     stroke: #949DA8;
-    stroke-width: .5px;
+    stroke-width: .2px;
 }
 
 .link.active {
     /* stroke: white; */
     stroke: #949DA8;
+    stroke-width: 0.8px;
 }

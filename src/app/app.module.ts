@@ -15,7 +15,7 @@ import { ProvenanceVisualizationComponent } from './provenance-visualization/pro
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
 import { SidenavComponent } from './ui/sidenav/sidenav.component';
 import { SlidesContainerComponent } from './ui/slides-container/slides-container.component';
-import { AnimationComponent } from './ui/animation/animation.component';
+
 
 
 
@@ -27,8 +27,7 @@ import { AnimationComponent } from './ui/animation/animation.component';
     ProvenanceVisualizationComponent,
     ProvenanceSlidesComponent,
     SidenavComponent,
-    SlidesContainerComponent,
-    AnimationComponent
+    SlidesContainerComponent
   ],
   imports: [
     BrowserModule,
