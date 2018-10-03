@@ -5,18 +5,22 @@ app-provenance-visualization {
 }
 
 .node {
-    fill: lightsteelblue;
-    stroke: steelblue;
+    fill: rgb(252,252,252);
+    stroke: rgb(37,69,95);
     cursor: pointer;
 }
 
 .node circle {
-    stroke-width: .3px;
+    stroke-width: .7px;
 }
 
 .node.branch-active {
-    fill: yellow;
+    fill: white;
     background-color: #ccc;
+}
+
+.node.branch-active circle {
+    r:2;
 }
 
 .node.branch-active text {
@@ -24,8 +28,19 @@ app-provenance-visualization {
 }
 
 .node.node-active {
-    fill: blue;
-    stroke: darkblue;
+    fill: yellow;
+    stroke: rgb(37,69,95);
+}
+
+.node.node-active circle {
+    stroke-width: .25px;
+    stroke: rgb(37,69,95);
+    r:5;
+}
+
+g:first-of-type {
+    stroke-width: .25px;
+    stroke: red;
 }
 
 .node text {
@@ -37,10 +52,11 @@ app-provenance-visualization {
 
 .link {
     fill: none;
-    stroke: white;
-    stroke-width: .5px;
+    stroke: rgba(255, 255, 255, 0.8);
+    stroke-width: .25px;
 }
 
 .link.active {
-    stroke: white;
+    stroke: rgba(187, 187, 187);
+    stroke-width: 1px;
 }

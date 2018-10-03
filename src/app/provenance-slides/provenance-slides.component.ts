@@ -25,7 +25,12 @@ export class ProvenanceSlidesComponent implements OnInit {
   }
 
   addSlide() {
-    this._deck.addSlide(new ProvenanceSlide('slide', 1000, 1000));
+    const node = this._deck.graph.current;
+    const slide = new ProvenanceSlide(node.label, 5000, 0, [], node);
+    this._deck.addSlide(slide,
+      this._deck.selectedSlide
+      ? this._deck.slides.indexOf(this._deck.selectedSlide) + 1
+      : this._deck.slides.length);
   }
 
   ngOnInit() {
