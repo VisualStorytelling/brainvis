@@ -1,5 +1,5 @@
 app-provenance-visualization {
-    height: 300px;
+    height: 700px;
     width: 300px;
     display: block;
 }
@@ -15,7 +15,7 @@ app-provenance-visualization {
 }
 
 .node.branch-active {
-    fill: yellow;
+    fill:#F3BB45;
     background-color: #ccc;
 }
 
@@ -24,23 +24,26 @@ app-provenance-visualization {
 }
 
 .node.node-active {
-    fill: blue;
-    stroke: darkblue;
+    fill: #DD272F;
+    stroke: #4ba3bd;
 }
 
 .node text {
     display: none;
-    fill: white;
+    /* fill: white; */
+    fill: #949DA8;
     stroke-width: 0;
     font-family: sans-serif;
 }
 
 .link {
     fill: none;
-    stroke: white;
+    /* stroke: white; */
+    stroke: #949DA8;
     stroke-width: .5px;
 }
 
 .link.active {
-    stroke: white;
+    /* stroke: white; */
+    stroke: #949DA8;
 }

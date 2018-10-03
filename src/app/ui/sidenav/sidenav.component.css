@@ -1,0 +1,29 @@
+
+  app-brainvis-canvas {
+    flex: 1;
+  }
+  mat-sidenav-container, mat-sidenav-content {
+    display: flex;
+    flex: 1;
+  }
+  mat-sidenav {
+    overflow: visible;
+    visibility: visible !important;
+    background-color: "#E9ECEF";
+  }
+  #menu-trigger {
+    position: absolute;
+    left: 300px;
+    z-index: 11;
+    background-color: orange;
+    background: linear-gradient(60deg, #fcae29, #ef9803);
+  }
+  .menuContainer{
+    position: absolute;
+    left: 300px;
+}
+  .menuContainer button{
+    background-color: orange;
+    background: linear-gradient(60deg, #fcae29, #ef9803); 
+    margin-bottom: 10px;
+  }

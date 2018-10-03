@@ -1,0 +1,23 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #drawer mode="side" >
+       
+      <button  id="menu-trigger" mat-mini-fab ripple mat-icon-button aria-label="Toggle sidenav"  (click)="showMenu()">
+          <mat-icon aria-label="Side nav toggle icon">menu</mat-icon>
+        </button>
+        <div class='menuContainer' [@menu]="showMenuContainer">
+                <button  mat-mini-fab ripple mat-icon-button (click)="drawer.toggle()" >
+                        <mat-icon aria-label="graph icon">graphic_eq</mat-icon>
+                </button>
+                <button  mat-mini-fab ripple mat-icon-button (click)="showSlides()">
+                        <mat-icon aria-label="slides icon">slideshow</mat-icon>
+                </button>
+                
+            </div>
+    <app-provenance-visualization></app-provenance-visualization>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <app-brainvis-canvas #canvas></app-brainvis-canvas>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+
+<app-slides-container [isVisible]="showSlideContainer"></app-slides-container>

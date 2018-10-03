@@ -95,9 +95,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   ngOnInit() {
     // todo: remove object from window
     (window as any).canvas = this;
-    this.width = this.elem.clientWidth;
-    this.height = this.elem.clientHeight;
-
+    this.width = window.screen.width;
+    this.height = window.screen.height;
     this.scene.background = new THREE.Color('black');
     this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 10000);
 

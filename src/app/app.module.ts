@@ -9,10 +9,14 @@ import { ProvenanceService } from './provenance.service';
 import { BrainvisCanvasComponent } from './brainvis-canvas/brainvis-canvas.component';
 import { BrainvisCanvasControlsComponent } from './brainvis-canvas-controls/brainvis-canvas-controls.component';
 
-import { MatIconModule, MatSidenavModule, MatSlideToggleModule, MatButtonModule } from '@angular/material';
+import {CustomMaterialModule} from "./core/material.module";
 import { FormsModule } from '@angular/forms';
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
+import { SidenavComponent } from './ui/sidenav/sidenav.component';
+import { SlidesContainerComponent } from './ui/slides-container/slides-container.component';
+import { AnimationComponent } from './ui/animation/animation.component';
+
 
 
 @NgModule({
@@ -21,17 +25,18 @@ import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides
     BrainvisCanvasComponent,
     BrainvisCanvasControlsComponent,
     ProvenanceVisualizationComponent,
-    ProvenanceSlidesComponent
+    ProvenanceSlidesComponent,
+    SidenavComponent,
+    SlidesContainerComponent,
+    AnimationComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     BrowserAnimationsModule,
-    MatButtonModule,
-    MatSlideToggleModule,
-    MatSidenavModule,
-    MatIconModule,
+    CustomMaterialModule
   ],
+  entryComponents: [SlidesContainerComponent],
   providers: [ProvenanceService],
   bootstrap: [AppComponent]
 })
