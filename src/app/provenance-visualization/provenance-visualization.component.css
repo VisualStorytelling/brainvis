@@ -1,7 +1,8 @@
 app-provenance-visualization {
-    height: 300px;
+    height: 50%;
     width: 300px;
     display: block;
+    background-color: white;
 }
 
 .node {
@@ -12,35 +13,47 @@ app-provenance-visualization {
 
 .node circle {
     stroke-width: .3px;
+    opacity: 0.6;
 }
 
 .node.branch-active {
-    fill: yellow;
+    fill:#F3BB45;
     background-color: #ccc;
 }
 
 .node.branch-active text {
     display: block;
 }
-
+.node.branch-active.node circle {
+    opacity: 1;
+    
+}
 .node.node-active {
-    fill: blue;
-    stroke: darkblue;
+    fill: #DD272F;
+    stroke: #4ba3bd;
+    
+}
+.node.node-active circle {
+    r: 3;
 }
 
 .node text {
     display: none;
-    fill: white;
+    /* fill: white; */
+    fill: #000;
     stroke-width: 0;
     font-family: sans-serif;
 }
 
 .link {
     fill: none;
-    stroke: white;
-    stroke-width: .5px;
+    /* stroke: white; */
+    stroke: #000;
+    stroke-width: .2px;
 }
 
 .link.active {
-    stroke: white;
+    /* stroke: white; */
+    stroke: #000;
+    stroke-width: 0.8px;
 }
