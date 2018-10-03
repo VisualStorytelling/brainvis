@@ -28,7 +28,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _showSliceHandle = true;
   private _showObjects = true;
   private objectSelector: ObjectSelector;
-  // private annotationAnchorSelector: AnnotationAnchorSelector;
+  private annotationAnchorSelector: AnnotationAnchorSelector;
 
   @Input() set showSlice(showSlice: boolean) {
     this._showSlice = showSlice;
@@ -62,13 +62,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   @Output() selectedObjectsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
   get selectedObjects() { return this.objectSelector.getObjects(); }
 
-  // @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
-  //   const oldAnchors = this.annotationAnchorSelector.getObjects();
-  //   this.annotationAnchorSelector.setSelection(newAnchors);
-  //   this.annotationAnchorsChange.emit([newAnchors, oldAnchors]);
-  // }
-  // @Output() annotationAnchorsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
-  // get annotationAnchors() { return this.annotationAnchorSelector.getObjects(); }
+  @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
+    const oldAnchors = this.annotationAnchorSelector.getObjects();
+    this.annotationAnchorSelector.setSelection(newAnchors);
+    this.annotationAnchorsChange.emit([newAnchors, oldAnchors]);
+  }
+  @Output() annotationAnchorsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
+  get annotationAnchors() { return this.annotationAnchorSelector.getObjects(); }
 
   private width: number;
   private height: number;
@@ -132,12 +132,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.initScene();
 
     this.objectSelector = new ObjectSelector(this.objects);
-    // this.annotationAnchorSelector = new AnnotationAnchorSelector(this.objects);
+    this.annotationAnchorSelector = new AnnotationAnchorSelector(this.objects);
 
     this.intersectionManager = new IntersectionManager(this.renderer.domElement, this.camera);
 
     this.intersectionManager.addListener(this.objectSelector);
-    // this.intersectionManager.addListener(this.annotationAnchorSelector);
+    this.intersectionManager.addListener(this.annotationAnchorSelector);
 
     this.addEventListeners();
     this.animate();
@@ -201,9 +201,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         this.intersectionManager.addListener(this.sliceManipulator);
 
         // Annotation Anchor(s)
-        // this.anchorDummy = new AnnotationAnchor(this.renderer.domElement, this.camera);
-        // this.scene.add(this.anchorDummy);
-        // this.anchorDummy.visible = true;
+        this.anchorDummy = new AnnotationAnchor(this.renderer.domElement, this.camera);
+        this.scene.add(this.anchorDummy);
+        this.anchorDummy.visible = true;
 
         this.intersectionManager.addListener(this.anchorDummy);
 
