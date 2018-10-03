@@ -359,6 +359,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
+  setSlicePlaneZoom(positions: ISlicePosition, within: number) {
+    if (this.stackHelper) {
+      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
+        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within > 0 ? within : 1000);
+    }
+  }
+
   toggleSlice(state) {
     if (this.stackHelper) {
       this.stackHelper._slice.visible = state;

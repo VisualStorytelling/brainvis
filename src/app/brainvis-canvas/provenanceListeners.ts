@@ -6,9 +6,9 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('cameraStart', (startEvent) => {
     const cameraEndListener = (event) => {
       tracker.applyAction({
-        do: 'setControlZoom',
+        do: 'setControlOrientation',
         doArguments: [(event as any).orientation],
-        undo: 'setControlZoom',
+        undo: 'setControlOrientation',
         undoArguments: [(startEvent as any).orientation],
       });
       canvas.removeEventListener('cameraEnd', cameraEndListener);
@@ -39,6 +39,17 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'setSlicePlaneOrientation',
       doArguments: [position, direction],
       undo: 'setSlicePlaneOrientation',
+      undoArguments: [oldPosition, oldDirection],
+    });
+  });
+
+  canvas.addEventListener('sliceZoomChanged', (event: any) => {
+    const { position, direction, oldPosition, oldDirection } = event.changes;
+    console.log(position, direction, oldPosition, oldDirection);
+    tracker.applyAction({
+      do: 'setSlicePlaneZoom',
+      doArguments: [position, direction],
+      undo: 'setSlicePlaneZoom',
       undoArguments: [oldPosition, oldDirection],
     });
   });
