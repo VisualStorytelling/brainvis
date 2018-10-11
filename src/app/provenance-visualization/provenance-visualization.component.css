@@ -16,8 +16,31 @@ app-provenance-visualization {
     opacity: 0.6;
 }
 
-.node.branch-active {
-    fill:#F3BB45;
+.node circle.intent_none {
+    fill: #b0c4de;
+}
+
+.node circle.intent_exploration {
+    fill: #60aa85;
+}
+
+.node circle.intent_configuration {
+    fill: #b8852c;
+}
+
+.node circle.intent_selection {
+    fill: #286090;
+}
+
+.node circle.intent_derivation {
+    fill: #a94442;
+}
+
+.node circle.intent_provenance {
+    fill: #9210dd;
+}
+
+.node.branch-active {    
     background-color: #ccc;
 }
 
@@ -28,11 +51,11 @@ app-provenance-visualization {
     opacity: 1;
     
 }
-.node.node-active {
-    fill: #DD272F;
-    stroke: #4ba3bd;
-    
+
+.node.node-active {    
+    stroke: #4ba3bd;    
 }
+
 .node.node-active circle {
     r: 3;
 }
