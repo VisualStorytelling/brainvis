@@ -22,7 +22,10 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     canvas.removeEventListener('zoomEnd', zoomEndListener);
     zoomEndListener = debounce ((event) => {
       tracker.applyAction({
-        metadata: {userIntent: 'exploration'},
+        metadata: {
+          userIntent: 'exploration',
+          value: event.orientation
+        },
         do: 'setControlZoom',
         doArguments: [event.orientation],
         undo: 'setControlZoom',

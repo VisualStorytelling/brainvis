@@ -14,17 +14,25 @@ import { ProvenanceService } from '../provenance.service';
 export class ProvenanceSlidesComponent implements OnInit {
   private _deck: ProvenanceSlidedeck;
   private _deckViz: SlideDeckVisualization;
-  constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
 
+  constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
+  }
+
+  get deck() {
+    return this._deck;
   }
 
   addSlide() {
-    this._deck.addSlide(new ProvenanceSlide('slide', 1000, 1000));
+    const node = this._deck.graph.current;
+    const slide = new ProvenanceSlide(node.label, 5000, 0, [], node);
+    this._deck.addSlide(slide,
+      this._deck.selectedSlide
+      ? this._deck.slides.indexOf(this._deck.selectedSlide) + 1
+      : this._deck.slides.length);
   }
 
   ngOnInit() {
     this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
     this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[1]);
   }
-
 }
