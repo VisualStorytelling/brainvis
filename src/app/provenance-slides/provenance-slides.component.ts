@@ -14,10 +14,8 @@ import { ProvenanceService } from '../provenance.service';
 export class ProvenanceSlidesComponent implements OnInit {
   private _deck: ProvenanceSlidedeck;
   private _deckViz: SlideDeckVisualization;
-  private _currentSlide: ProvenanceSlide;
 
   constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
-
   }
 
   get deck() {
@@ -37,5 +35,4 @@ export class ProvenanceSlidesComponent implements OnInit {
     this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
     this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[1]);
   }
-
 }

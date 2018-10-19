@@ -6,9 +6,10 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('cameraStart', (startEvent) => {
     const cameraEndListener = (event) => {
       tracker.applyAction({
-        do: 'setControlZoom',
+        metadata: {userIntent: 'exploration'},
+        do: 'setControlOrientation',
         doArguments: [(event as any).orientation],
-        undo: 'setControlZoom',
+        undo: 'setControlOrientation',
         undoArguments: [(startEvent as any).orientation],
       });
       canvas.removeEventListener('cameraEnd', cameraEndListener);
@@ -21,6 +22,10 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     canvas.removeEventListener('zoomEnd', zoomEndListener);
     zoomEndListener = debounce ((event) => {
       tracker.applyAction({
+        metadata: {
+          userIntent: 'exploration',
+          value: event.orientation
+        },
         do: 'setControlZoom',
         doArguments: [event.orientation],
         undo: 'setControlZoom',
@@ -34,8 +39,8 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
-    console.log(position, direction, oldPosition, oldDirection);
     tracker.applyAction({
+      metadata: {userIntent: 'exploration'},
       do: 'setSlicePlaneOrientation',
       doArguments: [position, direction],
       undo: 'setSlicePlaneOrientation',
@@ -43,8 +48,20 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     });
   });
 
+  canvas.addEventListener('sliceZoomChanged', (event: any) => {
+    const { position, direction, oldPosition, oldDirection } = event.changes;
+    tracker.applyAction({
+      metadata: {userIntent: 'exploration'},
+      do: 'setSlicePlaneZoom',
+      doArguments: [position, direction],
+      undo: 'setSlicePlaneZoom',
+      undoArguments: [oldPosition, oldDirection],
+    });
+  });
+
   canvas.showSliceChange.subscribe(val => {
     tracker.applyAction({
+      metadata: {userIntent: 'configuration'},
       do: 'showSlice',
       doArguments: [val],
       undo: 'showSlice',
@@ -54,6 +71,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.showSliceHandleChange.subscribe(val => {
     tracker.applyAction({
+      metadata: {userIntent: 'configuration'},
       do: 'showSliceHandle',
       doArguments: [val],
       undo: 'showSliceHandle',
@@ -63,6 +81,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.showObjectsChange.subscribe(val => {
     tracker.applyAction({
+      metadata: {userIntent: 'configuration'},
       do: 'showObjects',
       doArguments: [val],
       undo: 'showObjects',
@@ -72,18 +91,11 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
     tracker.applyAction({
+      metadata: {userIntent: 'selection'},
       do: 'selectedObjects',
       doArguments: [newObjects],
       undo: 'selectedObjects',
       undoArguments: [oldObjects],
     }, true);
   });
-
-  // canvas.addEventListener('sliceZoomChanged', console.log);
-  // canvas.addEventListener('sliceVisibilityChanged', console.log);
-  // canvas.addEventListener('sliceHandleVisibilityChanged', console.log);
-  // canvas.addEventListener('sliceModeChanged', console.log);
-  // canvas.addEventListener('objectsVisibilityChanged', console.log);
-  // canvas.addEventListener('objectSelection', console.log);
-  // canvas.addEventListener('sliceZoomChanged', console.log);
 };

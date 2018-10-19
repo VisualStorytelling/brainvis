@@ -11,8 +11,8 @@ import STLLoader from './stlLoader';
 import { IntersectionManager, StaticGeometryListener } from './intersectionManager';
 import ObjectSelector from './objectSelector';
 
-import AnnotationAnchorSelector from './annotationAnchorSelector';
-import AnnotationAnchor from './annotationAnchor';
+// import AnnotationAnchorSelector from './annotationAnchorSelector';
+// import AnnotationAnchor from './annotationAnchor';
 
 import { ProvenanceService } from '../provenance.service';
 import { registerActions } from './provenanceActions';
@@ -28,7 +28,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _showSliceHandle = true;
   private _showObjects = true;
   private objectSelector: ObjectSelector;
-  private annotationAnchorSelector: AnnotationAnchorSelector;
+  // private annotationAnchorSelector: AnnotationAnchorSelector;
 
   @Input() set showSlice(showSlice: boolean) {
     this._showSlice = showSlice;
@@ -62,13 +62,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   @Output() selectedObjectsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
   get selectedObjects() { return this.objectSelector.getObjects(); }
 
-  @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
-    const oldAnchors = this.annotationAnchorSelector.getObjects();
-    this.annotationAnchorSelector.setSelection(newAnchors);
-    this.annotationAnchorsChange.emit([newAnchors, oldAnchors]);
-  }
-  @Output() annotationAnchorsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
-  get annotationAnchors() { return this.annotationAnchorSelector.getObjects(); }
+  // @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
+  //   const oldAnchors = this.annotationAnchorSelector.getObjects();
+  //   this.annotationAnchorSelector.setSelection(newAnchors);
+  //   this.annotationAnchorsChange.emit([newAnchors, oldAnchors]);
+  // }
+  // @Output() annotationAnchorsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
+  // get annotationAnchors() { return this.annotationAnchorSelector.getObjects(); }
 
   private width: number;
   private height: number;
@@ -132,12 +132,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.initScene();
 
     this.objectSelector = new ObjectSelector(this.objects);
-    this.annotationAnchorSelector = new AnnotationAnchorSelector(this.objects);
+    // this.annotationAnchorSelector = new AnnotationAnchorSelector(this.objects);
 
     this.intersectionManager = new IntersectionManager(this.renderer.domElement, this.camera);
 
     this.intersectionManager.addListener(this.objectSelector);
-    this.intersectionManager.addListener(this.annotationAnchorSelector);
+    // this.intersectionManager.addListener(this.annotationAnchorSelector);
 
     this.addEventListeners();
     this.animate();
@@ -201,11 +201,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         this.intersectionManager.addListener(this.sliceManipulator);
 
         // Annotation Anchor(s)
-        this.anchorDummy = new AnnotationAnchor(this.renderer.domElement, this.camera);
-        this.scene.add(this.anchorDummy);
-        this.anchorDummy.visible = true;
+        // this.anchorDummy = new AnnotationAnchor(this.renderer.domElement, this.camera);
+        // this.scene.add(this.anchorDummy);
+        // this.anchorDummy.visible = true;
 
-        this.intersectionManager.addListener(this.anchorDummy);
+        // this.intersectionManager.addListener(this.anchorDummy);
 
         this.controls.initEventListeners();
       }.bind(this))
@@ -276,6 +276,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         orientation
       });
     });
+
+    this.objectSelector.addEventListener('objectSelection', (event: any) => {
+      this.selectedObjects = event.newObject;
+    });
   }
 
   setSize(width: number, height: number) {
@@ -334,7 +338,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   getSlicePlaneChanges = (event) => {
-    console.log(event);
     const position = event.position.toArray();
     const direction = event.direction.toArray();
     const oldPosition = event.oldPosition.toArray();
@@ -376,6 +379,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   setSlicePlanePosition(positions: ISlicePosition, within: number) {
+    if (this.stackHelper) {
+      this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
+        new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within > 0 ? within : 1000);
+    }
+  }
+
+  setSlicePlaneZoom(positions: ISlicePosition, within: number) {
     if (this.stackHelper) {
       this.sliceManipulator.changeSlicePosition(new THREE.Vector3(positions.position[0], positions.position[1], positions.position[2]),
         new THREE.Vector3(positions.direction[0], positions.direction[1], positions.direction[2]), within > 0 ? within : 1000);

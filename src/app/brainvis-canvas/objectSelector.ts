@@ -33,19 +33,19 @@ export default class ObjectSelector extends THREE.EventDispatcher implements IIn
                 this.previousSelectedObject = asMesh;
                 this.previousColor = asMeshPongMaterial.color.getHex();
                 asMeshPongMaterial.color.setHex(0x0000ff);
+
                 this.dispatchEvent({
                     type: 'objectSelection',
-                    newObjectName: asMesh.name,
-                    previousObjectName: previousName
+                    newObject: asMesh
                 });
             }
         } else if (this.previousSelectedObject) {
             const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
+
             this.dispatchEvent({
                 type: 'objectSelection',
-                newObjectName: '',
-                previousObjectName: this.previousSelectedObject.name
+                newObject: undefined
             });
             this.previousSelectedObject = undefined;
         }
@@ -68,17 +68,24 @@ export default class ObjectSelector extends THREE.EventDispatcher implements IIn
 
     setSelection(newSelection) {
         let objectToSelect = null;
+
+        if (newSelection instanceof Array) {
+            newSelection = newSelection[0];
+        }
+
         for (const object of this.objects.children) {
-            if (object.name === newSelection) {
+            if (newSelection && object.name === newSelection.name) {
                 objectToSelect = object;
                 break;
             }
         }
+
         if (this.previousSelectedObject) {
             const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
             this.previousSelectedObject = undefined;
         }
+
         if (objectToSelect) {
             const asMesh = <THREE.Mesh>objectToSelect;
             if (asMesh.material instanceof THREE.MeshPhongMaterial) {
