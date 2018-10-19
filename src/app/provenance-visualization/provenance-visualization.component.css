@@ -16,6 +16,10 @@ app-provenance-visualization {
     opacity: 0.6;
 }
 
+.node circle.keynode {
+    stroke: #000000;
+}
+
 .node circle.intent_none {
     fill: #b0c4de;
 }
