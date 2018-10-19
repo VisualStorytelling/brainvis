@@ -1,7 +1,7 @@
 /*
-Special class to manage intersection with goemtry.
-Subsystems can register to be tested for intersections.
-All subsytems gets mouse up/down/move messages but the substem with the closest hitpoint will get intersection information.
+    Special class to manage intersection with goemetry.
+    Subsystems can register to be tested for intersections.
+    All subsytems gets mouse up/down/move and intersection information.
 */
 
 import * as THREE from 'three';

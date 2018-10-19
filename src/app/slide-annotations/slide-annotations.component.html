@@ -1,0 +1,20 @@
+<button
+  mat-button
+  color="primary"
+  id="alignButton"
+  (click)="newAnnotation()"
+>
+  Add annotation
+</button>
+
+<div *ngFor="let annotation of annotations">
+  <input
+    draggable="true"
+    (dragend)="dragEnd(annotation, $event)"
+    [value]="annotation.data.text || ''"
+    placeholder="Change me"
+    (change)="updateAnnotation(annotation, $event.target.value)"
+    [style.left.px]="annotationXY(annotation).x"
+    [style.top.px]="annotationXY(annotation).y"
+  />
+</div>

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 // const { Object3D } = THREE;
 import { IIntersectionListener } from './intersectionManager';
 
-export default class ObjectSelector extends THREE.EventDispatcher implements IIntersectionListener {
+export default class AnnotationAnchorSelector extends THREE.EventDispatcher implements IIntersectionListener {
     private objects: THREE.Object3D;
     private previousSelectedObject: THREE.Mesh;
     private previousColor: number;
@@ -14,7 +14,7 @@ export default class ObjectSelector extends THREE.EventDispatcher implements IIn
 
     onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
         if (intersection !== undefined) {
-            event.stopImmediatePropagation();
+            // event.stopImmediatePropagation();
         }
         if (intersection !== undefined &&
             this.previousSelectedObject !== intersection.object &&
@@ -33,19 +33,19 @@ export default class ObjectSelector extends THREE.EventDispatcher implements IIn
                 this.previousSelectedObject = asMesh;
                 this.previousColor = asMeshPongMaterial.color.getHex();
                 asMeshPongMaterial.color.setHex(0x0000ff);
-
                 this.dispatchEvent({
                     type: 'objectSelection',
-                    newObject: asMesh
+                    newObjectName: asMesh.name,
+                    previousObjectName: previousName
                 });
             }
         } else if (this.previousSelectedObject) {
             const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
-
             this.dispatchEvent({
                 type: 'objectSelection',
-                newObject: undefined
+                newObjectName: '',
+                previousObjectName: this.previousSelectedObject.name
             });
             this.previousSelectedObject = undefined;
         }
@@ -68,24 +68,17 @@ export default class ObjectSelector extends THREE.EventDispatcher implements IIn
 
     setSelection(newSelection) {
         let objectToSelect = null;
-
-        if (newSelection instanceof Array) {
-            newSelection = newSelection[0];
-        }
-
         for (const object of this.objects.children) {
-            if (newSelection && object.name === newSelection.name) {
+            if (object.name === newSelection) {
                 objectToSelect = object;
                 break;
             }
         }
-
         if (this.previousSelectedObject) {
             const asMeshPongMaterial = <THREE.MeshPhongMaterial>this.previousSelectedObject.material;
             asMeshPongMaterial.color.setHex(this.previousColor);
             this.previousSelectedObject = undefined;
         }
-
         if (objectToSelect) {
             const asMesh = <THREE.Mesh>objectToSelect;
             if (asMesh.material instanceof THREE.MeshPhongMaterial) {

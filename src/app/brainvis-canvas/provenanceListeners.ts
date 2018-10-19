@@ -39,7 +39,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
-    console.log(position, direction, oldPosition, oldDirection);
     tracker.applyAction({
       metadata: {userIntent: 'exploration'},
       do: 'setSlicePlaneOrientation',
@@ -51,7 +50,6 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.addEventListener('sliceZoomChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
-    console.log(position, direction, oldPosition, oldDirection);
     tracker.applyAction({
       metadata: {userIntent: 'exploration'},
       do: 'setSlicePlaneZoom',
