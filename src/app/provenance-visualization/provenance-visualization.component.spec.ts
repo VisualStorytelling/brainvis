@@ -8,9 +8,8 @@ describe('ProvenanceVisualizationComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ProvenanceVisualizationComponent ]
-    })
-    .compileComponents();
+      declarations: [ProvenanceVisualizationComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
