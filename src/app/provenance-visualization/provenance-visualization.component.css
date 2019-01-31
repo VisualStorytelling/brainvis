@@ -1,82 +1,92 @@
 app-provenance-visualization {
-    height: 50%;
-    width: 300px;
-    display: block;
-    background-color: white;
+  height: 50%;
+  width: 300px;
+  display: block;
+  background-color: white;
 }
-
 .node {
-    fill: lightsteelblue;
-    stroke: steelblue;
-    cursor: pointer;
+  fill: lightsteelblue;
+  stroke: steelblue;
+  cursor: pointer;
 }
 
 .node circle {
-    stroke-width: .3px;
-    opacity: 0.6;
+  stroke-width: 0.3px;
+  opacity: 0.6;
 }
 
 .node circle.intent_none {
-    fill: #b0c4de;
+  fill: #b0c4de;
 }
 
 .node circle.intent_exploration {
-    fill: #60aa85;
+  fill: #60aa85;
 }
 
 .node circle.intent_configuration {
-    fill: #b8852c;
+  fill: #b8852c;
 }
 
 .node circle.intent_selection {
-    fill: #286090;
+  fill: #286090;
 }
 
 .node circle.intent_derivation {
-    fill: #a94442;
+  fill: #a94442;
 }
 
 .node circle.intent_provenance {
-    fill: #9210dd;
+  fill: #9210dd;
 }
 
-.node.branch-active {    
-    background-color: #ccc;
+.node.branch-active {
+  background-color: #ccc;
 }
 
 .node.branch-active text {
-    display: block;
+  display: block;
 }
 .node.branch-active.node circle {
-    opacity: 1;
-    
+  opacity: 1;
 }
 
-.node.node-active {    
-    stroke: #4ba3bd;    
+.node.node-active {
+  stroke: #4ba3bd;
 }
 
 .node.node-active circle {
-    r: 3;
+  r: 3;
 }
 
 .node text {
-    display: none;
-    /* fill: white; */
-    fill: #000;
-    stroke-width: 0;
-    font-family: sans-serif;
+  display: none;
+  /* fill: white; */
+  fill: #000;
+  stroke-width: 0;
+  font-family: sans-serif;
 }
 
 .link {
-    fill: none;
-    /* stroke: white; */
-    stroke: #000;
-    stroke-width: .2px;
+  fill: none;
+  /* stroke: white; */
+  stroke: #000;
+  stroke-width: 0.2px;
 }
 
 .link.active {
-    /* stroke: white; */
-    stroke: #000;
-    stroke-width: 0.8px;
+  /* stroke: white; */
+  stroke: #000;
+  stroke-width: 0.8px;
+}
+
+/*Tasks Table*/
+.inputContainer {
+  display: flex;
+  justify-content: space-evenly;
+  margin-bottom: 10px;
+}
+.inputContainer input[type="text"] {
+  width: 200px;
+  padding: 0 10px;
+  border: none;
 }
