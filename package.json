@@ -10,6 +10,14 @@
     "e2e": "ng e2e"
   },
   "private": true,
+  "workspaces": {
+    "packages": [
+      "provenance-core",
+      "provenance-tree-visualization",
+      "slide-deck-visualization",
+      "provenance-task-list"
+    ]
+  },
   "dependencies": {
     "@angular/animations": "^6.0.7",
     "@angular/cdk": "^6.3.3",
@@ -25,6 +33,7 @@
     "@visualstorytelling/provenance-core": "*",
     "@visualstorytelling/provenance-tree-visualization": "*",
     "@visualstorytelling/slide-deck-visualization": "^1.0.0",
+    "@visualstorytelling/provenance-task-list": "^1.0.0",
     "ami.js": "^0.0.22",
     "core-js": "^2.5.4",
     "d3": "^5.4.0",
