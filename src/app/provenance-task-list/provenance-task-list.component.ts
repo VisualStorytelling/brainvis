@@ -4,7 +4,7 @@ import { ProvenanceTaskList } from '@visualstorytelling/provenance-task-list';
 
 @Component({
   selector: 'app-provenance-task-list',
-  template: '<div></div>',
+  template: '',
   styleUrls: ['./provenance-task-list.component.css']
 })
 export class ProvenanceTaskListComponent implements OnInit {

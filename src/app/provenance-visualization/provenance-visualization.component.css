@@ -79,3 +79,16 @@ app-provenance-visualization {
   stroke: #000;
   stroke-width: 0.8px;
 }
+.inputContainer {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  margin-top: 10px;
+}
+.inputContainer input[type="text"] {
+  border: none;
+  width: 200px;
+}
+.inputContainer input[type="text"]:focus {
+  outline: none;
+}
