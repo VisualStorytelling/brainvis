@@ -176,8 +176,8 @@ export default class SliceManipulatorWidget extends THREE.Object3D implements II
                 // starts at the edge of the volume and does not intersect it at all
                 const beginOffset = this.originalSlicePosition.clone();
                 beginOffset.sub(offset);
-                const interSetionPoint = this.intersectStackHelper(beginOffset, offset);
-                this.stackHelper.slice.planePosition.copy(interSetionPoint);
+                const interSectionPoint = this.intersectStackHelper(beginOffset, offset);
+                this.stackHelper.slice.planePosition.copy(interSectionPoint);
             } else if (this.previousSelection === this.sphere) {
                 const direction = intersectionPoint.clone();
                 direction.sub(this.stackHelper.slice.planePosition);

@@ -5,6 +5,7 @@
 */
 
 import * as THREE from 'three';
+import { Function } from 'estree';
 // const { Event, Object3D } = THREE;
 
 export interface IIntersectionListener {
@@ -17,21 +18,18 @@ export interface IIntersectionListener {
 
 export class StaticGeometryListener implements IIntersectionListener {
     object: THREE.Object3D;
+    onMouseDown: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
+    onMouseUp: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
+    onMouseMove: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
 
-    constructor(object: THREE.Object3D) {
+    constructor(object: THREE.Object3D, 
+                onMouseDown?:(intersection: THREE.Intersection, pointer: MouseEvent) => void,
+                onMouseUp?:(intersection: THREE.Intersection, pointer: MouseEvent) => void, 
+                onMouseMove?:(intersection: THREE.Intersection, pointer: MouseEvent) => void) {
         this.object = object;
-    }
-
-    onMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
-        //
-    }
-
-    onMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
-        //
-    }
-
-    onMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
-        //
+        this.onMouseDown = onMouseDown;
+        this.onMouseUp = onMouseUp;
+        this.onMouseMove = onMouseMove;
     }
 
     getObjects() {

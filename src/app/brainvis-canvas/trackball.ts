@@ -162,7 +162,7 @@ export default class Trackball extends THREE.EventDispatcher {
     };
   }());
 
-  constructor(object: THREE.Camera, domElement) {
+  constructor(object: THREE.Camera, domElement: HTMLCanvasElement) {
     super();
 
     this.camera = object;

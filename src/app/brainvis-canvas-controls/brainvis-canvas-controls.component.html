@@ -1,13 +1,20 @@
-<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle">
+<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle" [(disabled)]="canvas.showSliceHandleDisabled">
   Show slice handle
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showSlice">
+<mat-slide-toggle [(ngModel)]="canvas.showSlice" [(disabled)]="canvas.showSliceDisabled">
   Show slice
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showObjects">
+<mat-slide-toggle [(ngModel)]="canvas.showObjects" [(disabled)]="canvas.showObjectsDisabled">
   Show segmented objects
 </mat-slide-toggle>
-<div>
-  <button mat-button color="primary" id="alignButton">Align to slice</button>
-</div>
+<mat-slide-toggle [(ngModel)]="canvas.alignMode">
+  Align camera to slice
+</mat-slide-toggle>
+<mat-slide-toggle [(ngModel)]="canvas.editMode" [(disabled)]="canvas.editModeDisabled">
+  Segmentation mode
+</mat-slide-toggle>
+<mat-slider [(ngModel)]="canvas.segmentationSize" [(disabled)]="canvas.editModeDisabled" [min]='min' [max]='max' [step]='step' >
+  Segmentation size
+</mat-slider>
+<app-styled-slider [canvas]="canvas"></app-styled-slider>
 

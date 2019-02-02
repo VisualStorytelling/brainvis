@@ -56,7 +56,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       doArguments: [position, direction],
       undo: 'setSlicePlaneZoom',
       undoArguments: [oldPosition, oldDirection],
-    });
+    }, true);
   });
 
   canvas.showSliceChange.subscribe(val => {
@@ -85,6 +85,26 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
       do: 'showObjects',
       doArguments: [val],
       undo: 'showObjects',
+      undoArguments: [!val],
+    }, true);
+  });
+
+  canvas.editModeChange.subscribe(val => {
+    tracker.applyAction({
+      metadata: {userIntent: 'configuration'},
+      do: 'editMode',
+      doArguments: [val],
+      undo: 'editMode',
+      undoArguments: [!val],
+    }, true);
+  });
+
+  canvas.alignModeChange.subscribe(val => {
+    tracker.applyAction({
+      metadata: {userIntent: 'configuration'},
+      do: 'alignMode',
+      doArguments: [val],
+      undo: 'alignMode',
       undoArguments: [!val],
     }, true);
   });
