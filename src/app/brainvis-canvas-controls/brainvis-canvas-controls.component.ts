@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, ViewEncapsulation  } from '@angular/core';
 import { Options } from 'ng5-slider';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 import { StyledSliderComponent } from './styled-slider/styled-slider.component';
@@ -11,7 +11,19 @@ import { StyledSliderComponent } from './styled-slider/styled-slider.component';
 export class BrainvisCanvasControlsComponent {
   @Input() canvas: BrainvisCanvasComponent;
 
-  min = 1;
-  max = 9;
-  step = 2;
+  private availableColorMaps = [
+    {value: 'grayscale', viewValue: 'Grayscale'},
+    {value: 'pastels', viewValue: 'Colorful'}
+  ];
+
+  public min = 1;
+  public max = 9;
+  public step = 2;
+  public selectedColorMap = 'grayscale';
+
+  change(event) {
+    if(event.isUserInput) {
+      this.canvas.colorMap = event.source.value;
+    }
+  }
 }

@@ -55,6 +55,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _thresholdUpperBound = 1426;
   private _thresholdMinValue = 10;
   private _thresholdMaxValue = 90;
+
+  private _colorMap = 'grayscale';
   // private annotationAnchorSelector: AnnotationAnchorSelector;
 
   @Input() set showSlice(showSlice: boolean) {
@@ -162,6 +164,16 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
   get thresholdMaxValue() { return this._thresholdMaxValue; }
   @Output() thresholdMaxValueChange = new EventEmitter<number>();
+
+  @Input() set colorMap(value: string) {
+    this._colorMap = value;
+    if (this.stackHelper) {
+      this.stackHelper.slice.colorMap = this._colorMap;
+    }
+    this.colorMapValueChange.emit(value);
+  }
+  get colorMap() { return this._colorMap; }
+  @Output() colorMapValueChange = new EventEmitter<string>();
 
 
   // @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
@@ -364,6 +376,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         this.stackHelper.slice.planePosition.y = centerLPS.y;
         this.stackHelper.slice.planePosition.z = centerLPS.z;
         this.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
+        this.stackHelper.slice.colorMap = 'grayscale';
         this.stackHelper.slice._update();
         this.stackHelper.border.helpersSlice = this.stackHelper.slice;
 

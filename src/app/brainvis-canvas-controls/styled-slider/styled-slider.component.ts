@@ -21,7 +21,7 @@ export class StyledSliderComponent implements DoCheck {
 
     ngDoCheck() {
       let changeDetected = false;
-      
+
       if (this.canvas.thresholdLowerBound !== this.options.floor) {
         changeDetected = true;
       }
@@ -34,7 +34,7 @@ export class StyledSliderComponent implements DoCheck {
         const newOptions: Options = Object.assign({}, this.options);
         newOptions.floor = this.canvas.thresholdLowerBound;
         newOptions.ceil = this.canvas.thresholdUpperBound;
-  
+
         this.options = newOptions;
       }
     }

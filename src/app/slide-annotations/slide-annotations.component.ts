@@ -20,7 +20,9 @@ export class SlideAnnotationsComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.slides.deck.selectedSlide);
+    if (this.slides && this.slides.deck) {
+      console.log(this.slides.deck.selectedSlide);
+    }
   }
 
   get annotations() {
@@ -51,5 +53,4 @@ export class SlideAnnotationsComponent implements OnInit {
       new SlideAnnotation({text: ''})
     );
   }
-
 }

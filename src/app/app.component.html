@@ -1,23 +1,28 @@
 <mat-sidenav-container hasBackdrop="false">
   <mat-sidenav position="end" #sidenav mode="over" [opened]="false" hasBackdrop="false">
-    <button id="sidenav-trigger" color="primary" style="color: white" mat-icon-button (click)="sidenav.toggle()">
+    <button id="sidenav-trigger" color="primary" style="color: orange" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>
     </button>
 
     <!-- Sidenav content -->
     <app-provenance-visualization></app-provenance-visualization>
-    <app-provenance-slides #slides></app-provenance-slides>
+    <app-provenance-task-list class='task-list-container'></app-provenance-task-list>
   </mat-sidenav>
 
 
   <mat-sidenav-content>
     <app-brainvis-canvas #canvas></app-brainvis-canvas>
-    <div id="bottom-container">
+    <div id="top-container">
       <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
+      <app-slide-annotations id="annotation-overlay" [slides]="slides">
+        bladiebla
+      </app-slide-annotations>
     </div>
-    <app-slide-annotations id="annotation-overlay" [slides]="slides">
-      bladiebla
-    </app-slide-annotations>
+    <div id="bottom-container">
+      <app-slides-container>
+        <app-provenance-slides #slides></app-provenance-slides>
+      </app-slides-container>
+    </div>
     <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->
     <!--<p></p>-->
   </mat-sidenav-content>

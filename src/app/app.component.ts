@@ -8,11 +8,16 @@ import { ProvenanceService } from './provenance.service';
 })
 export class AppComponent implements OnInit {
   title = 'app';
+  private bottomDrawerOpen  = true;
+
   constructor(private provenance: ProvenanceService) {
     // console.log(arg);
     console.log('constructor');
   }
   ngOnInit() {
     console.log('init?');
+  }
+  toggleBottomDrawer() {
+    this.bottomDrawerOpen = !this.bottomDrawerOpen;
   }
 }

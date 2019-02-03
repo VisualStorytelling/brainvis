@@ -6,7 +6,8 @@
     "packages/ami",
     "packages/@visualstorytelling/provenance-core",
     "packages/@visualstorytelling/provenance-tree-visualization",
-    "packages/@visualstorytelling/slide-deck-visualization"
+    "packages/@visualstorytelling/slide-deck-visualization",
+    "packages/@visualstorytelling/provenance-task-list"
   ],
   "scripts": {
     "ng": "ng",

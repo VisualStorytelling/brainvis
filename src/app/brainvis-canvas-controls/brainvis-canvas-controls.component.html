@@ -16,5 +16,12 @@
 <mat-slider [(ngModel)]="canvas.segmentationSize" [(disabled)]="canvas.editModeDisabled" [min]='min' [max]='max' [step]='step' >
   Segmentation size
 </mat-slider>
+<mat-form-field>
+    <mat-select [(value)]='selectedColorMap'>
+      <mat-option *ngFor="let cm of availableColorMaps" (onSelectionChange)="change($event)" [value]="cm.value">
+        {{cm.viewValue}}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 <app-styled-slider [canvas]="canvas"></app-styled-slider>
 

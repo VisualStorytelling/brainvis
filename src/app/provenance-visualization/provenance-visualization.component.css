@@ -12,7 +12,7 @@ app-provenance-visualization {
 }
 
 .node circle {
-    stroke-width: .3px;
+    stroke-width: 0.3px;
     opacity: 0.6;
 }
 
@@ -44,28 +44,33 @@ app-provenance-visualization {
     fill: #9210dd;
 }
 
-.node.branch-active {    
+.node circle.intent_wrapped {
+    fill: white;
+    stroke: black;
+    stroke-dasharray: 3;
+    stroke-width: .6px;
+}
+
+.node.branch-active {
     background-color: #ccc;
 }
 
 .node.branch-active text {
     display: block;
 }
+
 .node.branch-active.node circle {
     opacity: 1;
-    
 }
 
-.node.node-active {    
-    stroke: #4ba3bd;    
-}
+.node.node-active {}
 
 .node.node-active circle {
-    r: 3;
+    stroke: black;
+    stroke-width: 1.5px;
 }
 
 .node text {
-    display: none;
     /* fill: white; */
     fill: #000;
     stroke-width: 0;
@@ -83,4 +88,34 @@ app-provenance-visualization {
     /* stroke: white; */
     stroke: #000;
     stroke-width: 0.8px;
+}
+
+.titleAggregation {
+    font-family: sans-serif;
+    font-size: 25px;
+}
+
+.dataAggregation-Box {
+    margin: 8px 0px 0px 12px;
+    font-family: sans-serif;
+}
+
+.aggButton {
+    width: 43%;
+    margin: 0px 10px 0px 5px;
+    font-size: 16px;
+    font-family: sans-serif;
+}
+
+.circle-text {
+    font-size: 6px;
+    display: block;
+}
+
+.circle-label {
+    font-size: 7px;
+}
+
+.hiddenClass {
+    display: none;
 }
