@@ -1,0 +1,14 @@
+.inputContainer {
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  margin-top: 10px;
+  border-radius: 10px;
+}
+.inputContainer input[type="text"] {
+  border: none;
+  width: 200px;
+}
+.inputContainer input[type="text"]:focus {
+  outline: none;
+}
