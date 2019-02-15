@@ -1129,8 +1129,8 @@ class ProvenanceTaskList {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNodeIntent", function() { return getNodeIntent; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceTreeVisualization", function() { return ProvenanceTreeVisualization; });
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "../node_modules/d3/index.js");
-/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
+/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! d3 */ "../node_modules/d3/index.js");
 
 
 
@@ -1208,10 +1208,10 @@ function GratzlLayout() {
 }
 
 /**
-* @description Child removed, child's children go to the parent.
-* @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
-* @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
-*/
+ * @description Child removed, child's children go to the parent.
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
+ * @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
+ */
 function transferToParent(node, child) {
     var _a, _b;
     node.children.splice(node.children.indexOf(child), 1);
@@ -1219,23 +1219,23 @@ function transferToParent(node, child) {
     (_b = node.wrappedNodes).push.apply(_b, child.wrappedNodes);
 }
 /**
-* @description Child removed, child's children go to child2. Child2 becomes node's child.
-* @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
-* @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
-* @param child2 {IGroupedTreeNode<ProvenanceNode>} - Child of the child node
-*/
-function transferChildrens(node, child, child2) {
+ * @description Child removed, child's children go to grandChild. GrandChild becomes node's child.
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
+ * @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
+ * @param grandChild {IGroupedTreeNode<ProvenanceNode>} - Child of the child node
+ */
+function transferChildren(node, child, grandChild) {
     var _a, _b;
     node.children.splice(node.children.indexOf(child), 1);
-    child.children.splice(child.children.indexOf(child2), 1);
-    (_a = child2.wrappedNodes).push.apply(_a, child.wrappedNodes);
-    (_b = child2.children).push.apply(_b, child.children);
-    node.children.push(child2);
+    child.children.splice(child.children.indexOf(grandChild), 1);
+    (_a = grandChild.wrappedNodes).push.apply(_a, child.wrappedNodes);
+    (_b = grandChild.children).push.apply(_b, child.children);
+    node.children.push(grandChild);
 }
 /**
-* @description Pointed node wraps ALL children recursively
-* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
-*/
+ * @description Pointed node wraps ALL children recursively
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+ */
 function transferAll(node) {
     var done;
     do {
@@ -1248,28 +1248,59 @@ function transferAll(node) {
     } while (done);
 }
 /**
-* @description Returns the maximum depth possible from the node selected.
-* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
-* @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
-*/
+ * @description Returns the minimum depth possible from the node selected.
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+ * @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
+ */
+var minDepth = function (node) {
+    if (node.children.length === 0) {
+        return 0;
+    }
+    return Math.min.apply(Math, node.children.map(minDepth)) + 1;
+};
+/**
+ * @description Returns the maximum depth possible from the node selected.
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+ * @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
+ */
 var maxDepth = function (node) {
     if (node.children.length === 0) {
         return 1;
     }
-    return (Math.max.apply(Math, node.children.map(maxDepth)) + 1);
+    return Math.max.apply(Math, node.children.map(maxDepth)) + 1;
 };
 /**
-* @description Returns the number of conexions with the node selected.
-* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
-* @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
-*/
+ * @description Returns the distance to the subroot from the node selected.
+ * @param provNode {ProvenanceNode} - Selected node
+ * @returns Number of nodes you have to cross to go to the subroot up from the node selected.
+ */
+var subrootDist = function (provNode) {
+    var value = 0;
+    if (!Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__["isStateNode"])(provNode)) {
+        value = 0;
+    }
+    else if (Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__["isStateNode"])(provNode)) {
+        if (provNode.parent.children.length > 1) {
+            value = 1;
+        }
+        else {
+            value = 1 + subrootDist(provNode.parent);
+        }
+    }
+    return value;
+};
+/**
+ * @description Returns the number of conexions with the node selected.
+ * @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+ * @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
+ */
 var connectivity = function (node) {
-    return (1 + node.children.length);
+    return 1 + node.children.length;
 };
 /**
-* @description Return the first node found in nodes that also belongs to the main branch of the tree.
-* @param  mainBranch  {IGroupedTreeNode<ProvenanceNode>} - Selected node
-*/
+ * @description Return the first node found in nodes that also belongs to the main branch of the tree.
+ * @param  mainBranch  {IGroupedTreeNode<ProvenanceNode>} - Selected node
+ */
 var mainNode = function (mainBranch, nodes) {
     var mNode = undefined;
     for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
@@ -1282,10 +1313,10 @@ var mainNode = function (mainBranch, nodes) {
     return mNode;
 };
 /**
-* @description Compare the depth of two selected nodes.
-* @param  node1  {IGroupedTreeNode<ProvenanceNode>} - Selected node #1
-* @param  node2  {IGroupedTreeNode<ProvenanceNode>} - Selected node #2
-*/
+ * @description Compare the depth of two selected nodes.
+ * @param  node1  {IGroupedTreeNode<ProvenanceNode>} - Selected node #1
+ * @param  node2  {IGroupedTreeNode<ProvenanceNode>} - Selected node #2
+ */
 var nodeDepthComparison = function (node1, node2) {
     if (maxDepth(node1) > maxDepth(node2)) {
         return 1;
@@ -1297,16 +1328,15 @@ var nodeDepthComparison = function (node1, node2) {
 };
 /////////////////// DIFFERENT DATA AGGREGATION ALGORITHM ///////////
 /**
-* @description No algorithm is applied. Created for a better understanding.
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-*/
-var doNothing = function (node, test) {
-};
+ * @description No algorithm is applied. Created for a better understanding.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ */
+var doNothing = function (node, test) { };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ */
 var group = function (node, test) {
     var merged = false;
     do {
@@ -1314,9 +1344,9 @@ var group = function (node, test) {
         for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
             var child = _a[_i];
             for (var _b = 0, _c = child.children; _b < _c.length; _b++) {
-                var child2 = _c[_b];
-                if (test(child, child2)) {
-                    transferChildrens(node, child, child2);
+                var grandChild = _c[_b];
+                if (test(child, grandChild)) {
+                    transferChildren(node, child, grandChild);
                     merged = true;
                     break;
                 }
@@ -1328,9 +1358,9 @@ var group = function (node, test) {
     node.children.map(function (child) { return group(child, test); });
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ */
 var compress = function (node, test) {
     var merged = false;
     do {
@@ -1347,9 +1377,9 @@ var compress = function (node, test) {
     node.children.map(function (child) { return compress(child, test); });
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ */
 var categorize = function (node, test, mainBranch) {
     var merged = false;
     var bannedNodes = [];
@@ -1369,7 +1399,7 @@ var categorize = function (node, test, mainBranch) {
                 }
             } // end - for loop for creating the testedNodes list
             if (mainNode_1) {
-                transferChildrens(node, child, mainNode_1);
+                transferChildren(node, child, mainNode_1);
                 bannedNodes = testedNodes;
                 merged = true;
                 break;
@@ -1377,11 +1407,13 @@ var categorize = function (node, test, mainBranch) {
             else {
                 for (var _d = 0, testedNodes_1 = testedNodes; _d < testedNodes_1.length; _d++) {
                     var child2 = testedNodes_1[_d];
-                    if (!(bannedNodes.includes(child2))) {
-                        var depths = testedNodes.map(function (d) { return maxDepth(d); });
+                    if (!bannedNodes.includes(child2)) {
+                        var depths = testedNodes.map(function (d) {
+                            return maxDepth(d);
+                        });
                         var maxDepthNode = Math.min.apply(Math, depths);
                         if (maxDepthNode == maxDepth(child2)) {
-                            transferChildrens(node, child, child2);
+                            transferChildren(node, child, child2);
                             bannedNodes = testedNodes;
                             merged = true;
                             break;
@@ -1396,21 +1428,21 @@ var categorize = function (node, test, mainBranch) {
     node.children.map(function (child) { return categorize(child, test, mainBranch); });
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var shrink = function (node, test, mainBranch, arg) {
     auxShrink(node, test, mainBranch, arg);
-    compress(node, test);
+    // compress(node, test);
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var auxShrink = function (node, test, mainBranch, arg) {
     var parameter = +arg;
     var numChildren = node.children.length;
@@ -1432,25 +1464,25 @@ var auxShrink = function (node, test, mainBranch, arg) {
         numChildren--;
     }
     for (var j = 0; j < numChildren; j++) {
-        auxShrink(node.children[j], test, mainBranch, (parameter - Math.trunc((j + 1) / 2)));
+        auxShrink(node.children[j], test, mainBranch, parameter - Math.trunc((j + 1) / 2));
     }
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var pruneI = function (node, test, mainBranch, arg) {
     auxPruneI(node, test, mainBranch, arg);
-    compress(node, test);
+    // compress(node, test);
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var auxPruneI = function (node, test, mainBranch, arg) {
     var parameter = +arg;
     var merged;
@@ -1459,7 +1491,9 @@ var auxPruneI = function (node, test, mainBranch, arg) {
         if (connectivity(node) > 2) {
             for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
                 var child = _a[_i];
-                if (maxDepth(child) <= parameter && mainBranch && !mainBranch.includes(child.wrappedNodes[0].id)) {
+                if (maxDepth(child) <= parameter &&
+                    mainBranch &&
+                    !mainBranch.includes(child.wrappedNodes[0].id)) {
                     transferAll(child);
                     transferToParent(node, child);
                     merged = true;
@@ -1471,21 +1505,21 @@ var auxPruneI = function (node, test, mainBranch, arg) {
     node.children.map(function (child) { return auxPruneI(child, test, mainBranch, parameter); });
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var pruneII = function (node, test, mainBranch, arg) {
     auxPruneII(node, test, mainBranch, arg);
-    compress(node, test);
+    // compress(node, test);
 };
 /**
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
-* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
-* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
-* @param arg {any} - Optinal parameter
-*/
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+ * @param arg {any} - Optinal parameter
+ */
 var auxPruneII = function (node, test, mainBranch, arg) {
     var parameter = +arg;
     var merged;
@@ -1496,7 +1530,9 @@ var auxPruneII = function (node, test, mainBranch, arg) {
             if (connectivity(child) > 2) {
                 for (var _b = 0, _c = child.children; _b < _c.length; _b++) {
                     var child2 = _c[_b];
-                    if (maxDepth(child2) <= parameter && mainBranch && !mainBranch.includes(child2.wrappedNodes[0].id)) {
+                    if (maxDepth(child2) <= parameter &&
+                        mainBranch &&
+                        !mainBranch.includes(child2.wrappedNodes[0].id)) {
                         transferAll(child2);
                         transferToParent(child, child2);
                         child.wrappedNodes.reverse();
@@ -1511,187 +1547,267 @@ var auxPruneII = function (node, test, mainBranch, arg) {
     } while (merged);
     node.children.map(function (child) { return auxPruneII(child, test, mainBranch, parameter); });
 };
+/**
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param arg {any} - Optinal parameter
+ */
+var plotTrimmerFunc = function (node, test, mainBranch, arg) {
+    trimmer(node, test, mainBranch, arg);
+};
+var trimmerAssignValues = function (node) {
+    // Leaf value = subroot distance * 2
+    // Interval nodes value = 1
+    // Subroots value = Minimum subroot distance of children * 2 + 1
+    var value = 0;
+    if (!Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__["isStateNode"])(node.wrappedNodes[0]) === null) {
+        value = Number.MAX_VALUE;
+    }
+    else if (connectivity(node) === 1) {
+        // Leaf node
+        value = subrootDist(node.wrappedNodes[0]) * 2;
+    }
+    else if (connectivity(node) === 2) {
+        // Interval node
+        value = 1;
+    }
+    else {
+        // Subroot
+        value = minDepth(node) * 2 + 1;
+    }
+    node.plotTrimmerValue = value;
+    for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+        var child = _a[_i];
+        trimmerAssignValues(child);
+    }
+};
+/**
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+ * @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+ * @param arg {any} - Optinal parameter
+ */
+var trimmer = function (node, test, mainBranch, arg) {
+    var parameter = +arg;
+    var merged;
+    trimmerAssignValues(node);
+    do {
+        merged = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            if (parameter >= child.plotTrimmerValue) {
+                transferToParent(node, child);
+                merged = true;
+            }
+        }
+    } while (merged);
+    node.children.map(function (child) { return trimmer(child, test, mainBranch, parameter); });
+};
 
 /**
-* @description Getter for the user intent of the node selected.
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
-* @returns Returns the Intent of the user for the node selected.
-*/
+ * @description Getter for the user intent of the node selected.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+ * @returns Returns the Intent of the user for the node selected.
+ */
 function getNodeIntent(node) {
-    if (Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["isStateNode"])(node) && node.action && node.action.metadata && node.action.metadata.userIntent) {
+    if (Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__["isStateNode"])(node) &&
+        node.action &&
+        node.action.metadata &&
+        node.action.metadata.userIntent) {
         return node.action.metadata.userIntent;
     }
-    return 'none';
+    return "none";
 }
 /**
-* @description Test whether a node is a key node or not.
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
-*/
+ * @description Test whether a node is a key node or not.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+ */
 function isKeyNode(node) {
-    if (!Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["isStateNode"])(node) || node.children.length === 0 || node.children.length > 1 || node.parent.children.length > 1 ||
-        (node.children.length === 1 && getNodeIntent(node) !== getNodeIntent(node.children[0]))) {
+    if (!Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_0__["isStateNode"])(node) ||
+        node.children.length === 0 ||
+        node.children.length > 1 ||
+        node.parent.children.length > 1 ||
+        (node.children.length === 1 &&
+            getNodeIntent(node) !== getNodeIntent(node.children[0]))) {
         return true;
     }
     return false;
 }
 /**
-* @description Returns a label for grouped nodes.
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
-*/
+ * @description Returns a label for grouped nodes.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+ */
 var groupNodeLabel = function (node) {
     if (node.wrappedNodes.length === 1) {
         return node.wrappedNodes[0].label;
     }
     else {
-        return (node.wrappedNodes[0].label);
+        return node.wrappedNodes[0].label;
     }
 };
-/*
- */
 /**
-* @description Wraps each node in the provenance tree in an extra IGroupedTreeNode; which can be manipulated for grouping etc, without modifying the actual ProvenanceTree.
-* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
-*/
+ * @description Wraps each node in the provenance tree in an extra IGroupedTreeNode; which can be manipulated for grouping etc, without modifying the actual ProvenanceTree.
+ * @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+ */
 var wrapNode = function (node) {
     return {
         wrappedNodes: [node],
         children: node.children.map(wrapNode),
+        plotTrimmerValue: -1
     };
 };
 /**
-* @description Test if two nodes share the same userIntent.
-* @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
-* @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
-*/
-var testUserIntent = function (a, b) { return (a.children.length === 1 && b.children.length <= 1 &&
-    (getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]))); };
+ * @description Test if two nodes share the same userIntent.
+ * @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+ * @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+ */
+var testUserIntent = function (a, b) {
+    return a.children.length === 1 &&
+        b.children.length <= 1 &&
+        getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]);
+};
 /**
-* @description Test if two nodes share the same userIntent, regardless the number of conexions
-* @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
-* @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
-*/
-var testUserIntentCategory = function (a, b) { return ((getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]))); };
+ * @description Test if two nodes share the same userIntent, regardless the number of conexions
+ * @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+ * @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+ */
+var testUserIntentCategory = function (a, b) { return getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]); };
 /**
-* @description Test if b is an interval node.
-* @param a {IGroupedTreeNode<ProvenanceNode>} - Not used.
-* @param b {IGroupedTreeNode<ProvenanceNode>} - Node to be tested.
-*/
-var testUserActions = function (a, b) { return ((b.children.length === 1)); };
+ * @description Test if b is an interval node.
+ * @param a {IGroupedTreeNode<ProvenanceNode>} - Not used.
+ * @param b {IGroupedTreeNode<ProvenanceNode>} - Node to be tested.
+ */
+var testUserActions = function (a, b) { return b.children.length === 1; };
 //////// Objects that represent the different data aggregation algorithms///////////
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var rawData = {
-    name: 'Raw data',
+    name: "Raw data",
     test: testUserIntent,
     algorithm: doNothing,
     arg: false,
-    description: 'No algorithm is applied. The full provenance data is shown.',
+    description: "No algorithm is applied. The full provenance data is shown."
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var grouping = {
-    name: 'Grouping',
+    name: "Grouping",
     test: testUserIntent,
     algorithm: group,
     arg: false,
-    description: 'This algorithm groups nodes of the same category (color). \n' +
-        'The remaining nodes represent the last interactions of category groups.\n' +
-        '\t The grouped nodes must have connectivity equal to two or less (interval nodes or leaves) and must belong to the same category group.\n',
+    description: "This algorithm groups nodes of the same category (color). \n" +
+        "The remaining nodes represent the last interactions of category groups.\n" +
+        "\t The grouped nodes must have connectivity equal to two or less (interval nodes or leaves) and must belong to the same category group.\n"
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var compression = {
-    name: 'Compression',
+    name: "Compression",
     test: testUserActions,
     algorithm: compress,
     arg: false,
     description: 'This algorithm groups nodes with connectivity equals to two (interval nodes). However, the node which "absorbs" the grouped nodes and which is still visualized can be of any connectivity\n' +
-        'The remaining nodes are nodes with connectivity different to two (leaves or subroots). \n' +
-        'The nodes are grouped regardless their category.\n',
+        "The remaining nodes are nodes with connectivity different to two (leaves or subroots). \n" +
+        "The nodes are grouped regardless their category.\n"
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var categorization = {
-    name: 'Categorizing',
+    name: "Categorizing",
     test: testUserIntentCategory,
     algorithm: categorize,
     arg: true,
-    description: 'This algorithm groups nodes of the same category (color).\n' +
-        'The remaining nodes represent the last interactions of category groups.\n' +
-        'The nodes are grouped regardless their connectivity.\n' +
-        'The grouped nodes must belong to the same category group.',
+    description: "This algorithm groups nodes of the same category (color).\n" +
+        "The remaining nodes represent the last interactions of category groups.\n" +
+        "The nodes are grouped regardless their connectivity.\n" +
+        "The grouped nodes must belong to the same category group."
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var shrinking = {
-    name: 'Shrinking',
+    name: "Shrinking",
     test: testUserActions,
     algorithm: shrink,
     arg: true,
-    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
-        'The level of each branch is assigned according to the offset from the master branch.\n' +
-        'A chosen parameter indicates the maximum branch level to be shown.\n' +
-        'E.g., if the number selected is one, the only branch shown is the master one.\n' +
-        'Differently, if the number selected is two, the master branch and the two-level branches will be shown.\n',
+    description: "This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n" +
+        "The level of each branch is assigned according to the offset from the master branch.\n" +
+        "A chosen parameter indicates the maximum branch level to be shown.\n" +
+        "E.g., if the number selected is one, the only branch shown is the master one.\n" +
+        "Differently, if the number selected is two, the master branch and the two-level branches will be shown.\n"
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var pruningI = {
-    name: 'Pruning I',
+    name: "Pruning I",
     test: testUserActions,
     algorithm: pruneI,
     arg: true,
-    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
-        'A chosen parameter indicates the minimum height that a subtree must have to be shown.\n' +
-        'E.g., if the chosen parameter is two, the subtrees with height two or less than two will be grouped.\n' +
-        'The grouped subtrees are represented by their subroot.' +
-        'The main tree is not considered as a subtree.',
+    description: "This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n" +
+        "A chosen parameter indicates the minimum height that a subtree must have to be shown.\n" +
+        "E.g., if the chosen parameter is two, the subtrees with height two or less than two will be grouped.\n" +
+        "The grouped subtrees are represented by their subroot." +
+        "The main tree is not considered as a subtree."
 };
 /**
-* @description Object of the interface DataAggregation<ProvenanceNode>.
-*/
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
 var pruningII = {
-    name: 'Pruning II',
+    name: "Pruning II",
     test: testUserActions,
     algorithm: pruneII,
     arg: true,
-    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
-        'A chosen parameter indicates the minimum depth that a subtree must have to be shown.\n' +
-        'E.g., if the chosen parameter is two, the subtrees with height two or less will be grouped.\n' +
-        'The grouped subtrees are represented by their deepest leaf.' +
-        'The main tree is not considered as a subtree.',
+    description: "This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n" +
+        "A chosen parameter indicates the minimum depth that a subtree must have to be shown.\n" +
+        "E.g., if the chosen parameter is two, the subtrees with height two or less will be grouped.\n" +
+        "The grouped subtrees are represented by their deepest leaf." +
+        "The main tree is not considered as a subtree."
 };
 /**
-* @description List of the data aggregation objects. Whenever you want to add a new data aggregation algorithm: create object and add it to this list.
-*/
-var aggregationObjects = [rawData, grouping,
-    compression, categorization,
-    shrinking, pruningI,
-    pruningII];
+ * @description Object of the interface DataAggregation<ProvenanceNode>.
+ */
+var plotTrimmer = {
+    name: "PlotTrimmer",
+    test: testUserActions,
+    algorithm: plotTrimmerFunc,
+    arg: true,
+    description: "Lorem Ipsum"
+};
 /**
-* @description Class used to create and manage a provenance tree visualization.
-* @param traverser {ProvenanceGraphTraverser} - To manage the data structure of the graph.
-* @param svg {D3SVGSelection} - To manage the graphics of the tree.
-* @param _dataAggregation {DataAggregation<ProvenanceNode>} - Data aggregation in use.
-* @param caterpillarActivated {boolean} - True if this feature is enable.
-*/
+ * @description List of the data aggregation objects. Whenever you want to add a new data aggregation algorithm: create object and add it to this list.
+ */
+var aggregationObjects = [
+    rawData,
+    grouping,
+    compression,
+    categorization,
+    shrinking,
+    pruningI,
+    pruningII,
+    plotTrimmer
+];
+/**
+ * @description Class used to create and manage a provenance tree visualization.
+ * @param traverser {ProvenanceGraphTraverser} - To manage the data structure of the graph.
+ * @param svg {D3SVGSelection} - To manage the graphics of the tree.
+ * @param _dataAggregation {DataAggregation<ProvenanceNode>} - Data aggregation in use.
+ * @param caterpillarActivated {boolean} - True if this feature is enable.
+ */
 var ProvenanceTreeVisualization = /** @class */ (function () {
     function ProvenanceTreeVisualization(traverser, elm) {
         var _this = this;
         this._dataAggregation = rawData; // changed from original
         this.caterpillarActivated = false;
         this.traverser = traverser;
-        this.setTittle(elm);
-        this.svg = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm).append('svg')
-            .attr('viewBox', '-5 5 130 110')
-            .attr('style', 'width: 95%; height: 70%; margin-left:5px');
-        traverser.graph.on('currentChanged', function () { return _this.update(); });
+        this.setTitle(elm);
+        this.svg = Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])(elm).append("svg")
+            .attr("viewBox", "-5 5 130 110")
+            .attr("style", "width: 95%; height: 70%; margin-left:5px");
+        traverser.graph.on("currentChanged", function () { return _this.update(); });
         this.setButtons(elm);
         this.update();
     }
@@ -1706,30 +1822,35 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         configurable: true
     });
     /**
-    * @description Update the tree layout.
-    */
+     * @description Update the tree layout.
+     */
     ProvenanceTreeVisualization.prototype.update = function () {
         var _this = this;
         var wrappedRoot = wrapNode(this.traverser.graph.root);
         // group by the data aggregation algorithm
         if (this.DataAggregation.arg) {
             // Store the main branch in the constant mainBranch
-            var treeRoot_1 = Object(d3__WEBPACK_IMPORTED_MODULE_0__["hierarchy"])(wrappedRoot); // Update de treeRoot
+            var treeRoot_1 = Object(d3__WEBPACK_IMPORTED_MODULE_1__["hierarchy"])(wrappedRoot); // Update de treeRoot
             var layoutCurrentNode_1 = treeRoot_1;
             treeRoot_1.each(function (node) {
                 if (node.data.wrappedNodes.includes(_this.traverser.graph.current)) {
                     layoutCurrentNode_1 = node;
                 }
             });
-            var mainBranch = treeRoot_1.path(layoutCurrentNode_1).map(function (d) { return d.data.wrappedNodes[0].id; });
-            this.DataAggregation.algorithm(wrappedRoot, this.DataAggregation.test, mainBranch, Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#arg').property('value'));
+            var mainBranch = treeRoot_1
+                .path(layoutCurrentNode_1)
+                .map(function (d) { return d.data.wrappedNodes[0].id; });
+            this.DataAggregation.algorithm(wrappedRoot, this.DataAggregation.test, mainBranch, Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("#arg").property("value"));
             // console.log("ha entrado en el correcto");
         }
         else {
             this.DataAggregation.algorithm(wrappedRoot, this.DataAggregation.test);
         }
-        var treeRoot = Object(d3__WEBPACK_IMPORTED_MODULE_0__["hierarchy"])(wrappedRoot); // Updated de treeRoot
-        var treeLayout = GratzlLayout().size([100 / 2, 120]);
+        var treeRoot = Object(d3__WEBPACK_IMPORTED_MODULE_1__["hierarchy"])(wrappedRoot); // Updated de treeRoot
+        var treeLayout = GratzlLayout().size([
+            100 / 2,
+            120
+        ]);
         var layoutCurrentNode = treeRoot;
         treeRoot.each(function (node) {
             if (node.data.wrappedNodes.includes(_this.traverser.graph.current)) {
@@ -1739,75 +1860,69 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         var tree = treeLayout(treeRoot, layoutCurrentNode);
         var treeNodes = tree.descendants();
         var oldNodes = this.svg
-            .selectAll('g.node')
-            .data(treeNodes, function (d) { return (d.data.wrappedNodes.map(function (n) { return n.id; }).join()); });
+            .selectAll("g.node")
+            .data(treeNodes, function (d) {
+            return d.data.wrappedNodes.map(function (n) { return n.id; }).join();
+        });
         oldNodes.exit().remove();
         var newNodes = oldNodes
             .enter()
-            .append('g')
-            .attr('class', 'node')
-            .attr('transform', function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
+            .append("g")
+            .attr("class", "node")
+            .attr("transform", function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
+        newNodes.append("circle").attr("r", 2);
         newNodes
-            .append('circle')
-            .attr('r', 2);
-        newNodes
-            .append('text')
-            .attr('class', 'circle-label')
+            .append("text")
+            .attr("class", "circle-label")
             .text(function (d) { return groupNodeLabel(d.data); })
-            .attr('x', 7)
-            .attr('y', 3);
+            .attr("x", 7)
+            .attr("y", 3);
         newNodes
-            .append('text')
-            .attr('class', 'circle-text')
-            .text('1')
-            .attr('x', -1.5)
-            .attr('y', 2);
+            .append("text")
+            .attr("class", "circle-text")
+            .text("1")
+            .attr("x", -1.5)
+            .attr("y", 2);
         var updateNodes = newNodes.merge(oldNodes);
-        updateNodes
-            .select('circle')
-            .attr('class', function (d) {
-            var classString = '';
+        updateNodes.select("circle").attr("class", function (d) {
+            var classString = "";
             if (isKeyNode(d.data.wrappedNodes[0])) {
-                classString += ' keynode';
+                classString += " keynode";
             }
-            classString += ' intent_' + getNodeIntent(d.data.wrappedNodes[0]);
+            classString += " intent_" + getNodeIntent(d.data.wrappedNodes[0]);
             return classString;
         });
-        updateNodes
-            .select('text.circle-label')
-            .attr('visibility', function (d) {
+        updateNodes.select("text.circle-label").attr("visibility", function (d) {
             if (d.xOffset === 0) {
-                return 'visible';
+                return "visible";
             }
             else {
-                return 'hidden';
+                return "hidden";
             }
         });
         updateNodes
-            .select('text.circle-text')
-            .attr('visibility', function (d) {
-            if (d.data.wrappedNodes.length === 1) {
-                return 'hidden';
-            }
-            else {
-                return 'visible';
-            }
+            .select("text.circle-text")
+            .attr("visibility", function (d) {
+            return "visible";
+            // if (d.data.wrappedNodes.length === 1) {
+            //   return "hidden";
+            // } else {
+            //   return "visible";
+            // }
         })
-            .attr('x', function (d) {
+            .attr("x", function (d) {
             if (d.data.wrappedNodes.length >= 10) {
-                return (-3);
+                return -3;
             }
-            return (-1.5);
+            return -1.5;
         })
-            .text(function (d) { return d.data.wrappedNodes.length.toString(); });
-        updateNodes
-            .on('click', function (d) {
+            .text(function (d) { return d.data.plotTrimmerValue.toString(); });
+        // .text((d: any) => d.data.wrappedNodes.length.toString());
+        updateNodes.on("click", function (d) {
             _this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
             _this.update();
         });
-        updateNodes
-            .select('circle')
-            .attr('r', function (d) {
+        updateNodes.select("circle").attr("r", function (d) {
             var radius = 2;
             if (d.data.wrappedNodes.length != 1) {
                 radius = Math.min(2 + 2 + 0.3 * d.data.wrappedNodes.length, 7);
@@ -1815,13 +1930,15 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             return radius;
         });
         updateNodes
-            .attr('class', 'node branch-active')
-            .filter(function (d) { return d.data.wrappedNodes.includes(_this.traverser.graph.current); })
-            .attr('class', 'node branch-active node-active');
+            .attr("class", "node branch-active")
+            .filter(function (d) {
+            return d.data.wrappedNodes.includes(_this.traverser.graph.current);
+        })
+            .attr("class", "node branch-active node-active");
         updateNodes
             .transition()
             .duration(500)
-            .attr('transform', function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
+            .attr("transform", function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
         var linkPath = function (_a) {
             var source = _a.source, target = _a.target;
             var _b = [source, target], s = _b[0], t = _b[1];
@@ -1829,60 +1946,67 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             return "M" + s.x + "," + s.y + "\n              C" + s.x + ",  " + (s.y + t.y) / 2 + " " + t.x + ",  " + (s.y + t.y) / 2 + " " + t.x + ",  " + t.y;
         };
         var oldLinks = this.svg
-            .selectAll('path.link')
-            .data(tree.links(), function (d) { return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join(); });
+            .selectAll("path.link")
+            .data(tree.links(), function (d) {
+            return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join();
+        });
         oldLinks.exit().remove();
         var newLinks = oldLinks
             .enter()
-            .insert('path', 'g')
-            .attr('d', linkPath);
-        oldLinks.merge(newLinks)
-            .attr('class', 'link')
+            .insert("path", "g")
+            .attr("d", linkPath);
+        oldLinks
+            .merge(newLinks)
+            .attr("class", "link")
             .filter(function (d) { return d.target.xOffset === 0; })
-            .attr('class', 'link active');
-        oldLinks.merge(newLinks)
+            .attr("class", "link active");
+        oldLinks
+            .merge(newLinks)
             .transition()
             .duration(500)
-            .attr('d', linkPath);
+            .attr("d", linkPath);
         var updatedLinks = oldLinks.merge(newLinks);
         // Caterpillar routine if needed; *************************************************
         if (this.caterpillarActivated) {
             var mainNodes = updateNodes.filter(function (d) { return d.xOffset == 0; });
-            var mainNodesData_1 = mainNodes.data().map(function (d) { return d.data.wrappedNodes[0].id; });
+            var mainNodesData_1 = mainNodes
+                .data()
+                .map(function (d) { return d.data.wrappedNodes[0].id; });
             // console.log(mainNodesData);
-            var edgeNodes = mainNodes
-                .filter(function (d) {
+            var edgeNodes = mainNodes.filter(function (d) {
                 if (d.children) {
                     return d.children.length > 1;
                 }
                 return false;
             });
-            edgeNodes
-                .select('circle')
-                .attr('class', 'intent_wrapped');
+            edgeNodes.select("circle").attr("class", "intent_wrapped");
             // Hide the rest of the circles and links
             updateNodes
                 .filter(function (d) { return d.xOffset != 0; })
-                .attr('class', 'node hiddenClass');
+                .attr("class", "node hiddenClass");
             updatedLinks
                 .filter(function (d) { return d.target.xOffset != 0; })
-                .attr('class', 'node hiddenClass');
+                .attr("class", "node hiddenClass");
             // Set the label which indicate the number of nodes wrapped
             updateNodes
-                .select('text.circle-text')
+                .select("text.circle-text")
                 .filter(function (d) { return d.xOffset != 0; })
-                .attr('visibility', 'hidden');
+                .attr("visibility", "hidden");
             edgeNodes
-                .select('text.circle-text')
-                .attr('visibility', 'visible')
+                .select("text.circle-text")
+                .attr("visibility", "visible")
                 .text(function (d) {
                 var copyNode = d.copy();
-                copyNode.children = copyNode.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                copyNode.children = copyNode.children.filter(function (e, i, arr) {
+                    return !mainNodesData_1.includes(e.data.wrappedNodes[0].id);
+                });
                 return copyNode.descendants().length;
             })
-                .attr('x', function (d) {
+                .attr("x", function (d) {
                 var copyNode = d.copy();
-                copyNode.children = copyNode.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                copyNode.children = copyNode.children.filter(function (e, i, arr) {
+                    return !mainNodesData_1.includes(e.data.wrappedNodes[0].id);
+                });
                 if (copyNode.descendants().length < 10) {
                     return -1.5;
                 }
@@ -1891,41 +2015,50 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
                 }
             });
             // Set the radius of the circle
-            edgeNodes
-                .select('circle')
-                .attr('r', function (d) {
+            edgeNodes.select("circle").attr("r", function (d) {
                 return Math.min(4 + 0.15 * d.descendants().length, 6);
             });
             // Set the click function
-            edgeNodes
-                .on('click', function (d) {
-                var actualCatGraph = Object(d3__WEBPACK_IMPORTED_MODULE_0__["selectAll"])('.classCat');
+            edgeNodes.on("click", function (d) {
+                var actualCatGraph = Object(d3__WEBPACK_IMPORTED_MODULE_1__["selectAll"])(".classCat");
                 // When click again -> auxiliar tree disappearss.
-                if (actualCatGraph.data().map(function (k) { return k.data.wrappedNodes[0].id; }).includes(d.data.wrappedNodes[0].id)) {
-                    actualCatGraph.data([]).exit().remove();
-                    Object(d3__WEBPACK_IMPORTED_MODULE_0__["selectAll"])('path.linkCat').data([]).exit().remove();
+                if (actualCatGraph
+                    .data()
+                    .map(function (k) { return k.data.wrappedNodes[0].id; })
+                    .includes(d.data.wrappedNodes[0].id)) {
+                    actualCatGraph
+                        .data([])
+                        .exit()
+                        .remove();
+                    Object(d3__WEBPACK_IMPORTED_MODULE_1__["selectAll"])("path.linkCat")
+                        .data([])
+                        .exit()
+                        .remove();
                     console.log(actualCatGraph.data().map(function (k) { return k.data.wrappedNodes[0].id; }));
                     console.log(d.data.wrappedNodes[0].id);
                 }
-                else { // else -> deploy the new tree.
+                else {
+                    // else -> deploy the new tree.
                     var treeCopy = d.copy();
-                    treeCopy.children = treeCopy.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                    treeCopy.children = treeCopy.children.filter(function (e, i, arr) {
+                        return !mainNodesData_1.includes(e.data.wrappedNodes[0].id);
+                    });
                     var treeLayoutCat = GratzlLayout().size([35, 120]);
                     var treeCat = treeLayoutCat(treeCopy, treeCopy);
                     var excatNodes = _this.svg
-                        .selectAll('g.classCat')
-                        .data(treeCat.descendants(), function (d) { return (d.data.wrappedNodes.map(function (n) { return n.id; }).join()); });
+                        .selectAll("g.classCat")
+                        .data(treeCat.descendants(), function (d) {
+                        return d.data.wrappedNodes.map(function (n) { return n.id; }).join();
+                    });
                     excatNodes.exit().remove();
                     var catNodes = excatNodes
                         .enter()
-                        .append('g')
-                        .attr('class', 'classCat node branch-active ')
-                        .attr('transform', function (k) { return "translate(" + k.x + ", " + k.y + ")"; });
-                    catNodes.append('circle').attr('r', 2);
+                        .append("g")
+                        .attr("class", "classCat node branch-active ")
+                        .attr("transform", function (k) { return "translate(" + k.x + ", " + k.y + ")"; });
+                    catNodes.append("circle").attr("r", 2);
                     // Fix the radius of the circles according to #nodes wrapped
-                    catNodes
-                        .select('circle')
-                        .attr('r', function (d) {
+                    catNodes.select("circle").attr("r", function (d) {
                         var radius = 2;
                         if (d.data.wrappedNodes.length != 1) {
                             radius = Math.min(4 + 0.15 * d.data.wrappedNodes.length, 6);
@@ -1933,204 +2066,209 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
                         return radius;
                     });
                     // Assign classes to the circles
-                    catNodes
-                        .select('circle')
-                        .attr('class', function (d) {
-                        var classString = '';
+                    catNodes.select("circle").attr("class", function (d) {
+                        var classString = "";
                         if (isKeyNode(d.data.wrappedNodes[0])) {
-                            classString += ' keynode';
+                            classString += " keynode";
                         }
-                        classString += ' intent_' + getNodeIntent(d.data.wrappedNodes[0]);
+                        classString += " intent_" + getNodeIntent(d.data.wrappedNodes[0]);
                         return classString;
                     });
-                    catNodes
-                        .on('click', function (d) { return _this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250); });
+                    catNodes.on("click", function (d) {
+                        return _this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
+                    });
                     // Set the #nodes-wrapped label
                     catNodes
-                        .append('text')
-                        .attr('class', 'circle-text')
-                        .attr('visibility', function (d) {
+                        .append("text")
+                        .attr("class", "circle-text")
+                        .attr("visibility", function (d) {
                         if (d.data.wrappedNodes.length === 1) {
-                            return 'hidden';
+                            return "hidden";
                         }
                         else {
-                            return 'visible';
+                            return "visible";
                         }
                     })
-                        .attr('x', function (d) {
+                        .attr("x", function (d) {
                         if (d.data.wrappedNodes.length >= 10) {
-                            return (-3);
+                            return -3;
                         }
-                        return (-1.5);
+                        return -1.5;
                     })
-                        .attr('y', 2)
+                        .attr("y", 2)
                         .text(function (d) { return d.data.wrappedNodes.length.toString(); });
                     // Set the links between circles
                     var oldLinksCat = _this.svg
-                        .selectAll('path.linkCat')
-                        .data(treeCat.links(), function (d) { return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join(); });
+                        .selectAll("path.linkCat")
+                        .data(treeCat.links(), function (d) {
+                        return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join();
+                    });
                     oldLinksCat.exit().remove();
                     var newLinksCat = oldLinksCat
                         .enter()
-                        .insert('path', 'g')
-                        .attr('d', linkPath);
-                    oldLinksCat.merge(newLinksCat)
-                        .attr('class', 'link linkCat')
+                        .insert("path", "g")
+                        .attr("d", linkPath);
+                    oldLinksCat
+                        .merge(newLinksCat)
+                        .attr("class", "link linkCat")
                         .filter(function (d) { return d.target.xOffset === 0; })
-                        .attr('class', 'link active linkCat');
+                        .attr("class", "link active linkCat");
                 } // end else actualgraph
             }); // end on click
         } // if of caterpillar procedure
         // Update title
-        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation')
-            .text(this._dataAggregation.name);
+        Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("#DataAggregation").text(this._dataAggregation.name);
         // Warning when max nodes is reached.
-        updateNodes
-            .filter(function (d) {
-            var wrapNodes = updateNodes.filter(function (k) { return k.depth > 19; }).data().length;
+        updateNodes.filter(function (d) {
+            var wrapNodes = updateNodes.filter(function (k) { return k.depth > 19; }).data()
+                .length;
             if (d.depth > 19) {
-                Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' Max nodes reached: ' + wrapNodes.toString());
+                Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("#DataAggregation").text(_this._dataAggregation.name +
+                    " Max nodes reached: " +
+                    wrapNodes.toString());
             }
             return false;
         });
     }; // end update
     /**
-    * @description Show the tittle of the data aggregation algorithm used.
-    */
-    ProvenanceTreeVisualization.prototype.setTittle = function (elm) {
+     * @description Show the title of the data aggregation algorithm used.
+     */
+    ProvenanceTreeVisualization.prototype.setTitle = function (elm) {
         var _this = this;
-        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm)
-            .append('div')
-            .attr('style', 'padding-top:15px; text-align: center;')
-            .append('text')
-            .attr('class', 'tittleAggregation')
-            .attr('id', 'DataAggregation')
-            .text('Raw Data')
-            .on('click', function () {
-            window.alert(_this.DataAggregation.name.toUpperCase() + ': \n' + _this.DataAggregation.description);
+        Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])(elm)
+            .append("div")
+            .attr("style", "text-align: center;")
+            .append("text")
+            .attr("class", "titleAggregation")
+            .attr("id", "DataAggregation")
+            .text("Raw Data")
+            .on("click", function () {
+            window.alert(_this.DataAggregation.name.toUpperCase() +
+                ": \n" +
+                _this.DataAggregation.description);
         })
-            .attr('style', 'cursor:pointer');
+            .attr("style", "cursor:pointer");
     };
     /**
-    * @description Show the buttons of the user interface.
-    */
+     * @description Show the buttons of the user interface.
+     */
     ProvenanceTreeVisualization.prototype.setButtons = function (elm) {
         var _this = this;
-        var holder = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm)
-            .append('div');
+        var holder = Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])(elm).append("div");
         var buttonsHolder = holder
-            .append('div')
-            .attr('class', 'dataAggregation-Box');
+            .append("div")
+            .attr("class", "dataAggregation-Box");
         var connectivityBut = buttonsHolder
-            .append('button')
-            .text('Connectivity')
-            .attr('class', 'aggButton');
-        connectivityBut
-            .on('click', function () {
-            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' C: ' +
+            .append("button")
+            .text("Connectivity")
+            .attr("class", "aggButton");
+        connectivityBut.on("click", function () {
+            Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("#DataAggregation").text(_this._dataAggregation.name +
+                " C: " +
                 connectivity(wrapNode(_this.traverser.graph.current)).toString());
         });
         var depthBut = buttonsHolder
-            .append('button')
-            .text('Depth')
-            .attr('class', 'aggButton');
-        depthBut
-            .on('click', function () {
-            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' D: ' +
+            .append("button")
+            .text("Depth")
+            .attr("class", "aggButton");
+        depthBut.on("click", function () {
+            Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("#DataAggregation").text(_this._dataAggregation.name +
+                " D: " +
                 maxDepth(wrapNode(_this.traverser.graph.current)).toString());
         });
         // Data aggregation Div
-        var dataDiv = holder
-            .append('div')
-            .attr('class', 'dataAggregation-Box');
+        var dataDiv = holder.append("div").attr("class", "dataAggregation-Box");
         // label
-        dataDiv
-            .append('label')
-            .text('Data aggregation: ');
+        dataDiv.append("label").text("Data aggregation: ");
         // Combobox
         var select$$1 = dataDiv
-            .append('select')
-            .attr('style', 'width:50%')
-            .on('change', function () {
-            var selectValue = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('select').property('value');
+            .append("select")
+            .attr("style", "width:50%")
+            .on("change", function () {
+            var selectValue = Object(d3__WEBPACK_IMPORTED_MODULE_1__["select"])("select").property("value");
             _this.updateDataAggregationCom(selectValue);
         });
         select$$1
-            .selectAll('option')
-            .data(aggregationObjects).enter()
-            .append('option')
-            .text(function (d) { return d.name; });
+            .selectAll("option")
+            .data(aggregationObjects)
+            .enter()
+            .append("option")
+            .text(function (d) {
+            return d.name;
+        });
         // Arguments Div
-        var argDiv = holder
-            .append('div')
-            .attr('class', 'dataAggregation-Box');
+        var argDiv = holder.append("div").attr("class", "dataAggregation-Box");
         // label
-        argDiv
-            .append('label')
-            .text('Argument: ');
+        argDiv.append("label").text("Argument: ");
         // Combobox
         var selectarg = argDiv
-            .append('select')
-            .attr('id', 'arg')
-            .attr('style', 'width:15%')
-            .on('change', function () {
+            .append("select")
+            .attr("id", "arg")
+            .attr("style", "width:15%")
+            .on("change", function () {
             _this.updateDataAggregationCom(_this._dataAggregation.name);
         });
         selectarg
-            .selectAll('option')
-            .data([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).enter()
-            .append('option')
-            .text(function (d) { return d.toString(); });
+            .selectAll("option")
+            .data([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+            .enter()
+            .append("option")
+            .text(function (d) {
+            return d.toString();
+        });
         // Caterpillar button
         var caterpillarButton = argDiv
-            .append('button')
-            .text('Caterpillar')
-            .attr('class', 'aggButton')
-            .attr('style', 'width:50%; background-color:red; color:white');
-        caterpillarButton
-            .on('click', function () {
+            .append("button")
+            .text("Caterpillar")
+            .attr("class", "aggButton")
+            .attr("style", "width:50%; background-color:red; color:white");
+        caterpillarButton.on("click", function () {
             _this.caterpillarActivated = !_this.caterpillarActivated;
             if (_this.caterpillarActivated) {
-                caterpillarButton.attr('style', 'background-color:green; width:50%;color:white');
+                caterpillarButton.attr("style", "background-color:green; width:50%;color:white");
             }
             else {
-                caterpillarButton.attr('style', 'background-color:red;width:50%;color:white');
+                caterpillarButton.attr("style", "background-color:red;width:50%;color:white");
             }
             _this.update();
         });
     };
     /**
-    * @description Update the data aggregation in used
-    * @listens Combobox for data aggregation.
-    */
+     * @description Update the data aggregation in used
+     * @listens Combobox for data aggregation.
+     */
     ProvenanceTreeVisualization.prototype.updateDataAggregationCom = function (newDataAggregation) {
         switch (newDataAggregation) {
-            case 'Raw data': {
+            case "Raw data": {
                 this.DataAggregation = rawData;
                 break;
             }
-            case 'Grouping': {
+            case "Grouping": {
                 this.DataAggregation = grouping;
                 break;
             }
-            case 'Compression': {
+            case "Compression": {
                 this.DataAggregation = compression;
                 break;
             }
-            case 'Categorizing': {
+            case "Categorizing": {
                 this.DataAggregation = categorization;
                 break;
             }
-            case 'Shrinking': {
+            case "Shrinking": {
                 this.DataAggregation = shrinking;
                 break;
             }
-            case 'Pruning I': {
+            case "Pruning I": {
                 this.DataAggregation = pruningI;
                 break;
             }
-            case 'Pruning II': {
+            case "Pruning II": {
                 this.DataAggregation = pruningII;
+                break;
+            }
+            case "PlotTrimmer": {
+                this.DataAggregation = plotTrimmer;
                 break;
             }
         }
@@ -4090,7 +4228,7 @@ module.exports = ":host {\n  display: block;\n}\n"
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BrainvisCanvasComponent", function() { return BrainvisCanvasComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 /* harmony import */ var ami_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ami.js */ "../node_modules/ami.js/build/ami.js");
 /* harmony import */ var ami_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(ami_js__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _trackball__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./trackball */ "./src/app/brainvis-canvas/trackball.ts");
@@ -4994,7 +5132,7 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StaticGeometryListener", function() { return StaticGeometryListener; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "IntersectionManager", function() { return IntersectionManager; });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 /*
     Special class to manage intersection with goemetry.
     Subsystems can register to be tested for intersections.
@@ -5119,7 +5257,7 @@ var IntersectionManager = /** @class */ (function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -5391,7 +5529,7 @@ var addListeners = function (tracker, canvas) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -5495,7 +5633,7 @@ var SegmentationVoxels = /** @class */ (function (_super) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 /**
  * Original author: Pjotr Svetachov
  */
@@ -5820,7 +5958,7 @@ var SliceManipulatorWidget = /** @class */ (function (_super) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 /**
  * STL loader converted to TypeScript. Original authors:
  * @author aleeper / http://adamleeper.com/
@@ -6048,7 +6186,7 @@ var STLLoader = /** @class */ (function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STATE", function() { return STATE; });
-/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 /**
  * Original authors from THREEJS repo
  * @author Eberhard Graether / http:// egraether.com/
@@ -7313,7 +7451,7 @@ Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformB
 /* There is a bug in `ami.js` so that it needs a global THREE when imported.
    This file ensures it is attached to `window` before the rest of the app is loaded
  */
-window.THREE = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+window.THREE = __webpack_require__(/*! three */ "../node_modules/three/build/three.module.js");
 __webpack_require__(/*! ./init.ts */ "./src/init.ts");
 
 
