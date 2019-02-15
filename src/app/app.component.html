@@ -14,12 +14,12 @@
     <app-brainvis-canvas #canvas></app-brainvis-canvas>
     <div id="top-container">
       <app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>
-      <app-slide-annotations id="annotation-overlay" [slides]="slides">
+      <app-slide-annotations #slideAnnotations id="annotation-overlay" [slides]="slides">
         bladiebla
       </app-slide-annotations>
     </div>
     <div id="bottom-container">
-      <app-slides-container>
+      <app-slides-container [slideAnnotations]="slideAnnotations">
         <app-provenance-slides #slides></app-provenance-slides>
       </app-slides-container>
     </div>

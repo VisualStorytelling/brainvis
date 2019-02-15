@@ -22,10 +22,10 @@ export class StaticGeometryListener implements IIntersectionListener {
     onMouseUp: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
     onMouseMove: (intersection: THREE.Intersection, pointer: MouseEvent) => void;
 
-    constructor(object: THREE.Object3D, 
-                onMouseDown?:(intersection: THREE.Intersection, pointer: MouseEvent) => void,
-                onMouseUp?:(intersection: THREE.Intersection, pointer: MouseEvent) => void, 
-                onMouseMove?:(intersection: THREE.Intersection, pointer: MouseEvent) => void) {
+    constructor(object: THREE.Object3D,
+        onMouseDown?: (intersection: THREE.Intersection, pointer: MouseEvent) => void,
+        onMouseUp?: (intersection: THREE.Intersection, pointer: MouseEvent) => void,
+        onMouseMove?: (intersection: THREE.Intersection, pointer: MouseEvent) => void) {
         this.object = object;
         this.onMouseDown = onMouseDown;
         this.onMouseUp = onMouseUp;

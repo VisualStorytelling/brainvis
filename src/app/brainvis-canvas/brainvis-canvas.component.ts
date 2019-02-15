@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { View } from './view';
 
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
@@ -18,25 +19,14 @@ import { ProvenanceService } from '../provenance.service';
 import { registerActions } from './provenanceActions';
 import { addListeners } from './provenanceListeners';
 
-class View {
-  left: number;
-  top: number;
-  width: number;
-  height: number;
-  background: THREE.Color;
-  eye: THREE.Vector3;
-  up: THREE.Vector3;
-  fov: number;
-  camera: THREE.PerspectiveCamera;
-  updateCamera: Function;
-}
-
 @Component({
   selector: 'app-brainvis-canvas',
   template: '',
   styleUrls: ['./brainvis-canvas.component.css']
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
+  private doViews = false;
+
   private _showSlice = true;
   private _showSliceDisabled = false;
   private _showSliceHandle = true;
@@ -45,6 +35,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private _showObjectsDisabled = false;
   private _editMode = false;
   private _editModeDisabled = true;
+  private _quadView = false;
+  private _quadViewDisabled = false;
   private _alignMode = false;
   private _sliceMouseDown = false;
   private objectSelector: ObjectSelector;
@@ -106,6 +98,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._editModeDisabled = editModeDisabled;
   }
   get editModeDisabled() { return this._editModeDisabled; }
+
+  @Input() set quadView(quadView: boolean) {
+    this._quadView = quadView;
+    this.quadViewChange.emit(quadView);
+  }
+  @Output() quadViewChange = new EventEmitter<boolean>();
+  get quadView() { return this._quadView; }
+
+  @Input() set quadViewDisabled(quadViewDisabled: boolean) {
+    this._quadViewDisabled = quadViewDisabled;
+  }
+  get quadViewDisabled() { return this._quadViewDisabled; }
 
   @Input() set alignMode(alignMode: boolean) {
     this._alignMode = alignMode;
@@ -198,15 +202,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0.0, 0.0, 0.0),
-      eye: new THREE.Vector3(0.0, 5.0, 0.0),
+      eye: new THREE.Vector3(0.0, 150.0, 0.0),
       up: new THREE.Vector3(0.0, 0.0, -1.0),
       fov: 75,
-      camera: null,
-      updateCamera: function (camera: THREE.Camera, scene: THREE.Scene, mouseX: number) {
-        camera.position.x += mouseX * 0.05;
-        camera.position.x = Math.max(Math.min(camera.position.x, 2000), - 2000);
-        camera.lookAt(scene.position);
-      }
+      camera: null
     },
     { // Right top view: Perspective camera
       left: 0.5,
@@ -214,15 +213,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0.0, 0.0, 0.0),
-      eye: new THREE.Vector3(-5.0, -5.0, 5.0),
+      eye: new THREE.Vector3(100.0, 100.0, -100.0),
       up: new THREE.Vector3(0.0, 1.0, 0.0),
       fov: 75,
-      camera: null,
-      updateCamera: function (camera: THREE.Camera, scene: THREE.Scene, mouseX: number) {
-        camera.position.x += mouseX * 0.05;
-        camera.position.x = Math.max(Math.min(camera.position.x, 2000), - 2000);
-        camera.lookAt(scene.position);
-      }
+      camera: null
     },
     { // Left bottom view (FRONT): Feet towards camera (Z), face up (Y)
       left: 0.0,
@@ -230,15 +224,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0.0, 0.0, 0.0),
-      eye: new THREE.Vector3(0.0, 0.0, 5.0),
+      eye: new THREE.Vector3(0.0, 0.0, 150.0),
       up: new THREE.Vector3(0.0, 1.0, 0.0),
       fov: 75,
-      camera: null,
-      updateCamera: function (camera: THREE.Camera, scene: THREE.Scene, mouseX: number) {
-        camera.position.x += mouseX * 0.05;
-        camera.position.x = Math.max(Math.min(camera.position.x, 2000), - 2000);
-        camera.lookAt(scene.position);
-      }
+      camera: null
     },
     { // Right bottom view (FRONT): Left side towards camera, face up
       left: 0.5,
@@ -246,15 +235,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       width: 0.5,
       height: 0.5,
       background: new THREE.Color(0.0, 0.0, 0.0),
-      eye: new THREE.Vector3(-5.0, 0.0, 0.0),
+      eye: new THREE.Vector3(150.0, 0.0, 0.0),
       up: new THREE.Vector3(0.0, 1.0, 0.0),
       fov: 75,
-      camera: null,
-      updateCamera: function (camera: THREE.Camera, scene: THREE.Scene, mouseX: number) {
-        camera.position.x += mouseX * 0.05;
-        camera.position.x = Math.max(Math.min(camera.position.x, 2000), - 2000);
-        camera.lookAt(scene.position);
-      }
+      camera: null
     },
   ];
 
@@ -297,15 +281,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.height = this.elem.clientHeight;
 
     this.scene.background = new THREE.Color('black');
-    this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000);
 
-    // this.views.forEach((v: View) => {
-    //   const newCamera = new THREE.PerspectiveCamera( v.fov, this.width / this.height, 1, 10000 );
-    //   newCamera.position.copy( v.eye );
-    //   newCamera.up.copy( v.up );
-    //   v.camera = newCamera;
-    // });
-    // this.views[1].camera = this.camera;
+    // if (this._quadView) {
+      this.views.forEach((v: View) => {
+        const newCamera = new THREE.PerspectiveCamera(v.fov, this.width / this.height, 0.1, 10000);
+        newCamera.position.copy(v.eye);
+        newCamera.up.copy(v.up);
+        v.camera = newCamera;
+        v.camera.lookAt(new THREE.Vector3(0, 0, 0));
+      });
+      this.camera = this.views[1].camera;
+    // } else {
+    //   this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000);
+    // }
 
     this.renderer.setSize(this.width, this.height);
 
@@ -314,12 +302,21 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     canvasElm.style.display = 'block';
 
     // Setup controls
-    this.controls = new Trackball(this.camera, this.renderer.domElement);
+    if (this._quadView) {
+      this.controls = new Trackball(this.views, 1, this.renderer.domElement);
+    } else {
+      this.views[1].left = 0;
+      this.views[1].top = 0;
+      this.views[1].width = 1.0;
+      this.views[1].height = 1.0;
+      this.views[1].camera = this.camera;
+      this.controls = new Trackball([this.views[1]], 0, this.renderer.domElement);
+    }
 
     this.scene.add(this.objects);
 
     // Initial camera position
-    this.controls.position0.set(-5, -5, 5);
+    this.controls.position0.set(-100.0, -100.0, 100.0);
     this.controls.reset();
 
     this.initScene();
@@ -493,6 +490,23 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.objectSelector.addEventListener('objectSelection', (event: any) => {
       this.selectedObjects = event.newObject;
     });
+
+    this.renderer.domElement.addEventListener('resize', this.onResize, false);
+  }
+
+  onResize() {
+    // if (this._quadView) {
+      this.views.forEach((v: View) => {
+        v.camera.aspect = window.innerWidth / window.innerWidth;
+        v.camera.updateProjectionMatrix();
+      });
+    // } else {
+      this.camera.aspect = window.innerWidth / window.innerWidth;
+      this.camera.updateProjectionMatrix();
+    // }
+
+    this.renderer.setSize(window.innerWidth, window.innerWidth);
+    this.controls.handleResize(this.views);
   }
 
   setSize(width: number, height: number) {
@@ -500,7 +514,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(width, height);
-    this.controls.handleResize();
+    this.controls.handleResize(this.views);
   }
 
   setInteractive(interactive: boolean) {
@@ -555,23 +569,25 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   render() {
-    // this.views.forEach((v: View) => {
-    //   const camera: THREE.PerspectiveCamera = v.camera;
-    //   // v.updateCamera( camera, this.scene, mouseX, mouseY );
-    //   const left = Math.floor( this.width * v.left );
-    //   const top = Math.floor( this.height * v.top );
-    //   const width = Math.floor( this.width * v.width );
-    //   const height = Math.floor( this.height * v.height );
-    //   this.renderer.setViewport( left, top, width, height );
-    //   this.renderer.setScissor( left, top, width, height );
-    //   this.renderer.setScissorTest( true );
-    //   this.renderer.setClearColor( v.background );
-    //   camera.aspect = width / height;
-    //   camera.updateProjectionMatrix();
-    //   this.renderer.render( this.scene, camera );
-    // });
-
-    this.renderer.render(this.scene, this.camera);
+    if (this._quadView) {
+      this.views.forEach((v: View) => {
+        const camera: THREE.PerspectiveCamera = v.camera;
+        // v.updateCamera( camera, this.scene, mouseX, mouseY );
+        const left = Math.floor(this.width * v.left);
+        const top = Math.floor(this.height * v.top);
+        const width = Math.floor(this.width * v.width);
+        const height = Math.floor(this.height * v.height);
+        this.renderer.setViewport(left, top, width, height);
+        this.renderer.setScissor(left, top, width, height);
+        this.renderer.setScissorTest(true);
+        this.renderer.setClearColor(v.background);
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
+        this.renderer.render(this.scene, camera);
+      });
+    } else {
+      this.renderer.render(this.scene, this.camera);
+    }
   }
 
   getSlicePlaneChanges = (event) => {

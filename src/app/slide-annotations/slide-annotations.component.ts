@@ -12,6 +12,7 @@ export class SlideAnnotationsComponent implements OnInit {
   @Input() slides: ProvenanceSlidesComponent;
   public JSON: any;
   public console: any;
+
   constructor() {
     // console.log(registry[0].fromScreenCoordinates({x: 100, y: 100}));
     // console.log(toScreenCoordinates({name: 'dummyAnnotator', x: 100, y: 100}));
@@ -35,7 +36,7 @@ export class SlideAnnotationsComponent implements OnInit {
   }
 
   dragEnd(annotation, event) {
-    const annotatedCoordinates = fromScreenCoordinates({x: event.clientX, y: event.clientY});
+    const annotatedCoordinates = fromScreenCoordinates({ x: event.clientX, y: event.clientY });
     if (annotatedCoordinates) {
       annotation.data.coordinates = annotatedCoordinates;
     }
@@ -45,12 +46,14 @@ export class SlideAnnotationsComponent implements OnInit {
     if (annotation.data.coordinates) {
       return toScreenCoordinates(annotation.data.coordinates);
     }
-    return ({x: 0, y: 0});
+    return ({ x: 0, y: 0 });
   }
 
   newAnnotation() {
-    this.slides.deck.selectedSlide.addAnnotation(
-      new SlideAnnotation({text: ''})
-    );
+    if (this.slides.deck.selectedSlide) {
+      this.slides.deck.selectedSlide.addAnnotation(
+        new SlideAnnotation({ text: '' })
+      );
+    }
   }
 }

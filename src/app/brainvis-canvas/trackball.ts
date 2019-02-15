@@ -13,6 +13,7 @@
  */
 
 import * as THREE from 'three';
+import { View } from './view';
 
 export enum STATE {
   NONE = -1,
@@ -28,9 +29,11 @@ export enum STATE {
 export default class Trackball extends THREE.EventDispatcher {
   private state: STATE = STATE.NONE;
   private previousState: STATE = STATE.NONE;
+  private views: View[];
+  private viewNumber: number;
   public camera: THREE.Camera;
   private domElement;
-  private screen = { left: 0, top: 0, width: 0, height: 0 };
+  private screen = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 };
 
   public enabled = true;
   public rotateSpeed = 1.0;
@@ -90,7 +93,7 @@ export default class Trackball extends THREE.EventDispatcher {
   private toPosition: THREE.Vector3;
   private toUp: THREE.Vector3;
 
-  panCamera = (function() {
+  panCamera = (function () {
     const mouseChange = new THREE.Vector2(),
       objectUp = new THREE.Vector3(),
       pan = new THREE.Vector3();
@@ -162,10 +165,12 @@ export default class Trackball extends THREE.EventDispatcher {
     };
   }());
 
-  constructor(object: THREE.Camera, domElement: HTMLCanvasElement) {
+  constructor(views: View[], viewNumber: number, domElement: HTMLCanvasElement) {
     super();
 
-    this.camera = object;
+    this.views = views;
+    this.viewNumber = viewNumber;
+    this.camera = views[viewNumber].camera;
     this.domElement = (domElement !== undefined) ? domElement : document;
 
     //  for reset
@@ -178,7 +183,7 @@ export default class Trackball extends THREE.EventDispatcher {
       event.preventDefault();
     }, false);
 
-    this.handleResize();
+    this.handleResize(this.views);
 
     this.init();
 
@@ -204,20 +209,24 @@ export default class Trackball extends THREE.EventDispatcher {
 
   //  methods
 
-  handleResize() {
+  handleResize(views: View[]) {
     if (this.domElement === document) {
-      this.screen.left = 0;
+      this.screen.left = window.innerWidth * views[this.viewNumber].width;
+      this.screen.right = this.screen.left * 2.0;
       this.screen.top = 0;
-      this.screen.width = window.innerWidth;
-      this.screen.height = window.innerHeight;
+      this.screen.bottom = window.innerHeight * views[this.viewNumber].height;
+      this.screen.width = window.innerWidth * views[this.viewNumber].width;
+      this.screen.height = window.innerHeight * views[this.viewNumber].height;
     } else {
       const box = this.domElement.getBoundingClientRect();
       //  adjustments come from similar code in the jquery offset() function
       const d = this.domElement.ownerDocument.documentElement;
-      this.screen.left = box.left + window.pageXOffset - d.clientLeft;
+      this.screen.left = (box.left + window.pageXOffset - d.clientLeft) * views[this.viewNumber].width;
+      this.screen.right = this.screen.left * 2.0;
       this.screen.top = box.top + window.pageYOffset - d.clientTop;
-      this.screen.width = box.width;
-      this.screen.height = box.height;
+      this.screen.bottom = box.width * views[this.viewNumber].width;
+      this.screen.width = box.width * views[this.viewNumber].width;
+      this.screen.height = box.height * views[this.viewNumber].height;
     }
   }
 
@@ -227,12 +236,20 @@ export default class Trackball extends THREE.EventDispatcher {
     }
   }
 
+  inScope(pageX: number, pageY: number): boolean {
+    if (pageX < this.screen.left || pageX > this.screen.right || pageY < this.screen.top || pageY > this.screen.bottom) {
+      return false;
+    }
+    return true;
+  }
+
   getMouseOnScreen(pageX: number, pageY: number) {
     return new THREE.Vector2((pageX - this.screen.left) / this.screen.width,
       (pageY - this.screen.top) / this.screen.height);
   }
 
-  getMouseOnCircle(pageX, pageY) {
+
+  getMouseOnCircle(pageX: number, pageY: number) {
     return new THREE.Vector2(
       ((pageX - this.screen.width * 0.5 - this.screen.left) / (this.screen.width * 0.5)),
       ((this.screen.height + 2 * (this.screen.top - pageY)) / this.screen.width) //  screen.width intentional
@@ -432,6 +449,8 @@ export default class Trackball extends THREE.EventDispatcher {
 
   private mousedown = (event) => {
     if (this.enabled === false) { return; }
+
+    // if (!this.inScope(event.pageX, event.pageY)) { return; }
 
     this.isDragging = true;
 
