@@ -46,7 +46,9 @@ export class ProvenanceService {
     if (parts.length === 2) {
       const getResult = await fetch(`https://us-central1-brainvis.cloudfunctions.net/get?key=${parts[1]}`)
         .then(result => result.json());
-      return restoreProvenanceGraph(JSON.parse(getResult.graph));
+      const graph = restoreProvenanceGraph(JSON.parse(getResult.graph));
+      graph.current = graph.root;
+      return graph;
     }
   }
 
