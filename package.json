@@ -1,6 +1,13 @@
 {
   "name": "brainvis",
   "version": "0.0.0",
+  "workspaces": [
+    "packages/ami",
+    "packages/@visualstorytelling/provenance-core",
+    "packages/@visualstorytelling/provenance-tree-visualization",
+    "packages/@visualstorytelling/slide-deck-visualization",
+    "packages/@visualstorytelling/provenance-task-list"
+  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -29,7 +36,7 @@
     "core-js": "^2.5.4",
     "d3": "^5.4.0",
     "lodash": "^4.17.10",
-    "rxjs": "^6.0.0",
+    "rxjs": "6.0.0",
     "three": "^0.88.0",
     "three-dragcontrols": "^0.88.2",
     "zone.js": "^0.8.26"

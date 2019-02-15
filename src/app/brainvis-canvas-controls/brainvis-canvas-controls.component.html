@@ -1,13 +1,35 @@
-<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle">
+<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle" [(disabled)]="canvas.showSliceHandleDisabled">
   Show slice handle
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showSlice">
+<mat-slide-toggle [(ngModel)]="canvas.showSlice" [(disabled)]="canvas.showSliceDisabled">
   Show slice
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showObjects">
+<mat-slide-toggle [(ngModel)]="canvas.showObjects" [(disabled)]="canvas.showObjectsDisabled">
   Show segmented objects
 </mat-slide-toggle>
-<div>
-  <button mat-button color="primary" id="alignButton">Align to slice</button>
-</div>
+<mat-slide-toggle [(ngModel)]="canvas.quadView" [(disabled)]="canvas.quadViewDisabled">
+  Quad view
+</mat-slide-toggle>
+<mat-slide-toggle [(ngModel)]="canvas.alignMode">
+  Align camera to slice
+</mat-slide-toggle>
+<mat-slide-toggle [(ngModel)]="canvas.editMode" [(disabled)]="canvas.editModeDisabled">
+  Segmentation mode
+</mat-slide-toggle>
+<mat-slider [(ngModel)]="canvas.segmentationSize" [(disabled)]="canvas.editModeDisabled" [min]='min' [max]='max' [step]='step' >
+  Segmentation size
+</mat-slider>
+<button mat-icon-button (click)="provenance.saveGraph()">
+  <mat-icon>backup</mat-icon>
+  Save provenance tree
+  <mat-progress-spinner *ngIf="provenance.saveStatus === 'saving'" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+</button>
+<mat-form-field>
+  <mat-select [(value)]='selectedColorMap'>
+    <mat-option *ngFor="let cm of availableColorMaps" (onSelectionChange)="change($event)" [value]="cm.value">
+      {{cm.viewValue}}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+<app-styled-slider [canvas]="canvas"></app-styled-slider>
 

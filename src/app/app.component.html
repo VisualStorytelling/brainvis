@@ -1,4 +1,4 @@
-<mat-sidenav-container hasBackdrop="false">
+<mat-sidenav-container *ngIf="provenance.initialized" hasBackdrop="false">
   <mat-sidenav position="end" #sidenav mode="over" [opened]="false" hasBackdrop="false">
     <button id="sidenav-trigger" color="primary" style="color: white" mat-icon-button (click)="sidenav.toggle()">
       <mat-icon>menu</mat-icon>

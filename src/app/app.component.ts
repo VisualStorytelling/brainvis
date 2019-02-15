@@ -8,7 +8,7 @@ import { ProvenanceService } from './provenance.service';
 })
 export class AppComponent implements OnInit {
   title = 'app';
-  constructor(private provenance: ProvenanceService) {
+  constructor(public provenance: ProvenanceService) {
     // console.log(arg);
     console.log('constructor');
   }
