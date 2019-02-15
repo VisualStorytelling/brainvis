@@ -539,7 +539,7 @@ if(false) {}
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /mnt/c/Users/maarten/workspace/brainvis/src/styles.css */"./src/styles.css");
+module.exports = __webpack_require__(/*! /home/tom/Projects/prov/brainvis/src/styles.css */"./src/styles.css");
 
 
 /***/ })

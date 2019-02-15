@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([["main"],{
 
-/***/ "./packages/@visualstorytelling/provenance-core/dist/provenance-core.es5.js":
-/*!**********************************************************************************!*\
-  !*** ./packages/@visualstorytelling/provenance-core/dist/provenance-core.es5.js ***!
-  \**********************************************************************************/
+/***/ "../provenance-core/dist/provenance-core.es5.js":
+/*!******************************************************!*\
+  !*** ../provenance-core/dist/provenance-core.es5.js ***!
+  \******************************************************/
 /*! exports provided: ActionFunctionRegistry, ProvenanceGraph, restoreProvenanceGraph, serializeProvenanceGraph, ProvenanceTracker, ProvenanceGraphTraverser, ProvenanceSlide, ProvenanceSlidedeck, STATUS, ProvenanceSlidedeckPlayer, SlideAnnotation, generateUUID, generateTimestamp, isStateNode, isReversibleAction */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -66,13 +66,30 @@ MERCHANTABLITY OR NON-INFRINGEMENT.
 See the Apache Version 2.0 License for specific language governing permissions
 and limitations under the License.
 ***************************************************************************** */
+/* global Reflect, Promise */
 
-var __assign = Object.assign || function __assign(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
-    }
-    return t;
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
 };
 
 function __awaiter(thisArg, _arguments, P, generator) {
@@ -91,8 +108,8 @@ function __generator(thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -115,13 +132,14 @@ function __generator(thisArg, body) {
 function generateUUID() {
     // Public Domain/MIT
     var d = new Date().getTime();
-    if (typeof performance !== 'undefined' &&
-        typeof performance.now === 'function') {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         d += performance.now(); // use high-precision timer if available
     }
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        // tslint:disable-next-line:no-bitwise
         var r = ((d + Math.random() * 16) % 16) | 0;
         d = Math.floor(d / 16);
+        // tslint:disable-next-line:no-bitwise
         return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
 }
@@ -175,6 +193,7 @@ function mitt(all) {
          */
         off: function (type, handler) {
             if (all[type]) {
+                // tslint:disable-next-line:no-bitwise
                 all[type].splice(all[type].indexOf(handler) >>> 0, 1);
             }
         },
@@ -342,8 +361,8 @@ var ProvenanceTracker = /** @class */ (function () {
     ProvenanceTracker.prototype.applyAction = function (action, skipFirstDoFunctionCall) {
         if (skipFirstDoFunctionCall === void 0) { skipFirstDoFunctionCall = false; }
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             var createNewStateNode, newNode, currentNode, functionNameToExecute, funcWithThis, actionResult;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -418,8 +437,9 @@ function findPathToTargetNode(currentNode, targetNode, track, comingFromNode) {
         for (var _i = 0, nodesToCheck_1 = nodesToCheck; _i < nodesToCheck_1.length; _i++) {
             var node = nodesToCheck_1[_i];
             // If the node to check is in the track already, skip it.
-            if (node === comingFromNode)
+            if (node === comingFromNode) {
                 continue;
+            }
             /* istanbul ignore else */
             if (findPathToTargetNode(node, targetNode, track, currentNode)) {
                 track.unshift(currentNode);
@@ -430,6 +450,15 @@ function findPathToTargetNode(currentNode, targetNode, track, comingFromNode) {
     /* istanbul ignore next */
     return false;
 }
+var IrreversibleError = /** @class */ (function (_super) {
+    __extends(IrreversibleError, _super);
+    function IrreversibleError() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.invalidTraversal = true;
+        return _this;
+    }
+    return IrreversibleError;
+}(Error));
 var ProvenanceGraphTraverser = /** @class */ (function () {
     function ProvenanceGraphTraverser(registry, graph, tracker) {
         if (tracker === void 0) { tracker = null; }
@@ -446,8 +475,9 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
         this.registry = registry;
         this.graph = graph;
         this.tracker = tracker;
+        this._mitt = mitt();
     }
-    ProvenanceGraphTraverser.prototype.executeFunctions = function (functionsToDo, argumentsToDo) {
+    ProvenanceGraphTraverser.prototype.executeFunctions = function (functionsToDo, argumentsToDo, transitionTimes) {
         return __awaiter(this, void 0, void 0, function () {
             var result, i, funcWithThis, promise;
             return __generator(this, function (_a) {
@@ -485,11 +515,11 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
      *
      * @param id Node identifier
      */
-    ProvenanceGraphTraverser.prototype.toStateNode = function (id) {
+    ProvenanceGraphTraverser.prototype.toStateNode = function (id, transtionTime) {
         return __awaiter(this, void 0, void 0, function () {
-            var currentNode, targetNode, trackToTarget, success, _a, functionsToDo, argumentsToDo, result;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
+            var currentNode, targetNode, trackToTarget, success, functionsToDo, argumentsToDo, transitionTimes, arg, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         currentNode = this.graph.current;
                         targetNode = this.graph.getNode(id);
@@ -502,10 +532,27 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                         if (!success) {
                             throw new Error('No path to target node found in graph');
                         }
-                        _a = this.getFunctionsAndArgsFromTrack(trackToTarget), functionsToDo = _a.functionsToDo, argumentsToDo = _a.argumentsToDo;
-                        return [4 /*yield*/, this.executeFunctions(functionsToDo, argumentsToDo)];
+                        transitionTimes = [];
+                        try {
+                            arg = this.getFunctionsAndArgsFromTrack(trackToTarget);
+                            functionsToDo = arg.functionsToDo;
+                            argumentsToDo = arg.argumentsToDo;
+                            functionsToDo.forEach(function (func) {
+                                transitionTimes.push(transtionTime || 0);
+                            });
+                        }
+                        catch (error) {
+                            if (error.invalidTraversal) {
+                                this._mitt.emit('invalidTraversal', targetNode);
+                                return [2 /*return*/, undefined];
+                            }
+                            else {
+                                throw error;
+                            }
+                        }
+                        return [4 /*yield*/, this.executeFunctions(functionsToDo, argumentsToDo, transitionTimes)];
                     case 1:
-                        result = _b.sent();
+                        result = _a.sent();
                         this.graph.current = targetNode;
                         return [2 /*return*/, result];
                 }
@@ -523,7 +570,7 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
                 /* istanbul ignore else */
                 if (isStateNode(thisNode)) {
                     if (!isReversibleAction(thisNode.action)) {
-                        throw new Error('trying to undo an Irreversible action');
+                        throw new IrreversibleError('trying to undo an Irreversible action');
                     }
                     var undoFunc = this.registry.getFunctionByName(thisNode.action.undo);
                     functionsToDo.push(undoFunc);
@@ -549,20 +596,27 @@ var ProvenanceGraphTraverser = /** @class */ (function () {
         }
         return { functionsToDo: functionsToDo, argumentsToDo: argumentsToDo };
     };
+    ProvenanceGraphTraverser.prototype.on = function (type, handler) {
+        this._mitt.on(type, handler);
+    };
+    ProvenanceGraphTraverser.prototype.off = function (type, handler) {
+        this._mitt.off(type, handler);
+    };
     return ProvenanceGraphTraverser;
 }());
 
 var ProvenanceSlide = /** @class */ (function () {
-    function ProvenanceSlide(name, duration, delay, annotations, node) {
+    function ProvenanceSlide(name, duration, transitionTime, annotations, node) {
         if (annotations === void 0) { annotations = []; }
         if (node === void 0) { node = null; }
         this._id = generateUUID();
         this._name = name;
         this._duration = duration;
-        this._delay = delay;
+        this._transitionTime = transitionTime;
         this._annotations = annotations;
         this._node = node;
         this._mitt = mitt();
+        this._xPosition = 0;
     }
     Object.defineProperty(ProvenanceSlide.prototype, "id", {
         get: function () {
@@ -601,12 +655,12 @@ var ProvenanceSlide = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ProvenanceSlide.prototype, "delay", {
+    Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
         get: function () {
-            return this._delay;
+            return this._transitionTime;
         },
         set: function (value) {
-            this._delay = value;
+            this._transitionTime = value;
         },
         enumerable: true,
         configurable: true
@@ -633,6 +687,16 @@ var ProvenanceSlide = /** @class */ (function () {
     ProvenanceSlide.prototype.off = function (type, handler) {
         this._mitt.off(type, handler);
     };
+    Object.defineProperty(ProvenanceSlide.prototype, "xPosition", {
+        get: function () {
+            return this._xPosition;
+        },
+        set: function (value) {
+            this._xPosition = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return ProvenanceSlide;
 }());
 
@@ -692,7 +756,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         },
         set: function (slide) {
             if (slide && slide.node) {
-                this._traverser.toStateNode(slide.node.id);
+                this._traverser.toStateNode(slide.node.id, slide.transitionTime);
             }
             this._selectedSlide = slide;
             this._mitt.emit('slideSelected', slide);
@@ -717,7 +781,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         var index = this._slides.indexOf(slide);
         var previousTime = 0;
         for (var i = 0; i < index; i++) {
-            previousTime += this._slides[i].delay;
+            previousTime += this._slides[i].transitionTime;
             previousTime += this._slides[i].duration;
         }
         return previousTime;
@@ -727,7 +791,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         var currentSlide = null;
         while (time >= 0 && index < this.slides.length) {
             currentSlide = this.slides[index];
-            var nextSlideOffset = currentSlide.delay + currentSlide.duration;
+            var nextSlideOffset = currentSlide.transitionTime + currentSlide.duration;
             if (time - nextSlideOffset < 0) {
                 break;
             }
@@ -743,6 +807,30 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    ProvenanceSlidedeck.prototype.next = function () {
+        if (this._selectedSlide !== null) {
+            var currentIndex = this._slides.indexOf(this._selectedSlide);
+            if (currentIndex < this._slides.length - 1) {
+                currentIndex += 1;
+                this.selectedSlide = this._slides[currentIndex];
+            }
+            else {
+                this.selectedSlide = this._slides[0];
+            }
+        }
+    };
+    ProvenanceSlidedeck.prototype.previous = function () {
+        if (this._selectedSlide !== null) {
+            var currentIndex = this._slides.indexOf(this._selectedSlide);
+            if (currentIndex > 0) {
+                currentIndex -= 1;
+                this.selectedSlide = this._slides[currentIndex];
+            }
+            else {
+                this.selectedSlide = this._slides[this._slides.length - 1];
+            }
+        }
+    };
     Object.defineProperty(ProvenanceSlidedeck.prototype, "graph", {
         get: function () {
             return this._graph;
@@ -786,13 +874,16 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._currentSlideIndex;
         },
+        set: function (index) {
+            this._currentSlideIndex = index;
+        },
         enumerable: true,
         configurable: true
     });
     ProvenanceSlidedeckPlayer.prototype.play = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
             var shouldPlayNext, slide;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -801,6 +892,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
                         };
                         if (!(this._status === STATUS.IDLE)) return [3 /*break*/, 4];
                         this._status = STATUS.PLAYING;
+                        this._selectCallback(this._slides[this._currentSlideIndex]);
                         _a.label = 1;
                     case 1:
                         slide = this._slides[this._currentSlideIndex];
@@ -821,6 +913,10 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
                 }
             });
         });
+    };
+    ProvenanceSlidedeckPlayer.prototype.next = function () {
+        this._currentSlideIndex += 1;
+        this._selectCallback(this._slides[this._currentSlideIndex]);
     };
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "status", {
         get: function () {
@@ -879,532 +975,164 @@ var SlideAnnotation = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./packages/@visualstorytelling/provenance-tree-visualization/dist/provenance-tree-visualization.es5.js":
-/*!**************************************************************************************************************!*\
-  !*** ./packages/@visualstorytelling/provenance-tree-visualization/dist/provenance-tree-visualization.es5.js ***!
-  \**************************************************************************************************************/
-/*! exports provided: GroupMode, ProvenanceTreeVisualization */
+/***/ "../provenance-task-list/dist/provenance-task-list.es5.js":
+/*!****************************************************************!*\
+  !*** ../provenance-task-list/dist/provenance-task-list.es5.js ***!
+  \****************************************************************/
+/*! exports provided: ProvenanceTaskList */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GroupMode", function() { return GroupMode; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceTreeVisualization", function() { return ProvenanceTreeVisualization; });
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
-
-
-function __awaiter(thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-}
-
-function __generator(thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceTaskList", function() { return ProvenanceTaskList; });
+class ProvenanceTaskList {
+    constructor(graph, elm) {
+        this.taskId = 1;
+        this.taskName = "Task" + this.taskId;
+        this.taskList = [
+            {
+                taskId: this.taskId,
+                taskName: this.taskName,
+                taskNodes: []
             }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-}
-
-function generateUUID() {
-    // Public Domain/MIT
-    var d = new Date().getTime();
-    if (typeof performance !== 'undefined' &&
-        typeof performance.now === 'function') {
-        d += performance.now(); // use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = ((d + Math.random() * 16) % 16) | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-    });
-}
-/**
- * Generate a Unix timestamp in milliseconds
- *
- * @returns {number} in milliseconds
- */
-function generateTimestamp() {
-    // Removed, because performance.now() returns a floating point number, which is not compatible with the Date.getTime() integer
-    // if (
-    //   window.performance &&
-    //   window.performance.now &&
-    //   window.performance.timing &&
-    //   window.performance.timing.navigationStart
-    // ) {
-    //   return window.performance.now();
-    // }
-    return new Date().getTime();
-}
-function isStateNode(node) {
-    return 'parent' in node;
-}
-
-/** Mitt: Tiny (~200b) functional event emitter / pubsub.
- *  @name mitt
- *  @returns {Mitt}
- */
-function mitt(all) {
-    all = all || Object.create(null);
-    return {
-        /**
-         * Register an event handler for the given type.
-         *
-         * @param  {String} type	Type of event to listen for
-         * @param  {Function} handler Function to call in response to given event
-         * @memberOf mitt
-         */
-        on: function (type, handler) {
-            (all[type] || (all[type] = [])).push(handler);
-        },
-        /**
-         * Remove an event handler for the given type.
-         *
-         * @param  {String} type	Type of event to unregister `handler` from
-         * @param  {Function} handler Handler function to remove
-         * @memberOf mitt
-         */
-        off: function (type, handler) {
-            if (all[type]) {
-                all[type].splice(all[type].indexOf(handler) >>> 0, 1);
-            }
-        },
-        /**
-         * Invoke all handlers for the given type.
-         *
-         * @param {String} type  The event type to invoke
-         * @param {Any} [evt]  Any value (object is recommended and powerful), passed to each handler
-         * @memberOf mitt
-         */
-        emit: function (type, evt) {
-            (all[type] || []).slice().map(function (handler) {
-                handler(evt);
-            });
-        }
-    };
-}
-
-/**
- * Provenance Graph implementation
- *
- * @param version The version of the software to track the provenance of
- *
- */
-var ProvenanceGraph = /** @class */ (function () {
-    function ProvenanceGraph(application, userid, rootNode) {
-        if (userid === void 0) { userid = 'Unknown'; }
-        this._nodes = {};
-        this._mitt = mitt();
-        this.application = application;
-        if (rootNode) {
-            this.root = rootNode;
-        }
-        else {
-            this.root = {
-                id: generateUUID(),
-                label: 'Root',
-                metadata: {
-                    createdBy: userid,
-                    createdOn: generateTimestamp()
-                },
-                children: [],
-                artifacts: {}
-            };
-        }
-        this.addNode(this.root);
-        this._current = this.root;
-    }
-    ProvenanceGraph.prototype.addNode = function (node) {
-        if (this._nodes[node.id]) {
-            throw new Error('Node already added');
-        }
-        this._nodes[node.id] = node;
-        this._mitt.emit('nodeAdded', node);
-    };
-    ProvenanceGraph.prototype.getNode = function (id) {
-        var result = this._nodes[id];
-        if (!result) {
-            throw new Error('Node id not found');
-        }
-        return this._nodes[id];
-    };
-    Object.defineProperty(ProvenanceGraph.prototype, "current", {
-        get: function () {
-            return this._current;
-        },
-        set: function (node) {
-            if (!this._nodes[node.id]) {
-                throw new Error('Node id not found');
-            }
-            this._current = node;
-            this._mitt.emit('currentChanged', node);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceGraph.prototype, "nodes", {
-        get: function () {
-            return this._nodes;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceGraph.prototype.emitNodeChangedEvent = function (node) {
-        /* istanbul ignore if */
-        if (!this._nodes[node.id]) {
-            throw new Error('Node id not found');
-        }
-        this._mitt.emit('nodeChanged', node);
-    };
-    ProvenanceGraph.prototype.on = function (type, handler) {
-        this._mitt.on(type, handler);
-    };
-    ProvenanceGraph.prototype.off = function (type, handler) {
-        this._mitt.off(type, handler);
-    };
-    return ProvenanceGraph;
-}());
-
-var ProvenanceSlide = /** @class */ (function () {
-    function ProvenanceSlide(name, duration, delay, annotations, node) {
-        if (annotations === void 0) { annotations = []; }
-        if (node === void 0) { node = null; }
-        this._id = generateUUID();
-        this._name = name;
-        this._duration = duration;
-        this._delay = delay;
-        this._annotations = annotations;
-        this._node = node;
-        this._mitt = mitt();
-    }
-    Object.defineProperty(ProvenanceSlide.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlide.prototype, "node", {
-        get: function () {
-            return this._node;
-        },
-        set: function (value) {
-            this._node = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlide.prototype, "name", {
-        get: function () {
-            return this._name;
-        },
-        set: function (value) {
-            this._name = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlide.prototype, "duration", {
-        get: function () {
-            return this._duration;
-        },
-        set: function (value) {
-            this._duration = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlide.prototype, "delay", {
-        get: function () {
-            return this._delay;
-        },
-        set: function (value) {
-            this._delay = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlide.prototype.addAnnotation = function (annotation) {
-        this._annotations.push(annotation);
-        this._mitt.emit('addAnnotation', annotation);
-    };
-    ProvenanceSlide.prototype.removeAnnotation = function (annotation) {
-        var index = this._annotations.indexOf(annotation);
-        this._annotations.splice(index, 1);
-        this._mitt.emit('removeAnnotation', annotation);
-    };
-    Object.defineProperty(ProvenanceSlide.prototype, "annotations", {
-        get: function () {
-            return this._annotations;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlide.prototype.on = function (type, handler) {
-        this._mitt.on(type, handler);
-    };
-    ProvenanceSlide.prototype.off = function (type, handler) {
-        this._mitt.off(type, handler);
-    };
-    return ProvenanceSlide;
-}());
-
-var ProvenanceSlidedeck = /** @class */ (function () {
-    function ProvenanceSlidedeck(application, traverser) {
-        this._slides = [];
-        this._captainPlaceholder = new ProvenanceSlide('Captain Placeholder', 0, 0);
-        this._mitt = mitt();
-        this._application = application;
-        this._graph = traverser.graph;
-        this._traverser = traverser;
-        this._selectedSlide = null;
-    }
-    Object.defineProperty(ProvenanceSlidedeck.prototype, "application", {
-        get: function () {
-            return this._application;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlidedeck.prototype.addSlide = function (slide, index) {
-        if (!index ||
-            isNaN(index) ||
-            !Number.isInteger(index) ||
-            index > this._slides.length ||
-            index < 0) {
-            index = this._slides.length;
-        }
-        if (slide && this._slides.indexOf(slide) >= 0) {
-            throw new Error('Cannot add a slide that is already in the deck');
-        }
-        if (!slide) {
-            var node = this._graph.current;
-            slide = new ProvenanceSlide(node.label, 1, 0, [], node);
-        }
-        if (this._slides.length === 0) {
-            this._selectedSlide = slide;
-        }
-        this._slides.splice(index, 0, slide);
-        this._mitt.emit('slideAdded', slide);
-        return slide;
-    };
-    ProvenanceSlidedeck.prototype.removeSlideAtIndex = function (index) {
-        var deletedSlides = this._slides.splice(index, 1);
-        // This can only be 1 slide now, therefore this is ok.
-        if (this._selectedSlide === deletedSlides[0]) {
-            this.selectedSlide = null;
-        }
-        this._mitt.emit('slideRemoved', deletedSlides[0]);
-    };
-    ProvenanceSlidedeck.prototype.removeSlide = function (slide) {
-        this.removeSlideAtIndex(this._slides.indexOf(slide));
-    };
-    Object.defineProperty(ProvenanceSlidedeck.prototype, "selectedSlide", {
-        get: function () {
-            return this._selectedSlide;
-        },
-        set: function (slide) {
-            if (slide && slide.node) {
-                this._traverser.toStateNode(slide.node.id);
-            }
-            this._selectedSlide = slide;
-            this._mitt.emit('slideSelected', slide);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlidedeck.prototype.moveSlide = function (indexFrom, indexTo) {
-        if (indexTo < 0 || indexTo > this.slides.length - 1) {
-            throw new Error('target index out of bounds');
-        }
-        if (indexTo >= this._slides.length) {
-            var k = indexTo - this._slides.length + 1;
-            while (k--) {
-                this._slides.push(this._captainPlaceholder);
-            }
-        }
-        this._slides.splice(indexTo, 0, this._slides.splice(indexFrom, 1)[0]);
-        this._mitt.emit('slidesMoved', this._slides);
-    };
-    ProvenanceSlidedeck.prototype.startTime = function (slide) {
-        var index = this._slides.indexOf(slide);
-        var previousTime = 0;
-        for (var i = 0; i < index; i++) {
-            previousTime += this._slides[i].delay;
-            previousTime += this._slides[i].duration;
-        }
-        return previousTime;
-    };
-    ProvenanceSlidedeck.prototype.slideAtTime = function (time) {
-        var index = 0;
-        var currentSlide = null;
-        while (time >= 0 && index < this.slides.length) {
-            currentSlide = this.slides[index];
-            var nextSlideOffset = currentSlide.delay + currentSlide.duration;
-            if (time - nextSlideOffset < 0) {
-                break;
-            }
-            time -= nextSlideOffset;
-            index++;
-        }
-        return currentSlide;
-    };
-    Object.defineProperty(ProvenanceSlidedeck.prototype, "slides", {
-        get: function () {
-            return this._slides;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlidedeck.prototype, "graph", {
-        get: function () {
-            return this._graph;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlidedeck.prototype.on = function (type, handler) {
-        this._mitt.on(type, handler);
-    };
-    ProvenanceSlidedeck.prototype.off = function (type, handler) {
-        this._mitt.off(type, handler);
-    };
-    return ProvenanceSlidedeck;
-}());
-
-var STATUS;
-(function (STATUS) {
-    STATUS[STATUS["IDLE"] = 0] = "IDLE";
-    STATUS[STATUS["PLAYING"] = 1] = "PLAYING";
-})(STATUS || (STATUS = {}));
-var wait = function (duration) { return new Promise(function (resolve) { return setTimeout(resolve, duration); }); };
-var ProvenanceSlidedeckPlayer = /** @class */ (function () {
-    function ProvenanceSlidedeckPlayer(slides, selectCallback) {
-        this._selectCallback = selectCallback;
-        this._slides = slides;
-        this._currentSlideIndex = 0;
-        this._status = STATUS.IDLE;
-    }
-    ProvenanceSlidedeckPlayer.prototype.setSlideIndex = function (slideIndex) {
-        this._currentSlideIndex = slideIndex;
-    };
-    Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "slides", {
-        get: function () {
-            return this._slides;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "currentSlideIndex", {
-        get: function () {
-            return this._currentSlideIndex;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlidedeckPlayer.prototype.play = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _this = this;
-            var shouldPlayNext, slide;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        shouldPlayNext = function () {
-                            return _this._status === STATUS.PLAYING && _this._currentSlideIndex < _this._slides.length - 1;
-                        };
-                        if (!(this._status === STATUS.IDLE)) return [3 /*break*/, 4];
-                        this._status = STATUS.PLAYING;
-                        _a.label = 1;
-                    case 1:
-                        slide = this._slides[this._currentSlideIndex];
-                        return [4 /*yield*/, wait(slide.duration)];
-                    case 2:
-                        _a.sent();
-                        if (shouldPlayNext()) {
-                            this._currentSlideIndex += 1;
-                            this._selectCallback(this._slides[this._currentSlideIndex]);
-                        }
-                        _a.label = 3;
-                    case 3:
-                        if (shouldPlayNext()) return [3 /*break*/, 1];
-                        _a.label = 4;
-                    case 4:
-                        this._status = STATUS.IDLE;
-                        return [2 /*return*/];
-                }
-            });
+        ];
+        this.counter = 0;
+        this.elm = elm;
+        let button = this.createButton();
+        this.tasksTable = this.createTaskTable();
+        elm.appendChild(button);
+        elm.appendChild(this.tasksTable);
+        this.graph = graph;
+        graph.on("nodeAdded", (node) => {
+            this.taskList[this.taskId - 1].taskNodes.push(node);
+            this.addMetadata(this.taskId);
         });
-    };
-    Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "status", {
-        get: function () {
-            return this._status;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    ProvenanceSlidedeckPlayer.prototype.stop = function () {
-        this._status = STATUS.IDLE;
-    };
-    return ProvenanceSlidedeckPlayer;
-}());
-
-var SlideAnnotation = /** @class */ (function () {
-    function SlideAnnotation(data) {
-        this._id = generateUUID();
-        this._data = data;
-        this._mitt = mitt();
     }
-    Object.defineProperty(SlideAnnotation.prototype, "id", {
-        get: function () {
-            return this._id;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SlideAnnotation.prototype, "data", {
-        get: function () {
-            return this._data;
-        },
-        set: function (value) {
-            this._data = value;
-            this._mitt.emit('change', value);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    SlideAnnotation.prototype.on = function (type, handler) {
-        this._mitt.on(type, handler);
-    };
-    SlideAnnotation.prototype.off = function (type, handler) {
-        this._mitt.off(type, handler);
-    };
-    return SlideAnnotation;
-}());
-//# sourceMappingURL=provenance-core.es5.js.map
+    createTaskTable() {
+        const tasksTable = document.createElement("ul");
+        tasksTable.id = "taskTable";
+        return tasksTable;
+    }
+    addMetadata(id) {
+        this.taskList[id - 1].taskNodes.forEach((node) => {
+            if (node.action.metadata) {
+                node.action.metadata.taskId = id;
+                node.action.metadata.taskName = this.taskName;
+            }
+            else {
+                node.action.metadata = {
+                    taskId: id,
+                    taskName: this.taskName
+                };
+            }
+        });
+    }
+    addTask() {
+        console.log(this.taskList);
+        // check counter for addTask button clicked
+        this.counter += 1;
+        if (this.counter > 1) {
+            this.taskId = this.counter;
+            this.taskName = "Task" + this.taskId;
+            this.createNewTask();
+        }
+        const inputContainer = document.createElement("li");
+        inputContainer.className = "inputContainer";
+        const checkbox = this.createCheckbox();
+        const label = this.createLabel();
+        const radioBtn = this.createRadioButton();
+        inputContainer.appendChild(radioBtn);
+        inputContainer.appendChild(label);
+        inputContainer.appendChild(checkbox);
+        this.tasksTable.appendChild(inputContainer);
+    }
+    createNewTask() {
+        const task = {
+            taskId: this.taskId,
+            taskName: this.taskName,
+            taskNodes: []
+        };
+        this.taskList.push(task);
+    }
+    updateTaskId(event) {
+        this.taskId = Number(event.target.id);
+        let name = event.target.nextElementSibling.value;
+        this.taskName = name;
+        debugger;
+    }
+    createRadioButton() {
+        const radio = document.createElement("input");
+        radio.type = "radio";
+        radio.name = "name";
+        radio.className = "";
+        radio.id = this.taskId.toString();
+        radio.setAttribute("checked", "checked");
+        radio.addEventListener("change", this.updateTaskId.bind(this));
+        return radio;
+    }
+    createCheckbox() {
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.name = "name";
+        checkbox.value = "value";
+        checkbox.id = this.taskId.toString();
+        return checkbox;
+    }
+    enableEdit(event) {
+        event.target.readOnly = false;
+    }
+    updateTaskName(event) {
+        const id = Number(event.target.id);
+        this.taskName = event.target.value;
+        // Update taskId and TaskName to Active Task Id and Name
+        this.taskId = id;
+        this.taskList[id - 1].taskName = this.taskName;
+        this.addMetadata(id);
+    }
+    createButton() {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "floatingButton";
+        button.innerText = "+";
+        button.value = "Add";
+        button.title = "New Task";
+        button.addEventListener("click", this.addTask.bind(this));
+        return button;
+    }
+    createLabel() {
+        const label = document.createElement("input");
+        label.type = "text";
+        label.name = "taskName";
+        label.value = this.taskName;
+        label.id = this.taskId.toString();
+        label.readOnly = true;
+        label.addEventListener("click", this.enableEdit.bind(this));
+        label.addEventListener("change", this.updateTaskName.bind(this));
+        return label;
+    }
+}
+
+
+//# sourceMappingURL=provenance-task-list.es5.js.map
+
+
+/***/ }),
+
+/***/ "../provenance-tree-visualization/dist/provenance-tree-visualization.es5.js":
+/*!**********************************************************************************!*\
+  !*** ../provenance-tree-visualization/dist/provenance-tree-visualization.es5.js ***!
+  \**********************************************************************************/
+/*! exports provided: getNodeIntent, ProvenanceTreeVisualization */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getNodeIntent", function() { return getNodeIntent; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceTreeVisualization", function() { return ProvenanceTreeVisualization; });
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "../node_modules/d3/index.js");
+/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
+
+
 
 function depthSort(a, b) {
     if (a.maxDescendantDepth > b.maxDescendantDepth) {
@@ -1478,44 +1206,533 @@ function GratzlLayout() {
     }
     return tree;
 }
-//# sourceMappingURL=gratzl.js.map
 
-var GroupMode;
-(function (GroupMode) {
-    GroupMode[GroupMode["NONE"] = 0] = "NONE";
-    GroupMode[GroupMode["INTENT"] = 1] = "INTENT";
-})(GroupMode || (GroupMode = {}));
+/**
+* @description Child removed, child's children go to the parent.
+* @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
+* @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
+*/
+function transferToParent(node, child) {
+    var _a, _b;
+    node.children.splice(node.children.indexOf(child), 1);
+    (_a = node.children).push.apply(_a, child.children);
+    (_b = node.wrappedNodes).push.apply(_b, child.wrappedNodes);
+}
+/**
+* @description Child removed, child's children go to child2. Child2 becomes node's child.
+* @param node {IGroupedTreeNode<ProvenanceNode>} - Parent node
+* @param child {IGroupedTreeNode<ProvenanceNode>} - Child node
+* @param child2 {IGroupedTreeNode<ProvenanceNode>} - Child of the child node
+*/
+function transferChildrens(node, child, child2) {
+    var _a, _b;
+    node.children.splice(node.children.indexOf(child), 1);
+    child.children.splice(child.children.indexOf(child2), 1);
+    (_a = child2.wrappedNodes).push.apply(_a, child.wrappedNodes);
+    (_b = child2.children).push.apply(_b, child.children);
+    node.children.push(child2);
+}
+/**
+* @description Pointed node wraps ALL children recursively
+* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+*/
+function transferAll(node) {
+    var done;
+    do {
+        done = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            transferToParent(node, child);
+            done = true;
+        }
+    } while (done);
+}
+/**
+* @description Returns the maximum depth possible from the node selected.
+* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+* @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
+*/
+var maxDepth = function (node) {
+    if (node.children.length === 0) {
+        return 1;
+    }
+    return (Math.max.apply(Math, node.children.map(maxDepth)) + 1);
+};
+/**
+* @description Returns the number of conexions with the node selected.
+* @param node {IGroupedTreeNode<ProvenanceNode>} - Selected node
+* @returns Number of nodes you have to cross to go to the deepest leaf from the node selected.
+*/
+var connectivity = function (node) {
+    return (1 + node.children.length);
+};
+/**
+* @description Return the first node found in nodes that also belongs to the main branch of the tree.
+* @param  mainBranch  {IGroupedTreeNode<ProvenanceNode>} - Selected node
+*/
+var mainNode = function (mainBranch, nodes) {
+    var mNode = undefined;
+    for (var _i = 0, nodes_1 = nodes; _i < nodes_1.length; _i++) {
+        var node = nodes_1[_i];
+        if (mainBranch.includes(node.wrappedNodes[0].id)) {
+            mNode = node;
+            break;
+        }
+    }
+    return mNode;
+};
+/**
+* @description Compare the depth of two selected nodes.
+* @param  node1  {IGroupedTreeNode<ProvenanceNode>} - Selected node #1
+* @param  node2  {IGroupedTreeNode<ProvenanceNode>} - Selected node #2
+*/
+var nodeDepthComparison = function (node1, node2) {
+    if (maxDepth(node1) > maxDepth(node2)) {
+        return 1;
+    }
+    else if (maxDepth(node1) < maxDepth(node2)) {
+        return -1;
+    }
+    return 0;
+};
+/////////////////// DIFFERENT DATA AGGREGATION ALGORITHM ///////////
+/**
+* @description No algorithm is applied. Created for a better understanding.
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+*/
+var doNothing = function (node, test) {
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+*/
+var group = function (node, test) {
+    var merged = false;
+    do {
+        merged = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            for (var _b = 0, _c = child.children; _b < _c.length; _b++) {
+                var child2 = _c[_b];
+                if (test(child, child2)) {
+                    transferChildrens(node, child, child2);
+                    merged = true;
+                    break;
+                }
+            }
+            if (merged)
+                break;
+        }
+    } while (merged);
+    node.children.map(function (child) { return group(child, test); });
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+*/
+var compress = function (node, test) {
+    var merged = false;
+    do {
+        merged = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            if (test(node, child) && child.wrappedNodes.length === 1) {
+                transferToParent(node, child);
+                merged = true;
+                break;
+            }
+        }
+    } while (merged);
+    node.children.map(function (child) { return compress(child, test); });
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+*/
+var categorize = function (node, test, mainBranch) {
+    var merged = false;
+    var bannedNodes = [];
+    do {
+        merged = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            var testedNodes = [];
+            var mainNode_1 = undefined;
+            for (var _b = 0, _c = child.children; _b < _c.length; _b++) {
+                var child2 = _c[_b];
+                if (test(child, child2)) {
+                    testedNodes.push(child2);
+                    if (mainBranch && mainBranch.includes(child2.wrappedNodes[0].id)) {
+                        mainNode_1 = child2;
+                    }
+                }
+            } // end - for loop for creating the testedNodes list
+            if (mainNode_1) {
+                transferChildrens(node, child, mainNode_1);
+                bannedNodes = testedNodes;
+                merged = true;
+                break;
+            }
+            else {
+                for (var _d = 0, testedNodes_1 = testedNodes; _d < testedNodes_1.length; _d++) {
+                    var child2 = testedNodes_1[_d];
+                    if (!(bannedNodes.includes(child2))) {
+                        var depths = testedNodes.map(function (d) { return maxDepth(d); });
+                        var maxDepthNode = Math.min.apply(Math, depths);
+                        if (maxDepthNode == maxDepth(child2)) {
+                            transferChildrens(node, child, child2);
+                            bannedNodes = testedNodes;
+                            merged = true;
+                            break;
+                        } // Aggregate the node with max depth
+                    } // if node not banned
+                } // for loop testedNodes
+            } // else mainNode
+            if (merged)
+                break;
+        }
+    } while (merged);
+    node.children.map(function (child) { return categorize(child, test, mainBranch); });
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var shrink = function (node, test, mainBranch, arg) {
+    auxShrink(node, test, mainBranch, arg);
+    compress(node, test);
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var auxShrink = function (node, test, mainBranch, arg) {
+    var parameter = +arg;
+    var numChildren = node.children.length;
+    if (numChildren > 0) {
+        node.children.sort(nodeDepthComparison);
+        var mNode = undefined;
+        if (mainBranch) {
+            mNode = mainNode(mainBranch, node.children);
+        }
+        if (mNode) {
+            node.children.splice(node.children.indexOf(mNode), 1);
+            node.children.push(mNode);
+            node.children.reverse();
+        }
+    }
+    for (var idx = numChildren - 1; idx >= 2 * parameter - 1; idx--) {
+        transferAll(node.children[idx]);
+        transferToParent(node, node.children[idx]);
+        numChildren--;
+    }
+    for (var j = 0; j < numChildren; j++) {
+        auxShrink(node.children[j], test, mainBranch, (parameter - Math.trunc((j + 1) / 2)));
+    }
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var pruneI = function (node, test, mainBranch, arg) {
+    auxPruneI(node, test, mainBranch, arg);
+    compress(node, test);
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var auxPruneI = function (node, test, mainBranch, arg) {
+    var parameter = +arg;
+    var merged;
+    do {
+        merged = false;
+        if (connectivity(node) > 2) {
+            for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+                var child = _a[_i];
+                if (maxDepth(child) <= parameter && mainBranch && !mainBranch.includes(child.wrappedNodes[0].id)) {
+                    transferAll(child);
+                    transferToParent(node, child);
+                    merged = true;
+                    break;
+                }
+            }
+        }
+    } while (merged);
+    node.children.map(function (child) { return auxPruneI(child, test, mainBranch, parameter); });
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var pruneII = function (node, test, mainBranch, arg) {
+    auxPruneII(node, test, mainBranch, arg);
+    compress(node, test);
+};
+/**
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Root of the graph
+* @param  test  {IGroupedTreeNode<ProvenanceNode>} - Test to be checked during execution.
+* @param mainBranch {Array<string>} - List of node's id which belong to the master branch.
+* @param arg {any} - Optinal parameter
+*/
+var auxPruneII = function (node, test, mainBranch, arg) {
+    var parameter = +arg;
+    var merged;
+    do {
+        merged = false;
+        for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
+            var child = _a[_i];
+            if (connectivity(child) > 2) {
+                for (var _b = 0, _c = child.children; _b < _c.length; _b++) {
+                    var child2 = _c[_b];
+                    if (maxDepth(child2) <= parameter && mainBranch && !mainBranch.includes(child2.wrappedNodes[0].id)) {
+                        transferAll(child2);
+                        transferToParent(child, child2);
+                        child.wrappedNodes.reverse();
+                        merged = true;
+                        break;
+                    }
+                }
+            }
+            if (merged)
+                break;
+        }
+    } while (merged);
+    node.children.map(function (child) { return auxPruneII(child, test, mainBranch, parameter); });
+};
+
+/**
+* @description Getter for the user intent of the node selected.
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+* @returns Returns the Intent of the user for the node selected.
+*/
 function getNodeIntent(node) {
-    if (isStateNode(node) && node.action && node.action.metadata && node.action.metadata.userIntent) {
+    if (Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["isStateNode"])(node) && node.action && node.action.metadata && node.action.metadata.userIntent) {
         return node.action.metadata.userIntent;
     }
     return 'none';
 }
+/**
+* @description Test whether a node is a key node or not.
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+*/
 function isKeyNode(node) {
-    if (!isStateNode(node) || node.children.length === 0 || node.children.length > 1 || node.parent.children.length > 1 ||
+    if (!Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["isStateNode"])(node) || node.children.length === 0 || node.children.length > 1 || node.parent.children.length > 1 ||
         (node.children.length === 1 && getNodeIntent(node) !== getNodeIntent(node.children[0]))) {
         return true;
     }
     return false;
 }
+/**
+* @description Returns a label for grouped nodes.
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+*/
+var groupNodeLabel = function (node) {
+    if (node.wrappedNodes.length === 1) {
+        return node.wrappedNodes[0].label;
+    }
+    else {
+        return (node.wrappedNodes[0].label);
+    }
+};
+/*
+ */
+/**
+* @description Wraps each node in the provenance tree in an extra IGroupedTreeNode; which can be manipulated for grouping etc, without modifying the actual ProvenanceTree.
+* @param  node  {IGroupedTreeNode<ProvenanceNode>} - Node selected.
+*/
+var wrapNode = function (node) {
+    return {
+        wrappedNodes: [node],
+        children: node.children.map(wrapNode),
+    };
+};
+/**
+* @description Test if two nodes share the same userIntent.
+* @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+* @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+*/
+var testUserIntent = function (a, b) { return (a.children.length === 1 && b.children.length <= 1 &&
+    (getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]))); };
+/**
+* @description Test if two nodes share the same userIntent, regardless the number of conexions
+* @param a {IGroupedTreeNode<ProvenanceNode>} - Node #1 to be tested.
+* @param b {IGroupedTreeNode<ProvenanceNode>} - Node #2 to be tested.
+*/
+var testUserIntentCategory = function (a, b) { return ((getNodeIntent(a.wrappedNodes[0]) === getNodeIntent(b.wrappedNodes[0]))); };
+/**
+* @description Test if b is an interval node.
+* @param a {IGroupedTreeNode<ProvenanceNode>} - Not used.
+* @param b {IGroupedTreeNode<ProvenanceNode>} - Node to be tested.
+*/
+var testUserActions = function (a, b) { return ((b.children.length === 1)); };
+//////// Objects that represent the different data aggregation algorithms///////////
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var rawData = {
+    name: 'Raw data',
+    test: testUserIntent,
+    algorithm: doNothing,
+    arg: false,
+    description: 'No algorithm is applied. The full provenance data is shown.',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var grouping = {
+    name: 'Grouping',
+    test: testUserIntent,
+    algorithm: group,
+    arg: false,
+    description: 'This algorithm groups nodes of the same category (color). \n' +
+        'The remaining nodes represent the last interactions of category groups.\n' +
+        '\t The grouped nodes must have connectivity equal to two or less (interval nodes or leaves) and must belong to the same category group.\n',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var compression = {
+    name: 'Compression',
+    test: testUserActions,
+    algorithm: compress,
+    arg: false,
+    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes). However, the node which "absorbs" the grouped nodes and which is still visualized can be of any connectivity\n' +
+        'The remaining nodes are nodes with connectivity different to two (leaves or subroots). \n' +
+        'The nodes are grouped regardless their category.\n',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var categorization = {
+    name: 'Categorizing',
+    test: testUserIntentCategory,
+    algorithm: categorize,
+    arg: true,
+    description: 'This algorithm groups nodes of the same category (color).\n' +
+        'The remaining nodes represent the last interactions of category groups.\n' +
+        'The nodes are grouped regardless their connectivity.\n' +
+        'The grouped nodes must belong to the same category group.',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var shrinking = {
+    name: 'Shrinking',
+    test: testUserActions,
+    algorithm: shrink,
+    arg: true,
+    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
+        'The level of each branch is assigned according to the offset from the master branch.\n' +
+        'A chosen parameter indicates the maximum branch level to be shown.\n' +
+        'E.g., if the number selected is one, the only branch shown is the master one.\n' +
+        'Differently, if the number selected is two, the master branch and the two-level branches will be shown.\n',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var pruningI = {
+    name: 'Pruning I',
+    test: testUserActions,
+    algorithm: pruneI,
+    arg: true,
+    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
+        'A chosen parameter indicates the minimum height that a subtree must have to be shown.\n' +
+        'E.g., if the chosen parameter is two, the subtrees with height two or less than two will be grouped.\n' +
+        'The grouped subtrees are represented by their subroot.' +
+        'The main tree is not considered as a subtree.',
+};
+/**
+* @description Object of the interface DataAggregation<ProvenanceNode>.
+*/
+var pruningII = {
+    name: 'Pruning II',
+    test: testUserActions,
+    algorithm: pruneII,
+    arg: true,
+    description: 'This algorithm groups nodes with connectivity equals to two (interval nodes), regardless their category.\n' +
+        'A chosen parameter indicates the minimum depth that a subtree must have to be shown.\n' +
+        'E.g., if the chosen parameter is two, the subtrees with height two or less will be grouped.\n' +
+        'The grouped subtrees are represented by their deepest leaf.' +
+        'The main tree is not considered as a subtree.',
+};
+/**
+* @description List of the data aggregation objects. Whenever you want to add a new data aggregation algorithm: create object and add it to this list.
+*/
+var aggregationObjects = [rawData, grouping,
+    compression, categorization,
+    shrinking, pruningI,
+    pruningII];
+/**
+* @description Class used to create and manage a provenance tree visualization.
+* @param traverser {ProvenanceGraphTraverser} - To manage the data structure of the graph.
+* @param svg {D3SVGSelection} - To manage the graphics of the tree.
+* @param _dataAggregation {DataAggregation<ProvenanceNode>} - Data aggregation in use.
+* @param caterpillarActivated {boolean} - True if this feature is enable.
+*/
 var ProvenanceTreeVisualization = /** @class */ (function () {
     function ProvenanceTreeVisualization(traverser, elm) {
         var _this = this;
-        this.groupMode = GroupMode.INTENT;
+        this._dataAggregation = rawData; // changed from original
+        this.caterpillarActivated = false;
         this.traverser = traverser;
+        this.setTittle(elm);
         this.svg = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm).append('svg')
-            .attr('viewBox', '-10 -10 130 130')
-            .attr('style', 'width: 100%; height: 100%');
+            .attr('viewBox', '-5 5 130 110')
+            .attr('style', 'width: 95%; height: 70%; margin-left:5px');
         traverser.graph.on('currentChanged', function () { return _this.update(); });
+        this.setButtons(elm);
         this.update();
     }
+    Object.defineProperty(ProvenanceTreeVisualization.prototype, "DataAggregation", {
+        get: function () {
+            return this._dataAggregation;
+        },
+        set: function (object) {
+            this._dataAggregation = object;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+    * @description Update the tree layout.
+    */
     ProvenanceTreeVisualization.prototype.update = function () {
         var _this = this;
-        var treeRoot = Object(d3__WEBPACK_IMPORTED_MODULE_0__["hierarchy"])(this.traverser.graph.root);
-        var treeLayout = GratzlLayout().size([100 / 2, 100]);
+        var wrappedRoot = wrapNode(this.traverser.graph.root);
+        // group by the data aggregation algorithm
+        if (this.DataAggregation.arg) {
+            // Store the main branch in the constant mainBranch
+            var treeRoot_1 = Object(d3__WEBPACK_IMPORTED_MODULE_0__["hierarchy"])(wrappedRoot); // Update de treeRoot
+            var layoutCurrentNode_1 = treeRoot_1;
+            treeRoot_1.each(function (node) {
+                if (node.data.wrappedNodes.includes(_this.traverser.graph.current)) {
+                    layoutCurrentNode_1 = node;
+                }
+            });
+            var mainBranch = treeRoot_1.path(layoutCurrentNode_1).map(function (d) { return d.data.wrappedNodes[0].id; });
+            this.DataAggregation.algorithm(wrappedRoot, this.DataAggregation.test, mainBranch, Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#arg').property('value'));
+            // console.log("ha entrado en el correcto");
+        }
+        else {
+            this.DataAggregation.algorithm(wrappedRoot, this.DataAggregation.test);
+        }
+        var treeRoot = Object(d3__WEBPACK_IMPORTED_MODULE_0__["hierarchy"])(wrappedRoot); // Updated de treeRoot
+        var treeLayout = GratzlLayout().size([100 / 2, 120]);
         var layoutCurrentNode = treeRoot;
         treeRoot.each(function (node) {
-            if (node.data === _this.traverser.graph.current) {
+            if (node.data.wrappedNodes.includes(_this.traverser.graph.current)) {
                 layoutCurrentNode = node;
             }
         });
@@ -1523,37 +1740,41 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
         var treeNodes = tree.descendants();
         var oldNodes = this.svg
             .selectAll('g.node')
-            .data(treeNodes, function (d) { return d.data.id; });
+            .data(treeNodes, function (d) { return (d.data.wrappedNodes.map(function (n) { return n.id; }).join()); });
+        oldNodes.exit().remove();
         var newNodes = oldNodes
             .enter()
             .append('g')
             .attr('class', 'node')
-            .attr('transform', function (d) {
-            return "translate(" + d.x + ", " + d.y + ")";
-        })
-            .on('click', function (d) { return _this.traverser.toStateNode(d.data.id); });
+            .attr('transform', function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
         newNodes
             .append('circle')
             .attr('r', 2);
         newNodes
             .append('text')
-            .text(function (d) { return (isStateNode(d.data) ? d.data.label : ''); })
-            .attr('style', 'font-size: 8px')
+            .attr('class', 'circle-label')
+            .text(function (d) { return groupNodeLabel(d.data); })
             .attr('x', 7)
             .attr('y', 3);
+        newNodes
+            .append('text')
+            .attr('class', 'circle-text')
+            .text('1')
+            .attr('x', -1.5)
+            .attr('y', 2);
         var updateNodes = newNodes.merge(oldNodes);
         updateNodes
             .select('circle')
             .attr('class', function (d) {
             var classString = '';
-            if (isKeyNode(d.data)) {
+            if (isKeyNode(d.data.wrappedNodes[0])) {
                 classString += ' keynode';
             }
-            classString += ' intent_' + getNodeIntent(d.data);
+            classString += ' intent_' + getNodeIntent(d.data.wrappedNodes[0]);
             return classString;
         });
         updateNodes
-            .select('text')
+            .select('text.circle-label')
             .attr('visibility', function (d) {
             if (d.xOffset === 0) {
                 return 'visible';
@@ -1563,25 +1784,54 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             }
         });
         updateNodes
-            .filter(function (d) { return d.xOffset === 0; })
+            .select('text.circle-text')
+            .attr('visibility', function (d) {
+            if (d.data.wrappedNodes.length === 1) {
+                return 'hidden';
+            }
+            else {
+                return 'visible';
+            }
+        })
+            .attr('x', function (d) {
+            if (d.data.wrappedNodes.length >= 10) {
+                return (-3);
+            }
+            return (-1.5);
+        })
+            .text(function (d) { return d.data.wrappedNodes.length.toString(); });
+        updateNodes
+            .on('click', function (d) {
+            _this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250);
+            _this.update();
+        });
+        updateNodes
+            .select('circle')
+            .attr('r', function (d) {
+            var radius = 2;
+            if (d.data.wrappedNodes.length != 1) {
+                radius = Math.min(2 + 2 + 0.3 * d.data.wrappedNodes.length, 7);
+            }
+            return radius;
+        });
+        updateNodes
             .attr('class', 'node branch-active')
-            .filter(function (d) { return d.data === _this.traverser.graph.current; })
+            .filter(function (d) { return d.data.wrappedNodes.includes(_this.traverser.graph.current); })
             .attr('class', 'node branch-active node-active');
         updateNodes
             .transition()
             .duration(500)
-            .attr('transform', function (d) {
-            return "translate(" + d.x + ", " + d.y + ")";
-        });
+            .attr('transform', function (d) { return "translate(" + d.x + ", " + d.y + ")"; });
         var linkPath = function (_a) {
             var source = _a.source, target = _a.target;
             var _b = [source, target], s = _b[0], t = _b[1];
             // tslint:disable-next-line
-            return "M" + s.x + "," + s.y + "C" + s.x + "," + (s.y + t.y) / 2 + " " + t.x + "," + (s.y + t.y) / 2 + " " + t.x + "," + t.y;
+            return "M" + s.x + "," + s.y + "\n              C" + s.x + ",  " + (s.y + t.y) / 2 + " " + t.x + ",  " + (s.y + t.y) / 2 + " " + t.x + ",  " + t.y;
         };
         var oldLinks = this.svg
             .selectAll('path.link')
-            .data(tree.links(), function (d) { return d.target.data.id; });
+            .data(tree.links(), function (d) { return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join(); });
+        oldLinks.exit().remove();
         var newLinks = oldLinks
             .enter()
             .insert('path', 'g')
@@ -1594,6 +1844,297 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
             .transition()
             .duration(500)
             .attr('d', linkPath);
+        var updatedLinks = oldLinks.merge(newLinks);
+        // Caterpillar routine if needed; *************************************************
+        if (this.caterpillarActivated) {
+            var mainNodes = updateNodes.filter(function (d) { return d.xOffset == 0; });
+            var mainNodesData_1 = mainNodes.data().map(function (d) { return d.data.wrappedNodes[0].id; });
+            // console.log(mainNodesData);
+            var edgeNodes = mainNodes
+                .filter(function (d) {
+                if (d.children) {
+                    return d.children.length > 1;
+                }
+                return false;
+            });
+            edgeNodes
+                .select('circle')
+                .attr('class', 'intent_wrapped');
+            // Hide the rest of the circles and links
+            updateNodes
+                .filter(function (d) { return d.xOffset != 0; })
+                .attr('class', 'node hiddenClass');
+            updatedLinks
+                .filter(function (d) { return d.target.xOffset != 0; })
+                .attr('class', 'node hiddenClass');
+            // Set the label which indicate the number of nodes wrapped
+            updateNodes
+                .select('text.circle-text')
+                .filter(function (d) { return d.xOffset != 0; })
+                .attr('visibility', 'hidden');
+            edgeNodes
+                .select('text.circle-text')
+                .attr('visibility', 'visible')
+                .text(function (d) {
+                var copyNode = d.copy();
+                copyNode.children = copyNode.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                return copyNode.descendants().length;
+            })
+                .attr('x', function (d) {
+                var copyNode = d.copy();
+                copyNode.children = copyNode.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                if (copyNode.descendants().length < 10) {
+                    return -1.5;
+                }
+                else {
+                    return -3;
+                }
+            });
+            // Set the radius of the circle
+            edgeNodes
+                .select('circle')
+                .attr('r', function (d) {
+                return Math.min(4 + 0.15 * d.descendants().length, 6);
+            });
+            // Set the click function
+            edgeNodes
+                .on('click', function (d) {
+                var actualCatGraph = Object(d3__WEBPACK_IMPORTED_MODULE_0__["selectAll"])('.classCat');
+                // When click again -> auxiliar tree disappearss.
+                if (actualCatGraph.data().map(function (k) { return k.data.wrappedNodes[0].id; }).includes(d.data.wrappedNodes[0].id)) {
+                    actualCatGraph.data([]).exit().remove();
+                    Object(d3__WEBPACK_IMPORTED_MODULE_0__["selectAll"])('path.linkCat').data([]).exit().remove();
+                    console.log(actualCatGraph.data().map(function (k) { return k.data.wrappedNodes[0].id; }));
+                    console.log(d.data.wrappedNodes[0].id);
+                }
+                else { // else -> deploy the new tree.
+                    var treeCopy = d.copy();
+                    treeCopy.children = treeCopy.children.filter(function (e, i, arr) { return !mainNodesData_1.includes(e.data.wrappedNodes[0].id); });
+                    var treeLayoutCat = GratzlLayout().size([35, 120]);
+                    var treeCat = treeLayoutCat(treeCopy, treeCopy);
+                    var excatNodes = _this.svg
+                        .selectAll('g.classCat')
+                        .data(treeCat.descendants(), function (d) { return (d.data.wrappedNodes.map(function (n) { return n.id; }).join()); });
+                    excatNodes.exit().remove();
+                    var catNodes = excatNodes
+                        .enter()
+                        .append('g')
+                        .attr('class', 'classCat node branch-active ')
+                        .attr('transform', function (k) { return "translate(" + k.x + ", " + k.y + ")"; });
+                    catNodes.append('circle').attr('r', 2);
+                    // Fix the radius of the circles according to #nodes wrapped
+                    catNodes
+                        .select('circle')
+                        .attr('r', function (d) {
+                        var radius = 2;
+                        if (d.data.wrappedNodes.length != 1) {
+                            radius = Math.min(4 + 0.15 * d.data.wrappedNodes.length, 6);
+                        }
+                        return radius;
+                    });
+                    // Assign classes to the circles
+                    catNodes
+                        .select('circle')
+                        .attr('class', function (d) {
+                        var classString = '';
+                        if (isKeyNode(d.data.wrappedNodes[0])) {
+                            classString += ' keynode';
+                        }
+                        classString += ' intent_' + getNodeIntent(d.data.wrappedNodes[0]);
+                        return classString;
+                    });
+                    catNodes
+                        .on('click', function (d) { return _this.traverser.toStateNode(d.data.wrappedNodes[0].id, 250); });
+                    // Set the #nodes-wrapped label
+                    catNodes
+                        .append('text')
+                        .attr('class', 'circle-text')
+                        .attr('visibility', function (d) {
+                        if (d.data.wrappedNodes.length === 1) {
+                            return 'hidden';
+                        }
+                        else {
+                            return 'visible';
+                        }
+                    })
+                        .attr('x', function (d) {
+                        if (d.data.wrappedNodes.length >= 10) {
+                            return (-3);
+                        }
+                        return (-1.5);
+                    })
+                        .attr('y', 2)
+                        .text(function (d) { return d.data.wrappedNodes.length.toString(); });
+                    // Set the links between circles
+                    var oldLinksCat = _this.svg
+                        .selectAll('path.linkCat')
+                        .data(treeCat.links(), function (d) { return d.target.data.wrappedNodes.map(function (n) { return n.id; }).join(); });
+                    oldLinksCat.exit().remove();
+                    var newLinksCat = oldLinksCat
+                        .enter()
+                        .insert('path', 'g')
+                        .attr('d', linkPath);
+                    oldLinksCat.merge(newLinksCat)
+                        .attr('class', 'link linkCat')
+                        .filter(function (d) { return d.target.xOffset === 0; })
+                        .attr('class', 'link active linkCat');
+                } // end else actualgraph
+            }); // end on click
+        } // if of caterpillar procedure
+        // Update title
+        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation')
+            .text(this._dataAggregation.name);
+        // Warning when max nodes is reached.
+        updateNodes
+            .filter(function (d) {
+            var wrapNodes = updateNodes.filter(function (k) { return k.depth > 19; }).data().length;
+            if (d.depth > 19) {
+                Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' Max nodes reached: ' + wrapNodes.toString());
+            }
+            return false;
+        });
+    }; // end update
+    /**
+    * @description Show the tittle of the data aggregation algorithm used.
+    */
+    ProvenanceTreeVisualization.prototype.setTittle = function (elm) {
+        var _this = this;
+        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm)
+            .append('div')
+            .attr('style', 'padding-top:15px; text-align: center;')
+            .append('text')
+            .attr('class', 'tittleAggregation')
+            .attr('id', 'DataAggregation')
+            .text('Raw Data')
+            .on('click', function () {
+            window.alert(_this.DataAggregation.name.toUpperCase() + ': \n' + _this.DataAggregation.description);
+        })
+            .attr('style', 'cursor:pointer');
+    };
+    /**
+    * @description Show the buttons of the user interface.
+    */
+    ProvenanceTreeVisualization.prototype.setButtons = function (elm) {
+        var _this = this;
+        var holder = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm)
+            .append('div');
+        var buttonsHolder = holder
+            .append('div')
+            .attr('class', 'dataAggregation-Box');
+        var connectivityBut = buttonsHolder
+            .append('button')
+            .text('Connectivity')
+            .attr('class', 'aggButton');
+        connectivityBut
+            .on('click', function () {
+            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' C: ' +
+                connectivity(wrapNode(_this.traverser.graph.current)).toString());
+        });
+        var depthBut = buttonsHolder
+            .append('button')
+            .text('Depth')
+            .attr('class', 'aggButton');
+        depthBut
+            .on('click', function () {
+            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('#DataAggregation').text(_this._dataAggregation.name + ' D: ' +
+                maxDepth(wrapNode(_this.traverser.graph.current)).toString());
+        });
+        // Data aggregation Div
+        var dataDiv = holder
+            .append('div')
+            .attr('class', 'dataAggregation-Box');
+        // label
+        dataDiv
+            .append('label')
+            .text('Data aggregation: ');
+        // Combobox
+        var select$$1 = dataDiv
+            .append('select')
+            .attr('style', 'width:50%')
+            .on('change', function () {
+            var selectValue = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])('select').property('value');
+            _this.updateDataAggregationCom(selectValue);
+        });
+        select$$1
+            .selectAll('option')
+            .data(aggregationObjects).enter()
+            .append('option')
+            .text(function (d) { return d.name; });
+        // Arguments Div
+        var argDiv = holder
+            .append('div')
+            .attr('class', 'dataAggregation-Box');
+        // label
+        argDiv
+            .append('label')
+            .text('Argument: ');
+        // Combobox
+        var selectarg = argDiv
+            .append('select')
+            .attr('id', 'arg')
+            .attr('style', 'width:15%')
+            .on('change', function () {
+            _this.updateDataAggregationCom(_this._dataAggregation.name);
+        });
+        selectarg
+            .selectAll('option')
+            .data([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]).enter()
+            .append('option')
+            .text(function (d) { return d.toString(); });
+        // Caterpillar button
+        var caterpillarButton = argDiv
+            .append('button')
+            .text('Caterpillar')
+            .attr('class', 'aggButton')
+            .attr('style', 'width:50%; background-color:red; color:white');
+        caterpillarButton
+            .on('click', function () {
+            _this.caterpillarActivated = !_this.caterpillarActivated;
+            if (_this.caterpillarActivated) {
+                caterpillarButton.attr('style', 'background-color:green; width:50%;color:white');
+            }
+            else {
+                caterpillarButton.attr('style', 'background-color:red;width:50%;color:white');
+            }
+            _this.update();
+        });
+    };
+    /**
+    * @description Update the data aggregation in used
+    * @listens Combobox for data aggregation.
+    */
+    ProvenanceTreeVisualization.prototype.updateDataAggregationCom = function (newDataAggregation) {
+        switch (newDataAggregation) {
+            case 'Raw data': {
+                this.DataAggregation = rawData;
+                break;
+            }
+            case 'Grouping': {
+                this.DataAggregation = grouping;
+                break;
+            }
+            case 'Compression': {
+                this.DataAggregation = compression;
+                break;
+            }
+            case 'Categorizing': {
+                this.DataAggregation = categorization;
+                break;
+            }
+            case 'Shrinking': {
+                this.DataAggregation = shrinking;
+                break;
+            }
+            case 'Pruning I': {
+                this.DataAggregation = pruningI;
+                break;
+            }
+            case 'Pruning II': {
+                this.DataAggregation = pruningII;
+                break;
+            }
+        }
+        this.update();
     };
     return ProvenanceTreeVisualization;
 }());
@@ -1604,18 +2145,47 @@ var ProvenanceTreeVisualization = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./packages/@visualstorytelling/slide-deck-visualization/dist/slide-deck-visualization.es5.js":
-/*!****************************************************************************************************!*\
-  !*** ./packages/@visualstorytelling/slide-deck-visualization/dist/slide-deck-visualization.es5.js ***!
-  \****************************************************************************************************/
+/***/ "../slide-deck-visualization/dist/slide-deck-visualization.es5.js":
+/*!************************************************************************!*\
+  !*** ../slide-deck-visualization/dist/slide-deck-visualization.es5.js ***!
+  \************************************************************************/
 /*! exports provided: SlideDeckVisualization */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideDeckVisualization", function() { return SlideDeckVisualization; });
-/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "./node_modules/d3/index.js");
+/* harmony import */ var d3__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! d3 */ "../node_modules/d3/index.js");
 
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation. All rights reserved.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+MERCHANTABLITY OR NON-INFRINGEMENT.
+
+See the Apache Version 2.0 License for specific language governing permissions
+and limitations under the License.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
 
 function __awaiter(thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -1657,13 +2227,14 @@ function __generator(thisArg, body) {
 function generateUUID() {
     // Public Domain/MIT
     var d = new Date().getTime();
-    if (typeof performance !== 'undefined' &&
-        typeof performance.now === 'function') {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
         d += performance.now(); // use high-precision timer if available
     }
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        // tslint:disable-next-line:no-bitwise
         var r = ((d + Math.random() * 16) % 16) | 0;
         d = Math.floor(d / 16);
+        // tslint:disable-next-line:no-bitwise
         return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
     });
 }
@@ -1711,6 +2282,7 @@ function mitt(all) {
          */
         off: function (type, handler) {
             if (all[type]) {
+                // tslint:disable-next-line:no-bitwise
                 all[type].splice(all[type].indexOf(handler) >>> 0, 1);
             }
         },
@@ -1809,17 +2381,28 @@ var ProvenanceGraph = /** @class */ (function () {
     };
     return ProvenanceGraph;
 }());
+var IrreversibleError = /** @class */ (function (_super) {
+    __extends(IrreversibleError, _super);
+    function IrreversibleError() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.invalidTraversal = true;
+        return _this;
+    }
+    return IrreversibleError;
+}(Error));
 
 var ProvenanceSlide = /** @class */ (function () {
-    function ProvenanceSlide(name, duration, delay, annotations, node) {
+    function ProvenanceSlide(name, duration, transitionTime, annotations, node) {
         if (annotations === void 0) { annotations = []; }
         if (node === void 0) { node = null; }
         this._id = generateUUID();
         this._name = name;
         this._duration = duration;
-        this._delay = delay;
+        this._transitionTime = transitionTime;
         this._annotations = annotations;
         this._node = node;
+        this._mitt = mitt();
+        this._xPosition = 0;
     }
     Object.defineProperty(ProvenanceSlide.prototype, "id", {
         get: function () {
@@ -1858,26 +2441,44 @@ var ProvenanceSlide = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(ProvenanceSlide.prototype, "delay", {
+    Object.defineProperty(ProvenanceSlide.prototype, "transitionTime", {
         get: function () {
-            return this._delay;
+            return this._transitionTime;
         },
         set: function (value) {
-            this._delay = value;
+            this._transitionTime = value;
         },
         enumerable: true,
         configurable: true
     });
     ProvenanceSlide.prototype.addAnnotation = function (annotation) {
         this._annotations.push(annotation);
+        this._mitt.emit('addAnnotation', annotation);
     };
     ProvenanceSlide.prototype.removeAnnotation = function (annotation) {
         var index = this._annotations.indexOf(annotation);
         this._annotations.splice(index, 1);
+        this._mitt.emit('removeAnnotation', annotation);
     };
     Object.defineProperty(ProvenanceSlide.prototype, "annotations", {
         get: function () {
             return this._annotations;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ProvenanceSlide.prototype.on = function (type, handler) {
+        this._mitt.on(type, handler);
+    };
+    ProvenanceSlide.prototype.off = function (type, handler) {
+        this._mitt.off(type, handler);
+    };
+    Object.defineProperty(ProvenanceSlide.prototype, "xPosition", {
+        get: function () {
+            return this._xPosition;
+        },
+        set: function (value) {
+            this._xPosition = value;
         },
         enumerable: true,
         configurable: true
@@ -1941,7 +2542,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         },
         set: function (slide) {
             if (slide && slide.node) {
-                this._traverser.toStateNode(slide.node.id);
+                this._traverser.toStateNode(slide.node.id, slide.transitionTime);
             }
             this._selectedSlide = slide;
             this._mitt.emit('slideSelected', slide);
@@ -1966,7 +2567,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         var index = this._slides.indexOf(slide);
         var previousTime = 0;
         for (var i = 0; i < index; i++) {
-            previousTime += this._slides[i].delay;
+            previousTime += this._slides[i].transitionTime;
             previousTime += this._slides[i].duration;
         }
         return previousTime;
@@ -1976,7 +2577,7 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         var currentSlide = null;
         while (time >= 0 && index < this.slides.length) {
             currentSlide = this.slides[index];
-            var nextSlideOffset = currentSlide.delay + currentSlide.duration;
+            var nextSlideOffset = currentSlide.transitionTime + currentSlide.duration;
             if (time - nextSlideOffset < 0) {
                 break;
             }
@@ -1992,6 +2593,30 @@ var ProvenanceSlidedeck = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
+    ProvenanceSlidedeck.prototype.next = function () {
+        if (this._selectedSlide !== null) {
+            var currentIndex = this._slides.indexOf(this._selectedSlide);
+            if (currentIndex < this._slides.length - 1) {
+                currentIndex += 1;
+                this.selectedSlide = this._slides[currentIndex];
+            }
+            else {
+                this.selectedSlide = this._slides[0];
+            }
+        }
+    };
+    ProvenanceSlidedeck.prototype.previous = function () {
+        if (this._selectedSlide !== null) {
+            var currentIndex = this._slides.indexOf(this._selectedSlide);
+            if (currentIndex > 0) {
+                currentIndex -= 1;
+                this.selectedSlide = this._slides[currentIndex];
+            }
+            else {
+                this.selectedSlide = this._slides[this._slides.length - 1];
+            }
+        }
+    };
     Object.defineProperty(ProvenanceSlidedeck.prototype, "graph", {
         get: function () {
             return this._graph;
@@ -2035,6 +2660,9 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
         get: function () {
             return this._currentSlideIndex;
         },
+        set: function (index) {
+            this._currentSlideIndex = index;
+        },
         enumerable: true,
         configurable: true
     });
@@ -2050,6 +2678,7 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
                         };
                         if (!(this._status === STATUS.IDLE)) return [3 /*break*/, 4];
                         this._status = STATUS.PLAYING;
+                        this._selectCallback(this._slides[this._currentSlideIndex]);
                         _a.label = 1;
                     case 1:
                         slide = this._slides[this._currentSlideIndex];
@@ -2071,6 +2700,10 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
             });
         });
     };
+    ProvenanceSlidedeckPlayer.prototype.next = function () {
+        this._currentSlideIndex += 1;
+        this._selectCallback(this._slides[this._currentSlideIndex]);
+    };
     Object.defineProperty(ProvenanceSlidedeckPlayer.prototype, "status", {
         get: function () {
             return this._status;
@@ -2084,6 +2717,39 @@ var ProvenanceSlidedeckPlayer = /** @class */ (function () {
     return ProvenanceSlidedeckPlayer;
 }());
 
+var SlideAnnotation = /** @class */ (function () {
+    function SlideAnnotation(data) {
+        this._id = generateUUID();
+        this._data = data;
+        this._mitt = mitt();
+    }
+    Object.defineProperty(SlideAnnotation.prototype, "id", {
+        get: function () {
+            return this._id;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(SlideAnnotation.prototype, "data", {
+        get: function () {
+            return this._data;
+        },
+        set: function (value) {
+            this._data = value;
+            this._mitt.emit('change', value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    SlideAnnotation.prototype.on = function (type, handler) {
+        this._mitt.on(type, handler);
+    };
+    SlideAnnotation.prototype.off = function (type, handler) {
+        this._mitt.off(type, handler);
+    };
+    return SlideAnnotation;
+}());
+
 function firstArgThis(f) {
     return function (...args) {
         return f(this, ...args);
@@ -2091,98 +2757,309 @@ function firstArgThis(f) {
 }
 class SlideDeckVisualization {
     constructor(slideDeck, elm) {
-        this._tableHeight = 1000;
-        this._tableWidth = 300;
-        this._minimumSlideDuration = 5000;
-        this._barHeightTimeMultiplier = 0.01;
-        this._barWidth = 270;
+        this._tableHeight = 125;
+        this._tableWidth = 1800;
+        this._minimumSlideDuration = 1000;
+        this._barWidthTimeMultiplier = 0.05;
         this._barPadding = 5;
-        this._resizebarheight = 5;
-        this._previousSlideY = 0;
-        this._lineX1 = 30;
-        this._placeholderWidth = this._tableWidth - 40;
-        this._placeholderY = 0;
-        this._placeholderHeight = 40;
-        this._maxSlides = 20;
-        this._toolbarX = 200;
-        this._toolbarY = 10;
+        this._resizebarwidth = 5;
+        this._previousSlideX = 0;
+        this._lineX1 = 50;
+        this._placeholderWidth = 60;
+        this._placeholderX = 0;
+        this._placeholderHeight = 60;
+        this._toolbarX = 10;
+        this._toolbarY = 35;
         this._toolbarPadding = 20;
+        // Upon dragging a slide, no matter where you click on it, the beginning of the slide jumps to the mouse position.
+        // This next variable is calculated to adjust for that error, it is a workaround but it works
+        this._draggedSlideReAdjustmentFactor = 0;
+        this._originPosition = 60;
+        this._currentTime = 0;
+        this._currentlyPlaying = false;
+        this._timelineShift = 0;
         this._timeIndexedSlides = [];
-        this._index = (slide) => {
-            return this._slideDeck.slides.indexOf(slide);
-        };
+        this._gridTimeStep = 1000;
+        this._gridSnap = false;
         this.onDelete = (slide) => {
             this._slideDeck.removeSlide(slide);
         };
         this.onSelect = (slide) => {
             if (d3__WEBPACK_IMPORTED_MODULE_0__["event"].defaultPrevented)
                 return;
+            if (this._currentlyPlaying) {
+                this.stopPlaying();
+            }
+            this.selectSlide(slide);
+        };
+        this.selectSlide = (slide) => {
+            if (slide === null) {
+                return;
+            }
+            let originalSlideTransitionTime = slide.transitionTime;
+            let artificialTransitionTime = 0;
+            if (this._currentlyPlaying) {
+                artificialTransitionTime =
+                    slide.transitionTime -
+                        (this._currentTime - this._slideDeck.startTime(slide));
+            }
+            else {
+                artificialTransitionTime = 250;
+            }
+            slide.transitionTime =
+                artificialTransitionTime >= 0 ? artificialTransitionTime : 0;
             this._slideDeck.selectedSlide = slide;
+            slide.transitionTime = originalSlideTransitionTime;
+            // this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation, 350);
+            this.update();
         };
         this.onAdd = () => {
             let slideDeck = this._slideDeck;
             const node = slideDeck.graph.current;
-            const slide = new ProvenanceSlide(node.label, 1000, 0, [], node);
-            slideDeck.addSlide(slide, slideDeck.selectedSlide
-                ? slideDeck.slides.indexOf(slideDeck.selectedSlide) + 1
-                : slideDeck.slides.length);
+            const slide = new ProvenanceSlide(node.label, 5000, 0, [], node);
+            slideDeck.addSlide(slide, slideDeck.slides.length);
+            this.selectSlide(slide);
         };
         this.onClone = (slide) => {
             let slideDeck = this._slideDeck;
-            const cloneSlide = new ProvenanceSlide(slide.name, 1000, 0, [], slide.node);
+            const cloneSlide = new ProvenanceSlide(slide.name, 5000, 0, [], slide.node);
+            // cloneSlide.mainAnnotation = slide.mainAnnotation;
             slideDeck.addSlide(cloneSlide, slideDeck.selectedSlide
                 ? slideDeck.slides.indexOf(slideDeck.selectedSlide) + 1
                 : slideDeck.slides.length);
         };
         this.moveDragged = (that, draggedObject) => {
             Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(that).attr("transform", (slide) => {
-                const originalY = this.previousSlidesHeight(slide);
-                const draggedY = d3__WEBPACK_IMPORTED_MODULE_0__["event"].y;
+                const originalX = this.previousSlidesWidth(slide) - this._timelineShift;
+                const draggedX = d3__WEBPACK_IMPORTED_MODULE_0__["event"].x;
                 const myIndex = this._slideDeck.slides.indexOf(slide);
-                if (draggedY < originalY && myIndex > 0) {
+                if (draggedX < originalX && myIndex > 0) {
                     // check upwards
                     const previousSlide = this._slideDeck.slides[myIndex - 1];
-                    let previousSlideCenterY = this.previousSlidesHeight(previousSlide) +
-                        this.barTotalHeight(previousSlide) / 2;
-                    if (draggedY < previousSlideCenterY) {
+                    let previousSlideCenterY = this.previousSlidesWidth(previousSlide) -
+                        this._timelineShift +
+                        this.barTotalWidth(previousSlide) / 2;
+                    if (draggedX < previousSlideCenterY) {
                         this._slideDeck.moveSlide(myIndex, myIndex - 1);
                     }
                 }
-                else if (draggedY > originalY &&
+                else if (draggedX > originalX &&
                     myIndex < this._slideDeck.slides.length - 1) {
                     // check downwards
                     const nextSlide = this._slideDeck.slides[myIndex + 1];
-                    let nextSlideCenterY = this.previousSlidesHeight(nextSlide) +
-                        this.barTotalHeight(nextSlide) / 2;
-                    if (draggedY > nextSlideCenterY) {
+                    let nextSlideCenterY = this.previousSlidesWidth(nextSlide) -
+                        this._timelineShift +
+                        this.barTotalWidth(nextSlide) / 2;
+                    if (draggedX > nextSlideCenterY) {
                         this._slideDeck.moveSlide(myIndex, myIndex + 1);
                     }
                 }
-                return "translate(30," + d3__WEBPACK_IMPORTED_MODULE_0__["event"].y + ")";
+                if (this._draggedSlideReAdjustmentFactor === 0) {
+                    this._draggedSlideReAdjustmentFactor =
+                        draggedX - slide.xPosition;
+                }
+                let slidePosition = d3__WEBPACK_IMPORTED_MODULE_0__["event"].x -
+                    this._draggedSlideReAdjustmentFactor -
+                    this._timelineShift;
+                return "translate(" + slidePosition + ", 0)";
             });
         };
         this.moveDragended = (that, draggedObject) => {
             Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(that)
                 .classed("active", false)
                 .attr("transform", (slide) => {
-                return "translate(30," + this.previousSlidesHeight(slide) + ")";
+                return ("translate(" +
+                    (this.previousSlidesWidth(slide) +
+                        50 +
+                        this._resizebarwidth -
+                        this._timelineShift) +
+                    ", 0)");
             });
+            this._draggedSlideReAdjustmentFactor = 0;
         };
-        this.delayDragged = (that, slide) => {
-            slide.delay = Math.max(0, d3__WEBPACK_IMPORTED_MODULE_0__["event"].y) / this._barHeightTimeMultiplier;
+        this.transitionTimeDragged = (that, slide) => {
+            let transitionTime = Math.max(d3__WEBPACK_IMPORTED_MODULE_0__["event"].x, 0) / this._barWidthTimeMultiplier;
+            slide.transitionTime = this.getSnappedTime(slide, transitionTime, 0);
             this.update();
         };
-        this.delaySubject = (that, slide) => {
-            return { y: this.barDelayHeight(slide) };
+        this.transitionTimeSubject = (that, slide) => {
+            return { x: this.barTransitionTimeWidth(slide) };
         };
         this.durationDragged = (that, slide) => {
-            slide.duration =
-                Math.max(0, d3__WEBPACK_IMPORTED_MODULE_0__["event"].y) / this._barHeightTimeMultiplier;
+            let duration = Math.max(Math.max(d3__WEBPACK_IMPORTED_MODULE_0__["event"].x, 0) / this._barWidthTimeMultiplier, this._minimumSlideDuration);
+            slide.duration = this.getSnappedTime(slide, duration, 1);
             this.update();
         };
         this.durationSubject = (that, slide) => {
-            return { y: this.barDurationHeight(slide) };
+            return { x: this.barDurationWidth(slide) };
         };
+        this.getSnappedTime = (slide, time, isDuration) => {
+            if (this._gridSnap) {
+                let currentTime = this._slideDeck.startTime(slide) +
+                    slide.transitionTime * isDuration +
+                    time;
+                let remainder = currentTime % this._gridTimeStep;
+                if (remainder > this._gridTimeStep / 2) {
+                    return time + this._gridTimeStep - remainder;
+                }
+                else {
+                    return time - remainder;
+                }
+            }
+            return time;
+        };
+        this.rescaleTimeline = () => {
+            let wheelDirection = d3__WEBPACK_IMPORTED_MODULE_0__["event"].deltaY < 0 ? "up" : "down";
+            if (d3__WEBPACK_IMPORTED_MODULE_0__["event"].shiftKey) {
+                let correctedShiftAmount = d3__WEBPACK_IMPORTED_MODULE_0__["event"].x - (this._originPosition - this._timelineShift);
+                if (wheelDirection === "down") {
+                    let scalingFactor = 0.2;
+                    if (this._placeholderX > this._tableWidth / 2) {
+                        this._barWidthTimeMultiplier *= 1 - scalingFactor;
+                        this._timelineShift -= correctedShiftAmount * scalingFactor;
+                    }
+                }
+                else {
+                    let scalingFactor = 0.25;
+                    this._barWidthTimeMultiplier *= 1 + scalingFactor;
+                    if (!(this._placeholderX - this._timelineShift < d3__WEBPACK_IMPORTED_MODULE_0__["event"].x)) {
+                        this._timelineShift += correctedShiftAmount * scalingFactor;
+                    }
+                }
+                this.adjustGridScale();
+            }
+            else {
+                let shiftAmount = 100;
+                if (wheelDirection === "down") {
+                    this._timelineShift += shiftAmount;
+                }
+                else {
+                    this._timelineShift -= shiftAmount;
+                }
+            }
+            this.update();
+        };
+        this.onBackward = () => {
+            this.stopPlaying();
+            for (let i = this._timeIndexedSlides.length - 1; i >= 0; i--) {
+                if (this._currentTime > this._timeIndexedSlides[i].startTime) {
+                    this._currentTime = this._timeIndexedSlides[i].startTime;
+                    this.update();
+                    break;
+                }
+            }
+        };
+        this.onPlay = () => {
+            if (this._currentlyPlaying) {
+                this.stopPlaying();
+            }
+            else {
+                this.startPlaying();
+            }
+        };
+        this.startPlaying = () => {
+            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])("foreignObject.player_play")
+                .select("body")
+                .html('<i class="fa fa-pause"></i>');
+            this._currentlyPlaying = true;
+            this.playTimeline();
+        };
+        this.stopPlaying = () => {
+            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])("foreignObject.player_play")
+                .select("body")
+                .html('<i class="fa fa-play"></i>');
+            this._currentlyPlaying = false;
+        };
+        this.onForward = () => {
+            this.stopPlaying();
+            for (let timedSlide of this._timeIndexedSlides) {
+                if (this._currentTime < timedSlide.startTime) {
+                    this._currentTime = timedSlide.startTime;
+                    this.update();
+                    break;
+                }
+            }
+        };
+        this.seekStarted = (that) => {
+            if (this._currentlyPlaying) {
+                this.stopPlaying();
+            }
+            this._currentTime =
+                (d3__WEBPACK_IMPORTED_MODULE_0__["event"].x - this._originPosition + this._timelineShift) /
+                    this._barWidthTimeMultiplier;
+            this.update();
+        };
+        this.seekDragged = (that) => {
+            this._currentTime =
+                (d3__WEBPACK_IMPORTED_MODULE_0__["event"].x + this._timelineShift - this._originPosition) /
+                    this._barWidthTimeMultiplier;
+            this.update();
+        };
+        this.updateGridSnap = () => {
+            if (d3__WEBPACK_IMPORTED_MODULE_0__["event"].y === 540 || d3__WEBPACK_IMPORTED_MODULE_0__["event"].y === 539) {
+                // By far the biggest workaround in the history of code. If the mouse clicks here,
+                // this event still fires, but the checkbox does not get checked. As a result, the gridsnap should
+                // not be updated. This could all be avoided if I could check the checkbox property itself, but
+                // for some reason, all my attempts at accessing the checkbox through d3 is turning up a null value.
+                return;
+            }
+            if (this._gridSnap) {
+                this._gridSnap = false;
+            }
+            else {
+                this._gridSnap = true;
+            }
+        };
+        this.fixDrawingPriorities = () => {
+            this._slideTable
+                .select("rect.seek-dragger")
+                .attr("width", this._placeholderX)
+                .raise();
+            this._slideTable.select("rect.mask").raise();
+            this._slideTable.select("#player_placeholder").raise();
+            this._slideTable.select("foreignObject.player_backward").raise();
+            this._slideTable.select("foreignObject.player_play").raise();
+            this._slideTable.select("foreignObject.player_forward").raise();
+        };
+        this.displayGridLevel = () => {
+            Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])("text.grid_display").text("Grid step: " + (this._gridTimeStep / 1000).toFixed(2) + " Sec");
+        };
+        this.drawSeekBar = () => {
+            const timeWidth = this._currentTime * this._barWidthTimeMultiplier;
+            if (timeWidth >= this._placeholderX) {
+                this.stopPlaying();
+                this._currentTime =
+                    this._placeholderX / this._barWidthTimeMultiplier;
+            }
+            if (this._currentTime < 0) {
+                this._currentTime = 0;
+            }
+            const shiftedPosition = this._originPosition + timeWidth - this._timelineShift;
+            this._slideTable
+                .select("circle.currentTime")
+                .attr("cx", shiftedPosition)
+                .raise();
+            this._slideTable
+                .select("line.vertical-line-seek")
+                .attr("x1", shiftedPosition)
+                .attr("y1", 65)
+                .attr("x2", shiftedPosition)
+                .attr("y2", 0)
+                .raise();
+        };
+        this.adjustSlideAddObjectPosition = () => {
+            this._slideTable
+                .select("foreignObject.slide_add")
+                .attr("x", this._placeholderX + 105 - this._timelineShift)
+                .attr("y", 15);
+        };
+        this.adjustHorizontalLine = () => {
+            this._slideTable
+                .select("line.horizontal-line")
+                .attr("x2", this._placeholderX + 60 - this._timelineShift);
+        };
+        this._tableWidth = window.innerWidth - 400;
+        window.addEventListener("resize", this.resizeTable);
         this._slideDeck = slideDeck;
         this._root = Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(elm);
         this._slideTable = this._root
@@ -2199,11 +3076,33 @@ class SlideDeckVisualization {
             .attr("width", this._tableWidth);
         this._slideTable
             .append("line")
+            .attr("class", "vertical-line")
             .attr("x1", this._lineX1)
             .attr("y1", 0)
             .attr("x2", this._lineX1)
+            .attr("y2", 100)
             .attr("stroke", "gray")
             .attr("stroke-width", 2);
+        this._slideTable
+            .append("line")
+            .attr("class", "horizontal-line")
+            .attr("x1", this._lineX1)
+            .attr("y1", this._resizebarwidth + this._originPosition)
+            .attr("y2", this._resizebarwidth + this._originPosition)
+            .attr("stroke", "gray")
+            .attr("stroke-width", 2);
+        this._slideTable
+            .append("rect")
+            .attr("class", "seek-dragger")
+            .attr("fill", "transparent")
+            .attr("x", this._originPosition)
+            .attr("y", this._originPosition)
+            .attr("height", 12)
+            .attr("width", 12)
+            .attr("cursor", "pointer")
+            .call(Object(d3__WEBPACK_IMPORTED_MODULE_0__["drag"])()
+            .on("start", firstArgThis(this.seekStarted))
+            .on("drag", firstArgThis(this.seekDragged)));
         this._slideTable
             .append("rect")
             .attr("class", "slides_placeholder")
@@ -2212,15 +3111,131 @@ class SlideDeckVisualization {
             .attr("width", this._placeholderWidth)
             .attr("height", this._placeholderHeight);
         this._slideTable
+            .append("circle")
+            .attr("class", "currentTime")
+            .attr("fill", "red")
+            .attr("r", 4)
+            .attr("cx", this._originPosition)
+            .attr("cy", 65);
+        this._slideTable
+            .append("line")
+            .attr("class", "vertical-line-seek")
+            .attr("x1", this._originPosition)
+            .attr("y1", 65)
+            .attr("x2", this._originPosition)
+            .attr("y2", 0)
+            .attr("stroke", "red")
+            .attr("stroke-width", 1);
+        this._slideTable
             .append("svg:foreignObject")
             .attr("class", "slide_add")
-            .attr("x", (this._tableWidth - 40) / 2)
+            .attr("x", this._placeholderX + 18)
             .attr("cursor", "pointer")
             .attr("width", 30)
             .attr("height", 30)
             .append("xhtml:body")
             .on("click", this.onAdd)
             .html('<i class="fa fa-file-text-o"></i>');
+        this._slideTable
+            .append("rect")
+            .attr("class", "mask")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", 50)
+            .attr("height", 100)
+            .attr("fill", "white");
+        this._slideTable
+            .append("rect")
+            .attr("class", "slides_placeholder")
+            .attr("id", "player_placeholder")
+            .attr("x", 15)
+            .attr("y", 0)
+            .attr("width", 30)
+            .attr("height", 75);
+        this._slideTable
+            .append("svg:foreignObject")
+            .attr("class", "player_backward")
+            .attr("x", 22)
+            .attr("y", 5)
+            .attr("cursor", "pointer")
+            .attr("width", 20)
+            .attr("height", 20)
+            .append("xhtml:body")
+            .on("click", this.onBackward)
+            .html('<i class="fa fa-backward"></i>');
+        this._slideTable
+            .append("svg:foreignObject")
+            .attr("class", "player_play")
+            .attr("x", 22)
+            .attr("y", 25)
+            .attr("cursor", "pointer")
+            .attr("width", 20)
+            .attr("height", 20)
+            .append("xhtml:body")
+            .on("click", this.onPlay)
+            .html('<i class="fa fa-play"></i>');
+        this._slideTable
+            .append("svg:foreignObject")
+            .attr("class", "player_forward")
+            .attr("x", 22)
+            .attr("y", 45)
+            .attr("cursor", "pointer")
+            .attr("width", 20)
+            .attr("height", 20)
+            .append("xhtml:body")
+            .on("click", this.onForward)
+            .html('<i class="fa fa-forward"></i>');
+        this._slideTable
+            .append("text")
+            .attr("class", "grid_display")
+            .attr("x", this._originPosition + 10)
+            .attr("y", 110);
+        this._slideTable
+            .append("text")
+            .attr("class", "checkBox_text")
+            .attr("x", this._originPosition + 195)
+            .attr("y", 110)
+            .text("Grid Snap");
+        this._slideTable
+            .append("foreignObject")
+            .attr("width", 13)
+            .attr("height", 15)
+            .attr("x", this._originPosition + 175)
+            .attr("y", 96)
+            .append("xhtml:body")
+            .html("<form><input type=checkbox class=gridSnap/></form>")
+            .on("click", this.updateGridSnap);
+        // let area = this._root
+        //     .append<SVGElement>("svg")
+        //     .attr("class", "annotation-area")
+        //     .attr("x", this._tableWidth + 5)
+        //     .attr("y", 0)
+        //     .attr("width", 350)
+        //     .attr("height", 150);
+        // area
+        //     .append("rect")
+        //     .attr("class", "slides_placeholder")
+        //     .attr("id", "annotation-box")
+        //     .attr("x", 0)
+        //     .attr("y", 0)
+        //     .attr("width", 350)
+        //     .attr("height", 100);
+        // area
+        //     .append("text")
+        //     .attr("x", 10)
+        //     .attr("y", 120)
+        //     .attr("font-size", 18)
+        //     .text("Edit slide story");
+        // area
+        //     .append("rect")
+        //     .attr("class", "add_annotation")
+        //     .attr("x", 0)
+        //     .attr("y", 100)
+        //     .attr("width", 150)
+        //     .attr("height", 30)
+        //     .attr("cursor", "pointer")
+        //     .attr("fill", "transparent")
+        //     .on("click", this.addAnnotation);
         slideDeck.on("slideAdded", () => this.update());
         slideDeck.on("slideRemoved", () => this.update());
         slideDeck.on("slidesMoved", () => this.update());
@@ -2240,27 +3255,25 @@ class SlideDeckVisualization {
             .raise()
             .classed("active", true);
     }
-    barDelayHeight(slide) {
-        let calculatedHeight = this._barHeightTimeMultiplier * slide.delay;
-        return Math.max(calculatedHeight, 0);
+    barTransitionTimeWidth(slide) {
+        let calculatedWidth = this._barWidthTimeMultiplier * slide.transitionTime;
+        return Math.max(calculatedWidth, 0);
     }
-    barDurationHeight(slide) {
-        let calculatedHeight = this._barHeightTimeMultiplier * slide.duration;
-        return Math.max(calculatedHeight, this._minimumSlideDuration * this._barHeightTimeMultiplier);
+    barDurationWidth(slide) {
+        let calculatedWidth = this._barWidthTimeMultiplier * slide.duration;
+        return Math.max(calculatedWidth, this._minimumSlideDuration * this._barWidthTimeMultiplier);
     }
-    barTotalHeight(slide) {
-        let calculatedHeight = this.barDelayHeight(slide) +
-            this.barDurationHeight(slide) +
-            2 * this._resizebarheight;
-        return calculatedHeight;
+    barTotalWidth(slide) {
+        let calculatedWidth = this.barTransitionTimeWidth(slide) + this.barDurationWidth(slide);
+        return calculatedWidth;
     }
-    previousSlidesHeight(slide) {
+    previousSlidesWidth(slide) {
         let myIndex = this._slideDeck.slides.indexOf(slide);
-        let calculatedHeight = 0;
+        let calculatedWidth = 0;
         for (let i = 0; i < myIndex; i++) {
-            calculatedHeight += this.barTotalHeight(this._slideDeck.slides[i]);
+            calculatedWidth += this.barTotalWidth(this._slideDeck.slides[i]);
         }
-        return calculatedHeight;
+        return calculatedWidth;
     }
     updateTimeIndices(slideDeck) {
         this._timeIndexedSlides = [];
@@ -2270,11 +3283,131 @@ class SlideDeckVisualization {
                 slide: slide,
                 startTime: timeIndex
             });
-            timeIndex += slide.delay + slide.duration;
+            timeIndex += slide.transitionTime + slide.duration;
         });
+    }
+    playTimeline() {
+        let intervalStepMS = 25;
+        let playingID = setInterval(() => {
+            if (!this._currentlyPlaying) {
+                clearInterval(playingID);
+            }
+            else {
+                this._currentTime += intervalStepMS;
+                let currentSlide = this._slideDeck.slideAtTime(this._currentTime);
+                if (currentSlide !== this._slideDeck.selectedSlide) {
+                    this.selectSlide(currentSlide);
+                }
+            }
+            this.update();
+        }, intervalStepMS);
+    }
+    resizeTable() {
+        this._tableWidth = window.innerWidth - 400;
+        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(".slide__table").attr("width", this._tableWidth);
+        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(".slides_background_rect").attr("width", this._tableWidth);
+    }
+    // private getTextWidth(text: string, fontSize: number, fontFace: string) {
+    //     let canvas = document.createElement('canvas');
+    //     let context = canvas.getContext('2d');
+    //     if (context === null) {
+    //         return 0;
+    //     }
+    //     context.font = fontSize + 'px ' + fontFace;
+    //     return context.measureText(text).width;
+    // }
+    // private displayAnnotationText = (annotation: string, width: number) => {
+    //     d3.selectAll("text.annotation").remove();
+    //     let words = annotation.split(" ");
+    //     let currentLine = "";
+    //     let newLine = "";
+    //     let y = 20;
+    //     let fontSize = 20;
+    //     words.forEach(word => {
+    //         newLine = currentLine + word + " ";
+    //         if (this.getTextWidth(newLine, fontSize - 1, "Arial") > width){
+    //             d3.select("svg.annotation-area")
+    //                 .append("text")
+    //                 .attr("class", "annotation")
+    //                 .attr("x", 10)
+    //                 .attr("y", y)
+    //                 .attr("font-size", fontSize)
+    //                 .text(currentLine);
+    //             y += 22;
+    //             currentLine = word + " ";
+    //         } else {
+    //             currentLine = newLine;
+    //         }
+    //     });
+    //     d3.select("svg.annotation-area")
+    //             .append("text")
+    //             .attr("class", "annotation")
+    //             .attr("x", 10)
+    //             .attr("y", y)
+    //             .attr("font-size", fontSize)
+    //             .text(currentLine);
+    //     this.update();
+    // }
+    // private addAnnotation = () => {
+    //     if(this._slideDeck.selectedSlide === null){
+    //         alert("There is no slide currently selected!");
+    //         return;
+    //     }
+    //     let newAnnotation =  prompt("Edit story: ", this._slideDeck.selectedSlide.mainAnnotation);
+    //     if(newAnnotation !== null){
+    //         this._slideDeck.selectedSlide.mainAnnotation = newAnnotation;
+    //         if(newAnnotation.length > 150){
+    //             alert("Find a way to describe your slide in less than 150 characters!");
+    //             this.addAnnotation();
+    //             return;
+    //         }
+    //     } else {
+    //         this._slideDeck.selectedSlide.mainAnnotation = "";
+    //     }
+    //     this.displayAnnotationText(this._slideDeck.selectedSlide.mainAnnotation, 350);
+    // }
+    adjustGridScale() {
+        if (this._barWidthTimeMultiplier < 0.02) {
+            this._gridTimeStep = 5000;
+            return;
+        }
+        if (this._barWidthTimeMultiplier < 0.2) {
+            this._gridTimeStep = 1000;
+            return;
+        }
+        this._gridTimeStep = 200;
+    }
+    drawGrid(maxWidth) {
+        this._slideTable.selectAll("circle.gridTime").remove();
+        let time = 0;
+        let currentX = this._originPosition +
+            time * this._barWidthTimeMultiplier -
+            this._timelineShift;
+        while (currentX < maxWidth) {
+            let radius = time % (this._gridTimeStep * 5) === 0 ? 4 : 2;
+            this._slideTable
+                .append("circle")
+                .attr("class", "gridTime")
+                .attr("fill", "black")
+                .attr("r", radius)
+                .attr("cx", this._originPosition +
+                time * this._barWidthTimeMultiplier -
+                this._timelineShift)
+                .attr("cy", 65);
+            time += this._gridTimeStep;
+            currentX =
+                this._originPosition +
+                    time * this._barWidthTimeMultiplier -
+                    this._timelineShift;
+        }
+        this._slideTable.selectAll("circle.gridTime").lower();
+        this._slideTable.select("line.horizontal-line").lower();
     }
     update() {
         this.updateTimeIndices(this._slideDeck);
+        if (this._timelineShift < 0) {
+            this._timelineShift = 0;
+        }
         const allExistingNodes = this._slideTable
             .selectAll("g.slide")
             .data(this._slideDeck.slides, (d) => {
@@ -2291,20 +3424,10 @@ class SlideDeckVisualization {
             .on("end", firstArgThis(this.moveDragended)));
         newNodes
             .append("rect")
-            .attr("class", "slides_delay_resize")
-            .attr("x", this._barPadding)
-            .attr("width", this._barWidth - 2 * this._barPadding)
-            .attr("height", this._resizebarheight)
-            .attr("cursor", "ns-resize")
-            .call(Object(d3__WEBPACK_IMPORTED_MODULE_0__["drag"])()
-            .subject(firstArgThis(this.delaySubject))
-            .on("drag", firstArgThis(this.delayDragged)));
-        newNodes
-            .append("rect")
-            .attr("class", "slides_delay_rect")
-            .attr("x", this._barPadding)
+            .attr("class", "slides_transitionTime_rect")
+            .attr("x", this._resizebarwidth)
             .attr("y", 0)
-            .attr("width", this._barWidth - 2 * this._barPadding)
+            .attr("height", 60)
             .on("click", this.onSelect);
         let slideGroup = newNodes
             .append("g")
@@ -2315,24 +3438,29 @@ class SlideDeckVisualization {
         slideGroup
             .append("rect")
             .attr("class", "slides_rect")
-            .attr("width", this._barWidth - 2 * this._barPadding)
+            .attr("height", 60)
             .attr("cursor", "move")
             .on("click", this.onSelect);
         slideGroup
+            .append("svg")
+            .attr("class", "text-viewport")
+            .attr("height", 60)
             .append("text")
             .attr("class", "slides_text")
-            .attr("x", 2 * this._barPadding)
+            .attr("y", this._resizebarwidth + 2 * this._barPadding)
+            .attr("font-size", 20)
             .attr("dy", ".35em");
+        const textPosition = this._resizebarwidth + 4 * this._barPadding + 68;
         slideGroup
             .append("text")
-            .attr("class", "slides_delaytext")
-            .attr("x", 2 * this._barPadding)
-            .attr("dy", ".35em");
+            .attr("class", "slides_transitionTimetext")
+            .attr("y", textPosition)
+            .attr("font-size", 16)
+            .attr("dy", "-.65em");
         let toolbar = slideGroup.append("g").attr("class", "slide_toolbar");
         toolbar
             .append("svg:foreignObject")
             .attr("class", "slides_delete_icon")
-            .attr("x", this._toolbarX)
             .attr("cursor", "pointer")
             .attr("width", 20)
             .attr("height", 20)
@@ -2342,7 +3470,6 @@ class SlideDeckVisualization {
         toolbar
             .append("svg:foreignObject")
             .attr("class", "slides_clone_icon")
-            .attr("x", this._toolbarX + this._toolbarPadding)
             .attr("cursor", "pointer")
             .attr("width", 20)
             .attr("height", 20)
@@ -2353,40 +3480,62 @@ class SlideDeckVisualization {
         newNodes
             .append("text")
             .attr("class", "slides_durationtext")
-            .attr("x", this._barPadding - 30)
+            .attr("y", textPosition)
+            .attr("font-size", 16)
             .attr("dy", "-.65em");
         newNodes
             .append("circle")
             .attr("class", "time")
-            .attr("cx", 0)
-            .attr("r", 3)
-            .attr("fill", "black");
+            .attr("cy", this._resizebarwidth + 60)
+            .attr("r", 4)
+            .attr("fill", "blue");
+        newNodes
+            .append("circle")
+            .attr("class", "transitionTime_time")
+            .attr("cy", this._resizebarwidth + 60)
+            .attr("r", 4)
+            .attr("fill", "blue");
         newNodes
             .append("rect")
             .attr("class", "slides_duration_resize")
-            .attr("x", this._barPadding)
-            .attr("width", this._barWidth - 2 * this._barPadding)
-            .attr("height", this._resizebarheight)
-            .attr("cursor", "ns-resize")
+            .attr("x", 0)
+            .attr("width", this._resizebarwidth)
+            .attr("height", 60)
+            .attr("cursor", "ew-resize")
             .call(Object(d3__WEBPACK_IMPORTED_MODULE_0__["drag"])()
             .subject(firstArgThis(this.durationSubject))
             .on("drag", firstArgThis(this.durationDragged)));
+        newNodes
+            .append("rect")
+            .attr("class", "slides_transitionTime_resize")
+            .attr("y", 0)
+            .attr("width", this._resizebarwidth)
+            .attr("height", 60)
+            .attr("cursor", "ew-resize")
+            .call(Object(d3__WEBPACK_IMPORTED_MODULE_0__["drag"])()
+            .subject(firstArgThis(this.transitionTimeSubject))
+            .on("drag", firstArgThis(this.transitionTimeDragged)));
+        Object(d3__WEBPACK_IMPORTED_MODULE_0__["select"])(".slide__table").on("wheel", this.rescaleTimeline);
         // Update all nodes
         const allNodes = newNodes
             .merge(allExistingNodes)
             .attr("transform", (slide) => {
-            this._previousSlideY = this.previousSlidesHeight(slide);
-            return "translate(30," + this.previousSlidesHeight(slide) + ")";
+            this._previousSlideX = this.previousSlidesWidth(slide);
+            slide.xPosition =
+                50 + this._resizebarwidth + this.previousSlidesWidth(slide);
+            return ("translate(" +
+                (slide.xPosition - this._timelineShift) +
+                ", 0 )");
         });
         allNodes
-            .select("rect.slides_delay_rect")
-            .attr("height", (slide) => {
-            return this.barDelayHeight(slide);
+            .select("rect.slides_transitionTime_rect")
+            .attr("width", (slide) => {
+            return this.barTransitionTimeWidth(slide);
         });
         allNodes
-            .select("rect.slides_delay_resize")
-            .attr("y", (slide) => {
-            return this.barDelayHeight(slide);
+            .select("rect.slides_transitionTime_resize")
+            .attr("x", (slide) => {
+            return (this.barTransitionTimeWidth(slide) + this._resizebarwidth);
         });
         slideGroup = allNodes.select("g.slide_group");
         slideGroup
@@ -2394,70 +3543,99 @@ class SlideDeckVisualization {
             .attr("selected", (slide) => {
             return this._slideDeck.selectedSlide === slide;
         })
-            .attr("y", (slide) => {
-            return this.barDelayHeight(slide) + this._resizebarheight;
+            .attr("x", (slide) => {
+            return this.barTransitionTimeWidth(slide);
         })
-            .attr("height", (slide) => {
-            this._placeholderY =
-                this._previousSlideY + this.barDurationHeight(slide);
-            return this.barDurationHeight(slide);
+            .attr("width", (slide) => {
+            this._placeholderX =
+                this._previousSlideX +
+                    this.barDurationWidth(slide) +
+                    this.barTransitionTimeWidth(slide);
+            return this.barDurationWidth(slide);
+        });
+        slideGroup
+            .select("svg.text-viewport")
+            .attr("x", (slide) => {
+            return this.barTransitionTimeWidth(slide);
+        })
+            .attr("width", (slide) => {
+            return this.barDurationWidth(slide) - 5;
         });
         toolbar = allNodes.select("g.slide_toolbar");
         toolbar
             .select("foreignObject.slides_delete_icon")
             .attr("y", (slide) => {
             return this._toolbarY;
+        })
+            .attr("x", (slide) => {
+            return this._toolbarX + this.barTransitionTimeWidth(slide) - 3;
         });
         toolbar
             .select("foreignObject.slides_clone_icon")
             .attr("y", (slide) => {
             return this._toolbarY;
+        })
+            .attr("x", (slide) => {
+            return (this._toolbarX +
+                this._toolbarPadding +
+                this.barTransitionTimeWidth(slide) -
+                3);
         });
         slideGroup
             .select("text.slides_text")
-            .attr("y", (slide) => {
-            return (this.barDelayHeight(slide) +
-                this._resizebarheight +
-                2 * this._barPadding);
+            .attr("x", (slide) => {
+            return this._barPadding * 2 - 2;
         })
             .text((slide) => {
             return slide.name;
         });
         slideGroup
-            .select("text.slides_delaytext")
-            .attr("y", (slide) => {
-            return (this.barDelayHeight(slide) +
-                this._resizebarheight +
-                1 * this._barPadding +
-                25);
+            .select("text.slides_transitionTimetext")
+            .attr("x", (slide) => {
+            return (this.barTransitionTimeWidth(slide) + this._barPadding * 2);
         })
             .text((slide) => {
-            return "transition: " + slide.delay / 1000;
+            if (this.barTransitionTimeWidth(slide) > 35 ||
+                this._slideDeck.startTime(slide) === 0) {
+                return ((this._slideDeck.startTime(slide) +
+                    slide.transitionTime) /
+                    1000).toFixed(2);
+            }
+            else {
+                return "";
+            }
         });
-        allNodes.select("circle.time").attr("cy", (slide) => {
-            return this.barDelayHeight(slide) + this._resizebarheight;
+        allNodes.select("circle.time").attr("cx", (slide) => {
+            return this.barTotalWidth(slide) + this._resizebarwidth;
+        });
+        allNodes
+            .select("circle.transitionTime_time")
+            .attr("cx", (slide) => {
+            return (this.barTransitionTimeWidth(slide) + this._resizebarwidth);
         });
         allNodes
             .select("rect.slides_duration_resize")
-            .attr("y", (slide) => {
-            return this.barTotalHeight(slide) - this._resizebarheight;
+            .attr("x", (slide) => {
+            return this.barTotalWidth(slide);
         });
         allNodes
             .select("text.slides_durationtext")
-            .attr("y", (slide) => {
-            return (this.barDelayHeight(slide) +
-                this._resizebarheight +
-                4 * this._barPadding -
-                7);
+            .attr("x", (slide) => {
+            return this.barTotalWidth(slide) + this._barPadding + 10;
         })
             .text((slide) => {
-            return slide.duration / 1000;
+            return ((this._slideDeck.startTime(slide) +
+                slide.duration +
+                slide.transitionTime) /
+                1000).toFixed(2);
         });
-        placeholder.attr("y", this._placeholderY + 20);
-        this._slideTable.select("line").attr("y2", this._placeholderY + 20);
-        this._slideTable
-            .select("foreignObject.slide_add")
-            .attr("y", this._placeholderY + 30);
+        placeholder.attr("x", this._placeholderX + 80 - this._timelineShift);
+        this.adjustHorizontalLine();
+        this.adjustSlideAddObjectPosition();
+        this.drawSeekBar();
+        this.drawGrid(this._placeholderX + this._originPosition - this._timelineShift);
+        this.fixDrawingPriorities();
+        this.displayGridLevel();
         allExistingNodes.exit().remove();
     }
 }
@@ -2565,7 +3743,7 @@ registerAnnotator(new Annotator({
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "app-brainvis-canvas {\n  flex: 1;\n}\n#bottom-container {\n  position: absolute;\n  bottom: 0;\n  width: 100%;\n  background-color: rgba(0,0,0,.8);\n}\nmat-sidenav {\n  overflow: visible;\n  visibility: visible !important;\n  background-color: rgba(0, 0, 0, .8)\n}\nmat-sidenav-container, mat-sidenav-content {\n  display: flex;\n  flex: 1;\n}\n#sidenav-trigger {\n  position: absolute;\n  left: -50px;\n}\n"
+module.exports = "app-brainvis-canvas {\n  flex: 1;\n}\n#bottom-container {\n  position: absolute;\n  bottom: 0;\n  width: 100%;\n  height: 0%;\n  background-color: rgba(0,0,0,.8);\n}\n/*New Container for elements on the top of the screen to make way for timeline at the bottom*/\n#top-container\n{\n  position: absolute;\n  top: 0;\n  width: 25%;\n  background-color: rgba(0,0,0,.0);\n}\nmat-sidenav {\n  overflow: visible;\n  visibility: visible !important;\n  background-color: rgba(0, 0, 0, .8)\n}\nmat-sidenav-container, mat-sidenav-content {\n  display: flex;\n  flex: 1;\n}\n#sidenav-trigger {\n  color: orange;\n  position: absolute;\n  left: -50px;\n}\n"
 
 /***/ }),
 
@@ -2576,7 +3754,7 @@ module.exports = "app-brainvis-canvas {\n  flex: 1;\n}\n#bottom-container {\n  p
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-sidenav-container hasBackdrop=\"false\">\n  <mat-sidenav position=\"end\" #sidenav mode=\"over\" [opened]=\"false\" hasBackdrop=\"false\">\n    <button id=\"sidenav-trigger\" color=\"primary\" style=\"color: white\" mat-icon-button (click)=\"sidenav.toggle()\">\n      <mat-icon>menu</mat-icon>\n    </button>\n\n    <!-- Sidenav content -->\n    <app-provenance-visualization></app-provenance-visualization>\n    <app-provenance-slides #slides></app-provenance-slides>\n  </mat-sidenav>\n\n\n  <mat-sidenav-content>\n    <app-brainvis-canvas #canvas></app-brainvis-canvas>\n    <div id=\"bottom-container\">\n      <app-brainvis-canvas-controls [canvas]=\"canvas\"></app-brainvis-canvas-controls>\n    </div>\n    <app-slide-annotations id=\"annotation-overlay\" [slides]=\"slides\">\n      bladiebla\n    </app-slide-annotations>\n    <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->\n    <!--<p></p>-->\n  </mat-sidenav-content>\n</mat-sidenav-container>\n"
+module.exports = "<mat-sidenav-container *ngIf=\"provenance.initialized\" hasBackdrop=\"false\">\n  <mat-sidenav position=\"end\" #sidenav mode=\"over\" [opened]=\"false\" hasBackdrop=\"false\">\n    <button id=\"sidenav-trigger\" color=\"primary\" style=\"color: orange\" mat-icon-button (click)=\"sidenav.toggle()\">\n      <mat-icon>menu</mat-icon>\n    </button>\n\n    <!-- Sidenav content -->\n    <app-provenance-visualization></app-provenance-visualization>\n    <app-provenance-task-list class='task-list-container'></app-provenance-task-list>\n  </mat-sidenav>\n\n\n  <mat-sidenav-content>\n    <app-brainvis-canvas #canvas></app-brainvis-canvas>\n    <div id=\"top-container\">\n      <app-brainvis-canvas-controls [canvas]=\"canvas\"></app-brainvis-canvas-controls>\n      <app-slide-annotations #slideAnnotations id=\"annotation-overlay\" [slides]=\"slides\">\n        bladiebla\n      </app-slide-annotations>\n    </div>\n    <div id=\"bottom-container\">\n      <app-slides-container [slideAnnotations]=\"slideAnnotations\">\n        <app-provenance-slides #slides></app-provenance-slides>\n      </app-slides-container>\n    </div>\n    <!--<p><mat-slide-toggle>sidenav.opened</mat-slide-toggle></p>-->\n    <!--<p></p>-->\n  </mat-sidenav-content>\n</mat-sidenav-container>\n"
 
 /***/ }),
 
@@ -2607,11 +3785,15 @@ var AppComponent = /** @class */ (function () {
     function AppComponent(provenance) {
         this.provenance = provenance;
         this.title = 'app';
+        this.bottomDrawerOpen = true;
         // console.log(arg);
         console.log('constructor');
     }
     AppComponent.prototype.ngOnInit = function () {
         console.log('init?');
+    };
+    AppComponent.prototype.toggleBottomDrawer = function () {
+        this.bottomDrawerOpen = !this.bottomDrawerOpen;
     };
     AppComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
@@ -2649,13 +3831,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_forms__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @angular/forms */ "./node_modules/@angular/forms/fesm5/forms.js");
 /* harmony import */ var _provenance_visualization_provenance_visualization_component__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./provenance-visualization/provenance-visualization.component */ "./src/app/provenance-visualization/provenance-visualization.component.ts");
 /* harmony import */ var _provenance_slides_provenance_slides_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./provenance-slides/provenance-slides.component */ "./src/app/provenance-slides/provenance-slides.component.ts");
-/* harmony import */ var _slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./slide-annotations/slide-annotations.component */ "./src/app/slide-annotations/slide-annotations.component.ts");
+/* harmony import */ var _provenance_task_list_provenance_task_list_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./provenance-task-list/provenance-task-list.component */ "./src/app/provenance-task-list/provenance-task-list.component.ts");
+/* harmony import */ var _slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./slide-annotations/slide-annotations.component */ "./src/app/slide-annotations/slide-annotations.component.ts");
+/* harmony import */ var _ui_slides_container_slides_container_component__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./ui/slides-container/slides-container.component */ "./src/app/ui/slides-container/slides-container.component.ts");
+/* harmony import */ var ng5_slider__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ng5-slider */ "./node_modules/ng5-slider/esm5/ng5-slider.js");
+/* harmony import */ var _brainvis_canvas_controls_styled_slider_styled_slider_component__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./brainvis-canvas-controls/styled-slider/styled-slider.component */ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+
+
+
+
 
 
 
@@ -2679,17 +3869,22 @@ var AppModule = /** @class */ (function () {
                 _brainvis_canvas_controls_brainvis_canvas_controls_component__WEBPACK_IMPORTED_MODULE_6__["BrainvisCanvasControlsComponent"],
                 _provenance_visualization_provenance_visualization_component__WEBPACK_IMPORTED_MODULE_9__["ProvenanceVisualizationComponent"],
                 _provenance_slides_provenance_slides_component__WEBPACK_IMPORTED_MODULE_10__["ProvenanceSlidesComponent"],
-                _slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_11__["SlideAnnotationsComponent"]
+                _slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_12__["SlideAnnotationsComponent"],
+                _brainvis_canvas_controls_styled_slider_styled_slider_component__WEBPACK_IMPORTED_MODULE_15__["StyledSliderComponent"],
+                _provenance_task_list_provenance_task_list_component__WEBPACK_IMPORTED_MODULE_11__["ProvenanceTaskListComponent"],
+                _ui_slides_container_slides_container_component__WEBPACK_IMPORTED_MODULE_13__["SlidesContainerComponent"],
             ],
             imports: [
                 _angular_platform_browser__WEBPACK_IMPORTED_MODULE_0__["BrowserModule"],
                 _angular_forms__WEBPACK_IMPORTED_MODULE_8__["FormsModule"],
                 _angular_platform_browser_animations__WEBPACK_IMPORTED_MODULE_1__["BrowserAnimationsModule"],
-                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatButtonModule"],
-                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSlideToggleModule"],
-                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSidenavModule"],
-                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatFormFieldModule"],
-                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatIconModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatIconModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSidenavModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSlideToggleModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSliderModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatButtonModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatFormFieldModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSelectModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatRadioModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatAutocompleteModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatBadgeModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatBottomSheetModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatButtonToggleModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatCardModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatCheckboxModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatChipsModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatDatepickerModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatDialogModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatDividerModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatExpansionModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatGridListModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatInputModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatListModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatMenuModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatNativeDateModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatPaginatorModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatProgressBarModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatProgressSpinnerModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatRippleModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSnackBarModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatSortModule"],
+                _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatStepperModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatTableModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatTabsModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatToolbarModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatTooltipModule"], _angular_material__WEBPACK_IMPORTED_MODULE_7__["MatTreeModule"],
+                ng5_slider__WEBPACK_IMPORTED_MODULE_14__["Ng5SliderModule"]
             ],
             providers: [_provenance_service__WEBPACK_IMPORTED_MODULE_4__["ProvenanceService"]],
             bootstrap: [_app_component__WEBPACK_IMPORTED_MODULE_3__["AppComponent"]]
@@ -2702,17 +3897,6 @@ var AppModule = /** @class */ (function () {
 
 /***/ }),
 
-/***/ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.css":
-/*!*********************************************************************************!*\
-  !*** ./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.css ***!
-  \*********************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = ":host {\n  display: flex;\n  color: white;\n  margin: 1em;\n  flex-direction: column;\n}\n"
-
-/***/ }),
-
 /***/ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.html":
 /*!**********************************************************************************!*\
   !*** ./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.html ***!
@@ -2720,7 +3904,18 @@ module.exports = ":host {\n  display: flex;\n  color: white;\n  margin: 1em;\n  
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-slide-toggle [(ngModel)]=\"canvas.showSliceHandle\">\n  Show slice handle\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.showSlice\">\n  Show slice\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.showObjects\">\n  Show segmented objects\n</mat-slide-toggle>\n<div>\n  <button mat-button color=\"primary\" id=\"alignButton\">Align to slice</button>\n</div>\n\n"
+module.exports = "<mat-slide-toggle [(ngModel)]=\"canvas.showSliceHandle\" [(disabled)]=\"canvas.showSliceHandleDisabled\">\n  Show slice handle\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.showSlice\" [(disabled)]=\"canvas.showSliceDisabled\">\n  Show slice\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.showObjects\" [(disabled)]=\"canvas.showObjectsDisabled\">\n  Show segmented objects\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.quadView\" [(disabled)]=\"canvas.quadViewDisabled\">\n  Quad view\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.alignMode\">\n  Align camera to slice\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.editMode\" [(disabled)]=\"canvas.editModeDisabled\">\n  Segmentation mode\n</mat-slide-toggle>\n<mat-slider [(ngModel)]=\"canvas.segmentationSize\" [(disabled)]=\"canvas.editModeDisabled\" [min]='min' [max]='max' [step]='step' >\n  Segmentation size\n</mat-slider>\n<mat-form-field>\n    <mat-select [(value)]='selectedColorMap'>\n      <mat-option *ngFor=\"let cm of availableColorMaps\" (onSelectionChange)=\"change($event)\" [value]=\"cm.value\">\n        {{cm.viewValue}}\n      </mat-option>\n    </mat-select>\n  </mat-form-field>\n<app-styled-slider [canvas]=\"canvas\"></app-styled-slider>\n<button mat-icon-button (click)=\"provenance.saveGraph()\">\n  <mat-icon>backup</mat-icon>\n  Save provenance tree\n  <mat-progress-spinner *ngIf=\"provenance.saveStatus === 'saving'\" [diameter]=\"20\" mode=\"indeterminate\"></mat-progress-spinner>\n</button>"
+
+/***/ }),
+
+/***/ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.scss":
+/*!**********************************************************************************!*\
+  !*** ./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.scss ***!
+  \**********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ":host {\n  display: flex;\n  color: white;\n  margin: 1em;\n  flex-direction: column; }\n\n.mat-slider-horizontal {\n  height: 48px;\n  width: 300px;\n  min-width: 128px; }\n\n.mat-select-value {\n  color: red; }\n\n.mat-select-placeholder {\n  color: red; }\n"
 
 /***/ }),
 
@@ -2736,6 +3931,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BrainvisCanvasControlsComponent", function() { return BrainvisCanvasControlsComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _brainvis_canvas_brainvis_canvas_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../brainvis-canvas/brainvis-canvas.component */ "./src/app/brainvis-canvas/brainvis-canvas.component.ts");
+/* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -2747,9 +3943,24 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 };
 
 
+
 var BrainvisCanvasControlsComponent = /** @class */ (function () {
-    function BrainvisCanvasControlsComponent() {
+    function BrainvisCanvasControlsComponent(provenance) {
+        this.provenance = provenance;
+        this.availableColorMaps = [
+            { value: 'grayscale', viewValue: 'Grayscale' },
+            { value: 'pastels', viewValue: 'Colorful' }
+        ];
+        this.min = 1;
+        this.max = 9;
+        this.step = 2;
+        this.selectedColorMap = 'grayscale';
     }
+    BrainvisCanvasControlsComponent.prototype.change = function (event) {
+        if (event.isUserInput) {
+            this.canvas.colorMap = event.source.value;
+        }
+    };
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
         __metadata("design:type", _brainvis_canvas_brainvis_canvas_component__WEBPACK_IMPORTED_MODULE_1__["BrainvisCanvasComponent"])
@@ -2758,10 +3969,99 @@ var BrainvisCanvasControlsComponent = /** @class */ (function () {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
             selector: 'app-brainvis-canvas-controls',
             template: __webpack_require__(/*! ./brainvis-canvas-controls.component.html */ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.html"),
-            styles: [__webpack_require__(/*! ./brainvis-canvas-controls.component.css */ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.css")]
-        })
+            styles: [__webpack_require__(/*! ./brainvis-canvas-controls.component.scss */ "./src/app/brainvis-canvas-controls/brainvis-canvas-controls.component.scss")]
+        }),
+        __metadata("design:paramtypes", [_provenance_service__WEBPACK_IMPORTED_MODULE_2__["ProvenanceService"]])
     ], BrainvisCanvasControlsComponent);
     return BrainvisCanvasControlsComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.html":
+/*!*************************************************************************************!*\
+  !*** ./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.html ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"custom-slider\">\n    <ng5-slider [(value)]=\"canvas.thresholdMinValue\" [(highValue)]=\"canvas.thresholdMaxValue\" [options]=\"options\"></ng5-slider>\n</div>"
+
+/***/ }),
+
+/***/ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.scss":
+/*!*************************************************************************************!*\
+  !*** ./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.scss ***!
+  \*************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "::ng-deep .custom-slider .ng5-slider .ng5-slider-bar {\n  background: #ffe4d1;\n  height: 2px; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-selection {\n  background: orange; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-pointer {\n  width: 8px;\n  height: 16px;\n  top: auto;\n  /* to remove the default positioning */\n  bottom: 0;\n  background-color: #333;\n  border-top-left-radius: 3px;\n  border-top-right-radius: 3px; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-pointer:after {\n  display: none; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-bubble {\n  bottom: 14px; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-limit {\n  font-weight: bold;\n  color: orange; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-tick {\n  width: 1px;\n  height: 10px;\n  margin-left: 4px;\n  border-radius: 0;\n  background: #ffe4d1;\n  top: -1px; }\n\n::ng-deep .custom-slider .ng5-slider .ng5-slider-tick.ng5-slider-selected {\n  background: orange; }\n"
+
+/***/ }),
+
+/***/ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.ts":
+/*!***********************************************************************************!*\
+  !*** ./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.ts ***!
+  \***********************************************************************************/
+/*! exports provided: StyledSliderComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "StyledSliderComponent", function() { return StyledSliderComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _brainvis_canvas_brainvis_canvas_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../brainvis-canvas/brainvis-canvas.component */ "./src/app/brainvis-canvas/brainvis-canvas.component.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+var StyledSliderComponent = /** @class */ (function () {
+    function StyledSliderComponent() {
+        this.options = {
+            floor: 0,
+            ceil: 1426,
+            step: 1,
+            showTicks: false
+        };
+    }
+    StyledSliderComponent.prototype.ngDoCheck = function () {
+        var changeDetected = false;
+        if (this.canvas.thresholdLowerBound !== this.options.floor) {
+            changeDetected = true;
+        }
+        if (this.canvas.thresholdUpperBound !== this.options.ceil) {
+            changeDetected = true;
+        }
+        if (changeDetected) {
+            var newOptions = Object.assign({}, this.options);
+            newOptions.floor = this.canvas.thresholdLowerBound;
+            newOptions.ceil = this.canvas.thresholdUpperBound;
+            this.options = newOptions;
+        }
+    };
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", _brainvis_canvas_brainvis_canvas_component__WEBPACK_IMPORTED_MODULE_1__["BrainvisCanvasComponent"])
+    ], StyledSliderComponent.prototype, "canvas", void 0);
+    StyledSliderComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-styled-slider',
+            template: __webpack_require__(/*! ./styled-slider.component.html */ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.html"),
+            styles: [__webpack_require__(/*! ./styled-slider.component.scss */ "./src/app/brainvis-canvas-controls/styled-slider/styled-slider.component.scss")]
+        }),
+        __metadata("design:paramtypes", [])
+    ], StyledSliderComponent);
+    return StyledSliderComponent;
 }());
 
 
@@ -2791,16 +4091,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BrainvisCanvasComponent", function() { return BrainvisCanvasComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var ami_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ami.js */ "./node_modules/ami.js/build/ami.js");
+/* harmony import */ var ami_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ami.js */ "../node_modules/ami.js/build/ami.js");
 /* harmony import */ var ami_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(ami_js__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _trackball__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./trackball */ "./src/app/brainvis-canvas/trackball.ts");
 /* harmony import */ var _sliceManipulatorWidget__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./sliceManipulatorWidget */ "./src/app/brainvis-canvas/sliceManipulatorWidget.ts");
 /* harmony import */ var _stlLoader__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./stlLoader */ "./src/app/brainvis-canvas/stlLoader.ts");
 /* harmony import */ var _intersectionManager__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./intersectionManager */ "./src/app/brainvis-canvas/intersectionManager.ts");
 /* harmony import */ var _objectSelector__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./objectSelector */ "./src/app/brainvis-canvas/objectSelector.ts");
-/* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
-/* harmony import */ var _provenanceActions__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./provenanceActions */ "./src/app/brainvis-canvas/provenanceActions.ts");
-/* harmony import */ var _provenanceListeners__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./provenanceListeners */ "./src/app/brainvis-canvas/provenanceListeners.ts");
+/* harmony import */ var _segmentationVoxels__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./segmentationVoxels */ "./src/app/brainvis-canvas/segmentationVoxels.ts");
+/* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
+/* harmony import */ var _provenanceActions__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./provenanceActions */ "./src/app/brainvis-canvas/provenanceActions.ts");
+/* harmony import */ var _provenanceListeners__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./provenanceListeners */ "./src/app/brainvis-canvas/provenanceListeners.ts");
 var __extends = (undefined && undefined.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -2829,7 +4130,7 @@ var __metadata = (undefined && undefined.__metadata) || function (k, v) {
 
 
 // import AnnotationAnchorSelector from './annotationAnchorSelector';
-// import AnnotationAnchor from './annotationAnchor';
+
 
 
 
@@ -2837,19 +4138,96 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
     __extends(BrainvisCanvasComponent, _super);
     function BrainvisCanvasComponent(elem, provenance) {
         var _this = _super.call(this) || this;
+        _this.doViews = false;
         _this._showSlice = true;
+        _this._showSliceDisabled = false;
         _this._showSliceHandle = true;
+        _this._showSliceHandleDisabled = false;
         _this._showObjects = true;
+        _this._showObjectsDisabled = false;
+        _this._editMode = false;
+        _this._editModeDisabled = true;
+        _this._quadView = false;
+        _this._quadViewDisabled = false;
+        _this._alignMode = false;
+        _this._sliceMouseDown = false;
+        _this._segmentationIsDeleting = false;
+        _this._segmentationSize = 3;
+        _this._thresholdLowerBound = 0;
+        _this._thresholdUpperBound = 1426;
+        _this._thresholdMinValue = 10;
+        _this._thresholdMaxValue = 90;
+        _this._colorMap = 'grayscale';
         _this.showSliceChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
         _this.showSliceHandleChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
         _this.showObjectsChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.editModeChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.quadViewChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.alignModeChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
         _this.selectedObjectsChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.segmentationSizeChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.thresholdMinValueChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.thresholdMaxValueChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
+        _this.colorMapValueChange = new _angular_core__WEBPACK_IMPORTED_MODULE_0__["EventEmitter"]();
         _this.scene = new three__WEBPACK_IMPORTED_MODULE_1__["Scene"]();
         _this.objects = new three__WEBPACK_IMPORTED_MODULE_1__["Object3D"](); // all the loaded objects go in here
+        _this.views = [
+            {
+                left: 0.0,
+                top: 0.0,
+                width: 0.5,
+                height: 0.5,
+                background: new three__WEBPACK_IMPORTED_MODULE_1__["Color"](0.0, 0.0, 0.0),
+                eye: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 150.0, 0.0),
+                up: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 0.0, -1.0),
+                fov: 75,
+                camera: null
+            },
+            {
+                left: 0.5,
+                top: 0.0,
+                width: 0.5,
+                height: 0.5,
+                background: new three__WEBPACK_IMPORTED_MODULE_1__["Color"](0.0, 0.0, 0.0),
+                eye: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](100.0, 100.0, -100.0),
+                up: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 1.0, 0.0),
+                fov: 75,
+                camera: null
+            },
+            {
+                left: 0.0,
+                top: 0.5,
+                width: 0.5,
+                height: 0.5,
+                background: new three__WEBPACK_IMPORTED_MODULE_1__["Color"](0.0, 0.0, 0.0),
+                eye: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 0.0, 150.0),
+                up: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 1.0, 0.0),
+                fov: 75,
+                camera: null
+            },
+            {
+                left: 0.5,
+                top: 0.5,
+                width: 0.5,
+                height: 0.5,
+                background: new three__WEBPACK_IMPORTED_MODULE_1__["Color"](0.0, 0.0, 0.0),
+                eye: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](150.0, 0.0, 0.0),
+                up: new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0.0, 1.0, 0.0),
+                fov: 75,
+                camera: null
+            },
+        ];
         _this.renderer = new three__WEBPACK_IMPORTED_MODULE_1__["WebGLRenderer"]();
         _this.lightRotation = new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0);
         _this.animate = function () {
             requestAnimationFrame(_this.animate);
+            // update from settings
+            _this.objects.visible = _this._showObjects;
+            if (_this.stackHelper) {
+                _this.stackHelper._slice.visible = _this._showSlice;
+                _this.stackHelper._border.visible = _this._showSlice;
+                _this.sliceManipulator.visible = _this._showSliceHandle;
+            }
             // update light position
             if (_this.stackHelper) {
                 var lightDir = _this.camera.position.clone();
@@ -2900,24 +4278,25 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         // slice alignment
         _this.moveCameraTo2DSlice = function (event) {
             if (_this.stackHelper) {
-                // if this comes from the button we dispach an event to the provenance graph
-                // the graph will then call this function again
-                if (event) {
-                    _this.dispatchEvent({
-                        type: 'sliceModeChanged',
-                        mode2D: true
-                    });
-                    return;
-                }
+                // Finish movement
                 _this.controls.finishCurrentTransition();
                 _this.sliceManipulator.finishCurrentTransition();
+                // Store variables for restoration later
                 _this.cachedCameraOrigin = _this.controls.camera.position.clone();
                 _this.cachedCameraTarget = _this.controls.target.clone();
                 _this.cachedCameraUp = _this.controls.camera.up.clone();
-                _this.cachedSliceHandleVisibility = _this.sliceManipulator.visible;
-                _this.cachedObjectsShown = _this.objects.visible;
-                _this.sliceManipulator.visible = false;
-                _this.objects.visible = false;
+                _this.cachedObjectsShown = _this.showObjects;
+                _this.cachedSliceHandleShown = _this.showSliceHandle;
+                _this.cachedSliceShown = _this.showSlice;
+                // Switch controls and settings that are appropriate for this mode
+                _this._showObjects = false;
+                _this.showObjectsDisabled = true;
+                _this._showSliceHandle = false;
+                _this.showSliceHandleDisabled = true;
+                _this._showSlice = true;
+                _this.showSliceDisabled = true;
+                _this.editModeDisabled = false;
+                // store the camera position for later restoration
                 var cameraPosition = _this.stackHelper.slice.planePosition.clone();
                 cameraPosition.addScaledVector(_this.stackHelper.slice.planeDirection, 150.0);
                 // choose a up vector that does not point in the same way as the target plane
@@ -2926,30 +4305,24 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
                     upVector.set(0, 1, 0);
                 }
                 _this.controls.changeCamera(cameraPosition, _this.stackHelper.slice.planePosition.clone(), upVector, 0);
-                _this.alignButton.removeEventListener('click', _this.moveCameraTo2DSlice);
-                _this.alignButton.addEventListener('click', _this.moveCameraFrom2DSlice);
-                _this.alignButton.value = 'Back to 3D';
+                // turn off the camera controls
                 _this.controls.enabled = false;
             }
         };
         _this.moveCameraFrom2DSlice = function (event) {
             if (_this.stackHelper) {
-                // if this comes from the button we dispach an event to the provenance graph
-                // the graph will then call this function again
-                if (event) {
-                    _this.dispatchEvent({
-                        type: 'sliceModeChanged',
-                        mode2D: false
-                    });
-                    return;
-                }
+                // turn camera controls back on
                 _this.controls.enabled = true;
+                // reset to the old camera position
                 _this.controls.changeCamera(_this.cachedCameraOrigin, _this.cachedCameraTarget, _this.cachedCameraUp, 0);
-                _this.alignButton.removeEventListener('click', _this.moveCameraFrom2DSlice);
-                _this.alignButton.addEventListener('click', _this.moveCameraTo2DSlice);
-                _this.alignButton.value = 'Align to slice';
-                _this.sliceManipulator.visible = _this.cachedSliceHandleVisibility;
-                _this.objects.visible = _this.cachedObjectsShown;
+                // reset to old settings before align mode
+                _this._showSlice = _this.cachedSliceShown;
+                _this.showSliceDisabled = false;
+                _this._showSliceHandle = _this.cachedSliceHandleShown;
+                _this.showSliceHandleDisabled = false;
+                _this._showObjects = _this.cachedObjectsShown;
+                _this.showObjectsDisabled = false;
+                _this.editModeDisabled = true;
             }
         };
         _this.onShowObjectsChange = function (visible) {
@@ -2959,11 +4332,29 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
             });
         };
         _this.showObjectsToggled = function (checkBox) {
-            _this.toggleObjects(checkBox.currentTarget.checked);
             _this.onShowObjectsChange(checkBox.currentTarget.checked);
         };
-        Object(_provenanceActions__WEBPACK_IMPORTED_MODULE_9__["registerActions"])(provenance.registry, _this);
-        Object(_provenanceListeners__WEBPACK_IMPORTED_MODULE_10__["addListeners"])(provenance.tracker, _this);
+        _this.onEditModeChange = function (visible) {
+            _this.dispatchEvent({
+                type: 'editModeChanged',
+                change: visible
+            });
+        };
+        _this.editModeToggled = function (checkBox) {
+            _this.onEditModeChange(checkBox.currentTarget.checked);
+        };
+        _this.onAlignModeChange = function (visible) {
+            _this.dispatchEvent({
+                type: 'alignModeChanged',
+                change: visible
+            });
+        };
+        _this.alignModeToggled = function (checkBox) {
+            _this.toggleAlignMode(checkBox.currentTarget.checked);
+            _this.onAlignModeChange(checkBox.currentTarget.checked);
+        };
+        Object(_provenanceActions__WEBPACK_IMPORTED_MODULE_10__["registerActions"])(provenance.registry, _this);
+        Object(_provenanceListeners__WEBPACK_IMPORTED_MODULE_11__["addListeners"])(provenance.tracker, _this);
         _this.elem = elem.nativeElement;
         return _this;
     }
@@ -2972,8 +4363,15 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         // private annotationAnchorSelector: AnnotationAnchorSelector;
         set: function (showSlice) {
             this._showSlice = showSlice;
-            this.toggleSlice(showSlice);
             this.showSliceChange.emit(showSlice);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "showSliceDisabled", {
+        get: function () { return this._showSliceDisabled; },
+        set: function (showSliceDisabled) {
+            this._showSliceDisabled = showSliceDisabled;
         },
         enumerable: true,
         configurable: true
@@ -2982,8 +4380,15 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         get: function () { return this._showSliceHandle; },
         set: function (showSliceHandle) {
             this._showSliceHandle = showSliceHandle;
-            this.toggleSliceHandle(showSliceHandle);
             this.showSliceHandleChange.emit(showSliceHandle);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "showSliceHandleDisabled", {
+        get: function () { return this._showSliceHandleDisabled; },
+        set: function (showSliceHandleDisabled) {
+            this._showSliceHandleDisabled = showSliceHandleDisabled;
         },
         enumerable: true,
         configurable: true
@@ -2992,8 +4397,59 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         get: function () { return this._showObjects; },
         set: function (showObjects) {
             this._showObjects = showObjects;
-            this.toggleObjects(showObjects);
             this.showObjectsChange.emit(showObjects);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "showObjectsDisabled", {
+        get: function () { return this._showObjectsDisabled; },
+        set: function (showObjectsDisabled) {
+            this._showObjectsDisabled = showObjectsDisabled;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "editMode", {
+        get: function () { return this._editMode; },
+        set: function (editMode) {
+            this._editMode = editMode;
+            this.editModeChange.emit(editMode);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "editModeDisabled", {
+        get: function () { return this._editModeDisabled; },
+        set: function (editModeDisabled) {
+            this._editModeDisabled = editModeDisabled;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "quadView", {
+        get: function () { return this._quadView; },
+        set: function (quadView) {
+            this._quadView = quadView;
+            this.quadViewChange.emit(quadView);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "quadViewDisabled", {
+        get: function () { return this._quadViewDisabled; },
+        set: function (quadViewDisabled) {
+            this._quadViewDisabled = quadViewDisabled;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "alignMode", {
+        get: function () { return this._alignMode; },
+        set: function (alignMode) {
+            this._alignMode = alignMode;
+            this.toggleAlignMode(alignMode);
+            this.alignModeChange.emit(alignMode);
         },
         enumerable: true,
         configurable: true
@@ -3008,22 +4464,110 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         enumerable: true,
         configurable: true
     });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "segmentationSize", {
+        get: function () { return this._segmentationSize; },
+        set: function (value) {
+            this._segmentationSize = value;
+            this.segmentationSizeChange.emit(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "thresholdLowerBound", {
+        get: function () { return this._thresholdLowerBound; },
+        set: function (value) {
+            this._thresholdLowerBound = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "thresholdUpperBound", {
+        get: function () { return this._thresholdUpperBound; },
+        set: function (value) {
+            this._thresholdUpperBound = value;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "thresholdMinValue", {
+        get: function () { return this._thresholdMinValue; },
+        set: function (value) {
+            this._thresholdMinValue = value;
+            if (this.stackHelper) {
+                this.stackHelper.slice.lowerThreshold = this._thresholdMinValue;
+                this.stackHelper.slice.intensityAuto = false;
+            }
+            this.thresholdMinValueChange.emit(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "thresholdMaxValue", {
+        get: function () { return this._thresholdMaxValue; },
+        set: function (value) {
+            this._thresholdMaxValue = value;
+            if (this.stackHelper) {
+                this.stackHelper.slice.upperThreshold = this._thresholdMaxValue;
+                this.stackHelper.slice.intensityAuto = false;
+                // this.stackHelper.slice.thicknessMethod = 1;
+                // this.stackHelper.slice.thickness = 2;
+                // this.stackHelper.slice.steps = 2;
+            }
+            this.thresholdMaxValueChange.emit(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(BrainvisCanvasComponent.prototype, "colorMap", {
+        get: function () { return this._colorMap; },
+        set: function (value) {
+            this._colorMap = value;
+            if (this.stackHelper) {
+                this.stackHelper.slice.colorMap = this._colorMap;
+            }
+            this.colorMapValueChange.emit(value);
+        },
+        enumerable: true,
+        configurable: true
+    });
     BrainvisCanvasComponent.prototype.ngOnInit = function () {
+        var _this = this;
         // todo: remove object from window
         window.canvas = this;
         this.width = this.elem.clientWidth;
         this.height = this.elem.clientHeight;
         this.scene.background = new three__WEBPACK_IMPORTED_MODULE_1__["Color"]('black');
-        this.camera = new three__WEBPACK_IMPORTED_MODULE_1__["PerspectiveCamera"](75, this.width / this.height, 0.1, 10000);
+        // if (this._quadView) {
+        this.views.forEach(function (v) {
+            var newCamera = new three__WEBPACK_IMPORTED_MODULE_1__["PerspectiveCamera"](v.fov, _this.width / _this.height, 0.1, 10000);
+            newCamera.position.copy(v.eye);
+            newCamera.up.copy(v.up);
+            v.camera = newCamera;
+            v.camera.lookAt(new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](0, 0, 0));
+        });
+        this.camera = this.views[1].camera;
+        // } else {
+        //   this.camera = new THREE.PerspectiveCamera(75, this.width / this.height, 0.1, 1000);
+        // }
         this.renderer.setSize(this.width, this.height);
         var canvasElm = this.renderer.domElement;
         this.elem.appendChild(canvasElm);
         canvasElm.style.display = 'block';
         // Setup controls
-        this.controls = new _trackball__WEBPACK_IMPORTED_MODULE_3__["default"](this.camera, this.renderer.domElement);
+        if (this._quadView) {
+            this.controls = new _trackball__WEBPACK_IMPORTED_MODULE_3__["default"](this.views, 1, this.renderer.domElement);
+        }
+        else {
+            this.views[1].left = 0;
+            this.views[1].top = 0;
+            this.views[1].width = 1.0;
+            this.views[1].height = 1.0;
+            this.views[1].camera = this.camera;
+            this.controls = new _trackball__WEBPACK_IMPORTED_MODULE_3__["default"]([this.views[1]], 0, this.renderer.domElement);
+        }
         this.scene.add(this.objects);
         // Initial camera position
-        this.controls.position0.set(0, 0, 5);
+        this.controls.position0.set(-100.0, -100.0, 100.0);
         this.controls.reset();
         this.initScene();
         this.objectSelector = new _objectSelector__WEBPACK_IMPORTED_MODULE_7__["default"](this.objects);
@@ -3067,9 +4611,10 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
             this.stackHelper.slice.planePosition.y = centerLPS.y;
             this.stackHelper.slice.planePosition.z = centerLPS.z;
             this.stackHelper.slice.planeDirection = new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](1, 0, 0).normalize();
+            this.stackHelper.slice.colorMap = 'grayscale';
             this.stackHelper.slice._update();
             this.stackHelper.border.helpersSlice = this.stackHelper.slice;
-            var sliceGeometry = new _intersectionManager__WEBPACK_IMPORTED_MODULE_6__["StaticGeometryListener"](this.stackHelper.slice);
+            var sliceGeometry = new _intersectionManager__WEBPACK_IMPORTED_MODULE_6__["StaticGeometryListener"](this.stackHelper.slice, this.sliceMouseDown.bind(this), this.sliceMouseUp.bind(this), this.sliceMouseMove.bind(this));
             this.intersectionManager.addListener(sliceGeometry);
             // slice manipulator
             this.sliceManipulator = new _sliceManipulatorWidget__WEBPACK_IMPORTED_MODULE_4__["default"](this.stackHelper, this.renderer.domElement, this.camera);
@@ -3078,6 +4623,16 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
             this.sliceManipulator.addEventListener('orientationChange', this.onSlicePlaneOrientationChange);
             this.sliceManipulator.visible = this._showSliceHandle;
             this.intersectionManager.addListener(this.sliceManipulator);
+            this.segmentationVoxels = new _segmentationVoxels__WEBPACK_IMPORTED_MODULE_8__["default"](100, 100, 100, 1);
+            this.segmentationVoxels.visible = true;
+            this.scene.add(this.segmentationVoxels);
+            this.thresholdLowerBound = this.stackHelper.stack.minMax[0];
+            this.thresholdUpperBound = this.stackHelper.stack.minMax[1];
+            this.thresholdMinValue = this.stackHelper.stack.minMax[0];
+            this.thresholdMaxValue = this.stackHelper.stack.minMax[1];
+            // Setup volumerenderer
+            // this.volumeRenderer = new AMI.VolumeRenderingHelper(series[0].stack[0]);
+            // this.scene.add(this.volumeRenderer);
             // Annotation Anchor(s)
             // this.anchorDummy = new AnnotationAnchor(this.renderer.domElement, this.camera);
             // this.scene.add(this.anchorDummy);
@@ -3104,6 +4659,7 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
     };
     BrainvisCanvasComponent.prototype.addEventListeners = function () {
         var _this = this;
+        this.renderer.domElement.addEventListener('mousewheel', function (event) { return _this.mousewheel(event); });
         this.controls.addEventListener('zoomstart', function (event) {
             var position = _this.controls.camera.position.toArray();
             var target = _this.controls.target.toArray();
@@ -3147,12 +4703,26 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         this.objectSelector.addEventListener('objectSelection', function (event) {
             _this.selectedObjects = event.newObject;
         });
+        this.renderer.domElement.addEventListener('resize', this.onResize, false);
+    };
+    BrainvisCanvasComponent.prototype.onResize = function () {
+        // if (this._quadView) {
+        this.views.forEach(function (v) {
+            v.camera.aspect = window.innerWidth / window.innerWidth;
+            v.camera.updateProjectionMatrix();
+        });
+        // } else {
+        this.camera.aspect = window.innerWidth / window.innerWidth;
+        this.camera.updateProjectionMatrix();
+        // }
+        this.renderer.setSize(window.innerWidth, window.innerWidth);
+        this.controls.handleResize(this.views);
     };
     BrainvisCanvasComponent.prototype.setSize = function (width, height) {
         this.camera.aspect = width / height;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
-        this.controls.handleResize();
+        this.controls.handleResize(this.views);
     };
     BrainvisCanvasComponent.prototype.setInteractive = function (interactive) {
         this.controls.enabled = interactive;
@@ -3167,7 +4737,27 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         this.controls.changeCamera(new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]), new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]), new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]), within > 0 ? within : 1000);
     };
     BrainvisCanvasComponent.prototype.render = function () {
-        this.renderer.render(this.scene, this.camera);
+        var _this = this;
+        if (this._quadView) {
+            this.views.forEach(function (v) {
+                var camera = v.camera;
+                // v.updateCamera( camera, this.scene, mouseX, mouseY );
+                var left = Math.floor(_this.width * v.left);
+                var top = Math.floor(_this.height * v.top);
+                var width = Math.floor(_this.width * v.width);
+                var height = Math.floor(_this.height * v.height);
+                _this.renderer.setViewport(left, top, width, height);
+                _this.renderer.setScissor(left, top, width, height);
+                _this.renderer.setScissorTest(true);
+                _this.renderer.setClearColor(v.background);
+                camera.aspect = width / height;
+                camera.updateProjectionMatrix();
+                _this.renderer.render(_this.scene, camera);
+            });
+        }
+        else {
+            this.renderer.render(this.scene, this.camera);
+        }
     };
     BrainvisCanvasComponent.prototype.setSlicePlanePosition = function (positions, within) {
         if (this.stackHelper) {
@@ -3179,25 +4769,80 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
             this.sliceManipulator.changeSlicePosition(new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](positions.position[0], positions.position[1], positions.position[2]), new three__WEBPACK_IMPORTED_MODULE_1__["Vector3"](positions.direction[0], positions.direction[1], positions.direction[2]), within > 0 ? within : 1000);
         }
     };
-    BrainvisCanvasComponent.prototype.toggleSlice = function (state) {
-        if (this.stackHelper) {
-            this.stackHelper._slice.visible = state;
-            this.stackHelper._border.visible = state;
-            if (state === false) {
-                this.sliceManipulator.visible = state;
+    BrainvisCanvasComponent.prototype.toggleAlignMode = function (checked) {
+        if (checked) {
+            this.moveCameraTo2DSlice();
+        }
+        else {
+            this.moveCameraFrom2DSlice();
+            this.editMode = false;
+        }
+    };
+    BrainvisCanvasComponent.prototype.mousewheel = function (event) {
+        // TODO: check bounds
+        if (this._alignMode === false) {
+            return;
+        }
+        event.preventDefault();
+        event.stopPropagation();
+        var delta = 0;
+        if (event.wheelDelta) {
+            //  WebKit / Opera / Explorer 9
+            delta = event.wheelDelta / 40;
+        }
+        else if (event.detail) {
+            //  Firefox
+            delta = -event.detail / 3;
+        }
+        var change = 0;
+        if (delta > 0) {
+            change = 1;
+        }
+        else {
+            change = -1;
+        }
+        var oldPosition = this.stackHelper.slice.planePosition.clone();
+        var intersectionDirection = this.stackHelper.slice.planeDirection.clone();
+        var newPosition = oldPosition.addScaledVector(intersectionDirection, change);
+        this.sliceManipulator.changeSlicePosition(newPosition, intersectionDirection, 0);
+        this.dispatchEvent({
+            type: 'sliceZoomChanged',
+            changes: {
+                position: newPosition.clone(),
+                direction: intersectionDirection.clone(),
+                oldPosition: oldPosition.clone(),
+                oldDirection: intersectionDirection.clone()
+            }
+        });
+    };
+    BrainvisCanvasComponent.prototype.sliceMouseDown = function (intersection, pointer) {
+        if (intersection && this.editMode) {
+            this._sliceMouseDown = true;
+            if (this.segmentationVoxels.getGridPoint(intersection.point)) {
+                this._segmentationIsDeleting = true;
+                this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, false);
             }
             else {
-                this.sliceManipulator.visible = this._showSlice;
+                this._segmentationIsDeleting = false;
+                this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, true);
             }
         }
     };
-    BrainvisCanvasComponent.prototype.toggleSliceHandle = function (state) {
-        if (this.sliceManipulator) {
-            this.sliceManipulator.visible = state;
+    BrainvisCanvasComponent.prototype.sliceMouseUp = function (intersection, pointer) {
+        if (intersection) {
+            this._sliceMouseDown = false;
+            this._segmentationIsDeleting = false;
         }
     };
-    BrainvisCanvasComponent.prototype.toggleObjects = function (visible) {
-        this.objects.visible = visible;
+    BrainvisCanvasComponent.prototype.sliceMouseMove = function (intersection, pointer) {
+        if (intersection && this.editMode && this._sliceMouseDown) {
+            if (this._segmentationIsDeleting) {
+                this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, false);
+            }
+            else {
+                this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, true);
+            }
+        }
     };
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
@@ -3212,11 +4857,21 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
         __metadata("design:type", Boolean),
         __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "showSliceDisabled", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
     ], BrainvisCanvasComponent.prototype, "showSliceHandle", null);
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
         __metadata("design:type", Object)
     ], BrainvisCanvasComponent.prototype, "showSliceHandleChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "showSliceHandleDisabled", null);
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
         __metadata("design:type", Boolean),
@@ -3228,6 +4883,48 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
     ], BrainvisCanvasComponent.prototype, "showObjectsChange", void 0);
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "showObjectsDisabled", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "editMode", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "editModeChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "editModeDisabled", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "quadView", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "quadViewChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "quadViewDisabled", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Boolean),
+        __metadata("design:paramtypes", [Boolean])
+    ], BrainvisCanvasComponent.prototype, "alignMode", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "alignModeChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
         __metadata("design:type", Array),
         __metadata("design:paramtypes", [Array])
     ], BrainvisCanvasComponent.prototype, "selectedObjects", null);
@@ -3235,13 +4932,49 @@ var BrainvisCanvasComponent = /** @class */ (function (_super) {
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
         __metadata("design:type", Object)
     ], BrainvisCanvasComponent.prototype, "selectedObjectsChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Number),
+        __metadata("design:paramtypes", [Number])
+    ], BrainvisCanvasComponent.prototype, "segmentationSize", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "segmentationSizeChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Number),
+        __metadata("design:paramtypes", [Number])
+    ], BrainvisCanvasComponent.prototype, "thresholdMinValue", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "thresholdMinValueChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Number),
+        __metadata("design:paramtypes", [Number])
+    ], BrainvisCanvasComponent.prototype, "thresholdMaxValue", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "thresholdMaxValueChange", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", String),
+        __metadata("design:paramtypes", [String])
+    ], BrainvisCanvasComponent.prototype, "colorMap", null);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Output"])(),
+        __metadata("design:type", Object)
+    ], BrainvisCanvasComponent.prototype, "colorMapValueChange", void 0);
     BrainvisCanvasComponent = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
             selector: 'app-brainvis-canvas',
             template: '',
             styles: [__webpack_require__(/*! ./brainvis-canvas.component.css */ "./src/app/brainvis-canvas/brainvis-canvas.component.css")]
         }),
-        __metadata("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"], _provenance_service__WEBPACK_IMPORTED_MODULE_8__["ProvenanceService"]])
+        __metadata("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"], _provenance_service__WEBPACK_IMPORTED_MODULE_9__["ProvenanceService"]])
     ], BrainvisCanvasComponent);
     return BrainvisCanvasComponent;
 }(three__WEBPACK_IMPORTED_MODULE_1__["EventDispatcher"]));
@@ -3269,18 +5002,12 @@ __webpack_require__.r(__webpack_exports__);
 */
 
 var StaticGeometryListener = /** @class */ (function () {
-    function StaticGeometryListener(object) {
+    function StaticGeometryListener(object, onMouseDown, onMouseUp, onMouseMove) {
         this.object = object;
+        this.onMouseDown = onMouseDown;
+        this.onMouseUp = onMouseUp;
+        this.onMouseMove = onMouseMove;
     }
-    StaticGeometryListener.prototype.onMouseDown = function (intersection, pointer) {
-        //
-    };
-    StaticGeometryListener.prototype.onMouseUp = function (intersection, pointer) {
-        //
-    };
-    StaticGeometryListener.prototype.onMouseMove = function (intersection, pointer) {
-        //
-    };
     StaticGeometryListener.prototype.getObjects = function () {
         return this.object.children;
     };
@@ -3504,14 +5231,20 @@ var ObjectSelector = /** @class */ (function (_super) {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "registerActions", function() { return registerActions; });
 var getActions = function (canvas) { return ({
-    setControlZoom: function (args) { return Promise.resolve(canvas.setControlZoom(args, 500)); },
-    setControlOrientation: function (args) { return Promise.resolve(canvas.setControlOrientation(args, 500)); },
-    setSlicePlaneOrientation: function (position, direction) { return Promise.resolve(canvas.setSlicePlanePosition({ position: position, direction: direction }, 500)); },
-    setSlicePlaneZoom: function (position, direction) { return Promise.resolve(canvas.setSlicePlaneZoom({ position: position, direction: direction }, 500)); },
+    setControlZoom: function (args, transitionTime) { return Promise.resolve(canvas.setControlZoom(args, transitionTime)); },
+    setControlOrientation: function (args, transitionTime) { return Promise.resolve(canvas.setControlOrientation(args, transitionTime)); },
+    setSlicePlaneOrientation: function (position, direction, transitionTime) {
+        return Promise.resolve(canvas.setSlicePlanePosition({ position: position, direction: direction }, transitionTime));
+    },
+    setSlicePlaneZoom: function (position, direction, transitionTime) {
+        return Promise.resolve(canvas.setSlicePlaneZoom({ position: position, direction: direction }, transitionTime));
+    },
     showSlice: function (value) { return Promise.resolve(canvas.showSlice = value); },
     showObjects: function (value) { return Promise.resolve(canvas.showObjects = value); },
+    editMode: function (value) { return Promise.resolve(canvas.editMode = value); },
+    alignMode: function (value) { return Promise.resolve(canvas.alignMode = value); },
     showSliceHandle: function (value) { return Promise.resolve(canvas.showSliceHandle = value); },
-    showSegmentedObjects: function (value) { return Promise.resolve(canvas.showObjects = value); },
+    // showSegmentedObjects: (value: boolean) => Promise.resolve(canvas.showObjects = value),
     selectedObjects: function (value) { return Promise.resolve(canvas.selectedObjects = value); },
 }); };
 var registerActions = function (registry, canvas) {
@@ -3587,7 +5320,7 @@ var addListeners = function (tracker, canvas) {
             doArguments: [position, direction],
             undo: 'setSlicePlaneZoom',
             undoArguments: [oldPosition, oldDirection],
-        });
+        }, true);
     });
     canvas.showSliceChange.subscribe(function (val) {
         tracker.applyAction({
@@ -3616,6 +5349,24 @@ var addListeners = function (tracker, canvas) {
             undoArguments: [!val],
         }, true);
     });
+    canvas.editModeChange.subscribe(function (val) {
+        tracker.applyAction({
+            metadata: { userIntent: 'configuration' },
+            do: 'editMode',
+            doArguments: [val],
+            undo: 'editMode',
+            undoArguments: [!val],
+        }, true);
+    });
+    canvas.alignModeChange.subscribe(function (val) {
+        tracker.applyAction({
+            metadata: { userIntent: 'configuration' },
+            do: 'alignMode',
+            doArguments: [val],
+            undo: 'alignMode',
+            undoArguments: [!val],
+        }, true);
+    });
     canvas.selectedObjectsChange.subscribe(function (_a) {
         var newObjects = _a[0], oldObjects = _a[1];
         tracker.applyAction({
@@ -3627,6 +5378,110 @@ var addListeners = function (tracker, canvas) {
         }, true);
     });
 };
+
+
+/***/ }),
+
+/***/ "./src/app/brainvis-canvas/segmentationVoxels.ts":
+/*!*******************************************************!*\
+  !*** ./src/app/brainvis-canvas/segmentationVoxels.ts ***!
+  \*******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var three__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
+var __extends = (undefined && undefined.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+
+var SegmentationVoxels = /** @class */ (function (_super) {
+    __extends(SegmentationVoxels, _super);
+    function SegmentationVoxels(height, width, depth, gridSize) {
+        var _this = _super.call(this) || this;
+        _this.enabled = true;
+        _this._position = new three__WEBPACK_IMPORTED_MODULE_0__["Vector3"](0.0, 0.0, 0.0);
+        _this.visible = true;
+        _this._grid = new Array(height * width * depth);
+        _this._voxels = {};
+        _this._gridSize = gridSize;
+        _this._height = height;
+        _this._width = width;
+        _this._depth = depth;
+        _this._geometry = new three__WEBPACK_IMPORTED_MODULE_0__["CubeGeometry"](gridSize, gridSize, gridSize);
+        _this._material = new three__WEBPACK_IMPORTED_MODULE_0__["MeshBasicMaterial"]({ color: 0x00ff00, transparent: true, opacity: 0.5 });
+        return _this;
+    }
+    SegmentationVoxels.prototype.hash = function (xyz) {
+        return (xyz[0] * 31 + xyz[1] * 43 + xyz[2] * 71).toString();
+    };
+    SegmentationVoxels.prototype.roundPoint = function (location) {
+        var X = Math.round(location.x / this._gridSize);
+        var Y = Math.round(location.y / this._gridSize);
+        var Z = Math.round(location.z / this._gridSize);
+        return [X, Y, Z];
+    };
+    SegmentationVoxels.prototype.gridIndex = function (xyz) {
+        return ((this._height * this._width) * xyz[2]) + (this._height * xyz[1]) + xyz[0];
+    };
+    SegmentationVoxels.prototype.paintAt = function (location, segmentationSize, value) {
+        var xyz = this.roundPoint(location);
+        if (segmentationSize == 1) {
+            this.setGridPoint(xyz, value);
+        }
+        else if (segmentationSize == 3) {
+            for (var u = -1; u <= 1; u++) {
+                for (var v = -1; v <= 1; v++) {
+                    for (var w = -1; w <= 1; w++) {
+                        var newxyz = [(xyz[0] + u), (xyz[1] + v), (xyz[2] + w)];
+                        this.setGridPoint(newxyz, value);
+                    }
+                }
+            }
+        }
+    };
+    SegmentationVoxels.prototype.setGridPoint = function (xyz, value) {
+        var gridIndex = this.gridIndex(xyz);
+        var oldValue = this._grid[gridIndex];
+        if (value) {
+            if (!oldValue) {
+                var voxel = new three__WEBPACK_IMPORTED_MODULE_0__["Mesh"](this._geometry, this._material);
+                voxel.position.copy(new three__WEBPACK_IMPORTED_MODULE_0__["Vector3"](xyz[0] * this._gridSize, xyz[1] * this._gridSize, xyz[2] * this._gridSize));
+                this._voxels[this.hash(xyz)] = voxel;
+                this.add(voxel);
+            }
+        }
+        else {
+            if (oldValue) {
+                var oldVoxel = this._voxels[this.hash(xyz)];
+                this.remove(oldVoxel);
+            }
+        }
+        this._grid[gridIndex] = value;
+        return oldValue;
+    };
+    SegmentationVoxels.prototype.getGridPoint = function (location) {
+        var xyz = this.roundPoint(location);
+        var gridIndex = this.gridIndex(xyz);
+        return this._grid[gridIndex];
+    };
+    SegmentationVoxels.prototype.getObjects = function () {
+        return this.children;
+    };
+    SegmentationVoxels.prototype.isEnabled = function () {
+        return this.visible;
+    };
+    return SegmentationVoxels;
+}(three__WEBPACK_IMPORTED_MODULE_0__["Object3D"]));
+/* harmony default export */ __webpack_exports__["default"] = (SegmentationVoxels);
 
 
 /***/ }),
@@ -3794,8 +5649,8 @@ var SliceManipulatorWidget = /** @class */ (function (_super) {
                 // starts at the edge of the volume and does not intersect it at all
                 var beginOffset = this.originalSlicePosition.clone();
                 beginOffset.sub(offset);
-                var interSetionPoint = this.intersectStackHelper(beginOffset, offset);
-                this.stackHelper.slice.planePosition.copy(interSetionPoint);
+                var interSectionPoint = this.intersectStackHelper(beginOffset, offset);
+                this.stackHelper.slice.planePosition.copy(interSectionPoint);
             }
             else if (this.previousSelection === this.sphere) {
                 var direction = intersectionPoint.clone();
@@ -4230,11 +6085,11 @@ var STATE;
 })(STATE || (STATE = {}));
 var Trackball = /** @class */ (function (_super) {
     __extends(Trackball, _super);
-    function Trackball(object, domElement) {
+    function Trackball(views, viewNumber, domElement) {
         var _this = _super.call(this) || this;
         _this.state = STATE.NONE;
         _this.previousState = STATE.NONE;
-        _this.screen = { left: 0, top: 0, width: 0, height: 0 };
+        _this.screen = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 };
         _this.enabled = true;
         _this.rotateSpeed = 1.0;
         _this.zoomSpeed = 1.2;
@@ -4323,6 +6178,7 @@ var Trackball = /** @class */ (function (_super) {
             if (_this.enabled === false) {
                 return;
             }
+            // if (!this.inScope(event.pageX, event.pageY)) { return; }
             _this.isDragging = true;
             event.preventDefault();
             event.stopPropagation();
@@ -4410,7 +6266,9 @@ var Trackball = /** @class */ (function (_super) {
             _this.dispatchEvent({ type: 'zoomstart' });
             _this.dispatchEvent({ type: 'zoomend', state: STATE.ZOOM, newTarget: _this.target, newPosition: _this.target, newUp: _this.target });
         };
-        _this.camera = object;
+        _this.views = views;
+        _this.viewNumber = viewNumber;
+        _this.camera = views[viewNumber].camera;
         _this.domElement = (domElement !== undefined) ? domElement : document;
         //  for reset
         _this.target0 = _this.target.clone();
@@ -4419,7 +6277,7 @@ var Trackball = /** @class */ (function (_super) {
         _this.domElement.addEventListener('contextmenu', function (event) {
             event.preventDefault();
         }, false);
-        _this.handleResize();
+        _this.handleResize(_this.views);
         _this.init();
         //  force an update at start
         _this.update();
@@ -4438,27 +6296,37 @@ var Trackball = /** @class */ (function (_super) {
         window.addEventListener('keyup', this.keyup, false);
     };
     //  methods
-    Trackball.prototype.handleResize = function () {
+    Trackball.prototype.handleResize = function (views) {
         if (this.domElement === document) {
-            this.screen.left = 0;
+            this.screen.left = window.innerWidth * views[this.viewNumber].width;
+            this.screen.right = this.screen.left * 2.0;
             this.screen.top = 0;
-            this.screen.width = window.innerWidth;
-            this.screen.height = window.innerHeight;
+            this.screen.bottom = window.innerHeight * views[this.viewNumber].height;
+            this.screen.width = window.innerWidth * views[this.viewNumber].width;
+            this.screen.height = window.innerHeight * views[this.viewNumber].height;
         }
         else {
             var box = this.domElement.getBoundingClientRect();
             //  adjustments come from similar code in the jquery offset() function
             var d = this.domElement.ownerDocument.documentElement;
-            this.screen.left = box.left + window.pageXOffset - d.clientLeft;
+            this.screen.left = (box.left + window.pageXOffset - d.clientLeft) * views[this.viewNumber].width;
+            this.screen.right = this.screen.left * 2.0;
             this.screen.top = box.top + window.pageYOffset - d.clientTop;
-            this.screen.width = box.width;
-            this.screen.height = box.height;
+            this.screen.bottom = box.width * views[this.viewNumber].width;
+            this.screen.width = box.width * views[this.viewNumber].width;
+            this.screen.height = box.height * views[this.viewNumber].height;
         }
     };
     Trackball.prototype.handleEvent = function (event) {
         if (typeof this[event.type] === 'function') {
             this[event.type](event);
         }
+    };
+    Trackball.prototype.inScope = function (pageX, pageY) {
+        if (pageX < this.screen.left || pageX > this.screen.right || pageY < this.screen.top || pageY > this.screen.bottom) {
+            return false;
+        }
+        return true;
     };
     Trackball.prototype.getMouseOnScreen = function (pageX, pageY) {
         return new three__WEBPACK_IMPORTED_MODULE_0__["Vector2"]((pageX - this.screen.left) / this.screen.width, (pageY - this.screen.top) / this.screen.height);
@@ -4838,7 +6706,7 @@ var Trackball = /** @class */ (function (_super) {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "/*!\n *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome\n *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)\n */\n/* FONT PATH\n * -------------------------- */\n@font-face {\n  font-family: 'FontAwesome';\n  src: url('fontawesome-webfont.eot?v=4.7.0');\n  src: url('fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('fontawesome-webfont.woff?v=4.7.0') format('woff'), url('fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');\n  font-weight: normal;\n  font-style: normal;\n}\n.fa {\n  display: inline-block;\n  font: normal normal normal 14px/1 FontAwesome;\n  font-size: inherit;\n  text-rendering: auto;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n/* makes the font 33% larger relative to the icon container */\n.fa-lg {\n  font-size: 1.33333333em;\n  line-height: 0.75em;\n  vertical-align: -15%;\n}\n.fa-2x {\n  font-size: 2em;\n}\n.fa-3x {\n  font-size: 3em;\n}\n.fa-4x {\n  font-size: 4em;\n}\n.fa-5x {\n  font-size: 5em;\n}\n.fa-fw {\n  width: 1.28571429em;\n  text-align: center;\n}\n.fa-ul {\n  padding-left: 0;\n  margin-left: 2.14285714em;\n  list-style-type: none;\n}\n.fa-ul > li {\n  position: relative;\n}\n.fa-li {\n  position: absolute;\n  left: -2.14285714em;\n  width: 2.14285714em;\n  top: 0.14285714em;\n  text-align: center;\n}\n.fa-li.fa-lg {\n  left: -1.85714286em;\n}\n.fa-border {\n  padding: .2em .25em .15em;\n  border: solid 0.08em #eeeeee;\n  border-radius: .1em;\n}\n.fa-pull-left {\n  float: left;\n}\n.fa-pull-right {\n  float: right;\n}\n.fa.fa-pull-left {\n  margin-right: .3em;\n}\n.fa.fa-pull-right {\n  margin-left: .3em;\n}\n/* Deprecated as of 4.4.0 */\n.pull-right {\n  float: right;\n}\n.pull-left {\n  float: left;\n}\n.fa.pull-left {\n  margin-right: .3em;\n}\n.fa.pull-right {\n  margin-left: .3em;\n}\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n  animation: fa-spin 2s infinite linear;\n}\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n  animation: fa-spin 1s infinite steps(8);\n}\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n.fa-rotate-90 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)\";\n  -webkit-transform: rotate(90deg);\n  transform: rotate(90deg);\n}\n.fa-rotate-180 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)\";\n  -webkit-transform: rotate(180deg);\n  transform: rotate(180deg);\n}\n.fa-rotate-270 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)\";\n  -webkit-transform: rotate(270deg);\n  transform: rotate(270deg);\n}\n.fa-flip-horizontal {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)\";\n  -webkit-transform: scale(-1, 1);\n  transform: scale(-1, 1);\n}\n.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(1, -1);\n  transform: scale(1, -1);\n}\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  -webkit-filter: none;\n          filter: none;\n}\n.fa-stack {\n  position: relative;\n  display: inline-block;\n  width: 2em;\n  height: 2em;\n  line-height: 2em;\n  vertical-align: middle;\n}\n.fa-stack-1x,\n.fa-stack-2x {\n  position: absolute;\n  left: 0;\n  width: 100%;\n  text-align: center;\n}\n.fa-stack-1x {\n  line-height: inherit;\n}\n.fa-stack-2x {\n  font-size: 2em;\n}\n.fa-inverse {\n  color: #ffffff;\n}\n/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen\n   readers do not read off random characters that represent icons */\n.fa-glass:before {\n  content: \"\\f000\";\n}\n.fa-music:before {\n  content: \"\\f001\";\n}\n.fa-search:before {\n  content: \"\\f002\";\n}\n.fa-envelope-o:before {\n  content: \"\\f003\";\n}\n.fa-heart:before {\n  content: \"\\f004\";\n}\n.fa-star:before {\n  content: \"\\f005\";\n}\n.fa-star-o:before {\n  content: \"\\f006\";\n}\n.fa-user:before {\n  content: \"\\f007\";\n}\n.fa-film:before {\n  content: \"\\f008\";\n}\n.fa-th-large:before {\n  content: \"\\f009\";\n}\n.fa-th:before {\n  content: \"\\f00a\";\n}\n.fa-th-list:before {\n  content: \"\\f00b\";\n}\n.fa-check:before {\n  content: \"\\f00c\";\n}\n.fa-remove:before,\n.fa-close:before,\n.fa-times:before {\n  content: \"\\f00d\";\n}\n.fa-search-plus:before {\n  content: \"\\f00e\";\n}\n.fa-search-minus:before {\n  content: \"\\f010\";\n}\n.fa-power-off:before {\n  content: \"\\f011\";\n}\n.fa-signal:before {\n  content: \"\\f012\";\n}\n.fa-gear:before,\n.fa-cog:before {\n  content: \"\\f013\";\n}\n.fa-trash-o:before {\n  content: \"\\f014\";\n}\n.fa-home:before {\n  content: \"\\f015\";\n}\n.fa-file-o:before {\n  content: \"\\f016\";\n}\n.fa-clock-o:before {\n  content: \"\\f017\";\n}\n.fa-road:before {\n  content: \"\\f018\";\n}\n.fa-download:before {\n  content: \"\\f019\";\n}\n.fa-arrow-circle-o-down:before {\n  content: \"\\f01a\";\n}\n.fa-arrow-circle-o-up:before {\n  content: \"\\f01b\";\n}\n.fa-inbox:before {\n  content: \"\\f01c\";\n}\n.fa-play-circle-o:before {\n  content: \"\\f01d\";\n}\n.fa-rotate-right:before,\n.fa-repeat:before {\n  content: \"\\f01e\";\n}\n.fa-refresh:before {\n  content: \"\\f021\";\n}\n.fa-list-alt:before {\n  content: \"\\f022\";\n}\n.fa-lock:before {\n  content: \"\\f023\";\n}\n.fa-flag:before {\n  content: \"\\f024\";\n}\n.fa-headphones:before {\n  content: \"\\f025\";\n}\n.fa-volume-off:before {\n  content: \"\\f026\";\n}\n.fa-volume-down:before {\n  content: \"\\f027\";\n}\n.fa-volume-up:before {\n  content: \"\\f028\";\n}\n.fa-qrcode:before {\n  content: \"\\f029\";\n}\n.fa-barcode:before {\n  content: \"\\f02a\";\n}\n.fa-tag:before {\n  content: \"\\f02b\";\n}\n.fa-tags:before {\n  content: \"\\f02c\";\n}\n.fa-book:before {\n  content: \"\\f02d\";\n}\n.fa-bookmark:before {\n  content: \"\\f02e\";\n}\n.fa-print:before {\n  content: \"\\f02f\";\n}\n.fa-camera:before {\n  content: \"\\f030\";\n}\n.fa-font:before {\n  content: \"\\f031\";\n}\n.fa-bold:before {\n  content: \"\\f032\";\n}\n.fa-italic:before {\n  content: \"\\f033\";\n}\n.fa-text-height:before {\n  content: \"\\f034\";\n}\n.fa-text-width:before {\n  content: \"\\f035\";\n}\n.fa-align-left:before {\n  content: \"\\f036\";\n}\n.fa-align-center:before {\n  content: \"\\f037\";\n}\n.fa-align-right:before {\n  content: \"\\f038\";\n}\n.fa-align-justify:before {\n  content: \"\\f039\";\n}\n.fa-list:before {\n  content: \"\\f03a\";\n}\n.fa-dedent:before,\n.fa-outdent:before {\n  content: \"\\f03b\";\n}\n.fa-indent:before {\n  content: \"\\f03c\";\n}\n.fa-video-camera:before {\n  content: \"\\f03d\";\n}\n.fa-photo:before,\n.fa-image:before,\n.fa-picture-o:before {\n  content: \"\\f03e\";\n}\n.fa-pencil:before {\n  content: \"\\f040\";\n}\n.fa-map-marker:before {\n  content: \"\\f041\";\n}\n.fa-adjust:before {\n  content: \"\\f042\";\n}\n.fa-tint:before {\n  content: \"\\f043\";\n}\n.fa-edit:before,\n.fa-pencil-square-o:before {\n  content: \"\\f044\";\n}\n.fa-share-square-o:before {\n  content: \"\\f045\";\n}\n.fa-check-square-o:before {\n  content: \"\\f046\";\n}\n.fa-arrows:before {\n  content: \"\\f047\";\n}\n.fa-step-backward:before {\n  content: \"\\f048\";\n}\n.fa-fast-backward:before {\n  content: \"\\f049\";\n}\n.fa-backward:before {\n  content: \"\\f04a\";\n}\n.fa-play:before {\n  content: \"\\f04b\";\n}\n.fa-pause:before {\n  content: \"\\f04c\";\n}\n.fa-stop:before {\n  content: \"\\f04d\";\n}\n.fa-forward:before {\n  content: \"\\f04e\";\n}\n.fa-fast-forward:before {\n  content: \"\\f050\";\n}\n.fa-step-forward:before {\n  content: \"\\f051\";\n}\n.fa-eject:before {\n  content: \"\\f052\";\n}\n.fa-chevron-left:before {\n  content: \"\\f053\";\n}\n.fa-chevron-right:before {\n  content: \"\\f054\";\n}\n.fa-plus-circle:before {\n  content: \"\\f055\";\n}\n.fa-minus-circle:before {\n  content: \"\\f056\";\n}\n.fa-times-circle:before {\n  content: \"\\f057\";\n}\n.fa-check-circle:before {\n  content: \"\\f058\";\n}\n.fa-question-circle:before {\n  content: \"\\f059\";\n}\n.fa-info-circle:before {\n  content: \"\\f05a\";\n}\n.fa-crosshairs:before {\n  content: \"\\f05b\";\n}\n.fa-times-circle-o:before {\n  content: \"\\f05c\";\n}\n.fa-check-circle-o:before {\n  content: \"\\f05d\";\n}\n.fa-ban:before {\n  content: \"\\f05e\";\n}\n.fa-arrow-left:before {\n  content: \"\\f060\";\n}\n.fa-arrow-right:before {\n  content: \"\\f061\";\n}\n.fa-arrow-up:before {\n  content: \"\\f062\";\n}\n.fa-arrow-down:before {\n  content: \"\\f063\";\n}\n.fa-mail-forward:before,\n.fa-share:before {\n  content: \"\\f064\";\n}\n.fa-expand:before {\n  content: \"\\f065\";\n}\n.fa-compress:before {\n  content: \"\\f066\";\n}\n.fa-plus:before {\n  content: \"\\f067\";\n}\n.fa-minus:before {\n  content: \"\\f068\";\n}\n.fa-asterisk:before {\n  content: \"\\f069\";\n}\n.fa-exclamation-circle:before {\n  content: \"\\f06a\";\n}\n.fa-gift:before {\n  content: \"\\f06b\";\n}\n.fa-leaf:before {\n  content: \"\\f06c\";\n}\n.fa-fire:before {\n  content: \"\\f06d\";\n}\n.fa-eye:before {\n  content: \"\\f06e\";\n}\n.fa-eye-slash:before {\n  content: \"\\f070\";\n}\n.fa-warning:before,\n.fa-exclamation-triangle:before {\n  content: \"\\f071\";\n}\n.fa-plane:before {\n  content: \"\\f072\";\n}\n.fa-calendar:before {\n  content: \"\\f073\";\n}\n.fa-random:before {\n  content: \"\\f074\";\n}\n.fa-comment:before {\n  content: \"\\f075\";\n}\n.fa-magnet:before {\n  content: \"\\f076\";\n}\n.fa-chevron-up:before {\n  content: \"\\f077\";\n}\n.fa-chevron-down:before {\n  content: \"\\f078\";\n}\n.fa-retweet:before {\n  content: \"\\f079\";\n}\n.fa-shopping-cart:before {\n  content: \"\\f07a\";\n}\n.fa-folder:before {\n  content: \"\\f07b\";\n}\n.fa-folder-open:before {\n  content: \"\\f07c\";\n}\n.fa-arrows-v:before {\n  content: \"\\f07d\";\n}\n.fa-arrows-h:before {\n  content: \"\\f07e\";\n}\n.fa-bar-chart-o:before,\n.fa-bar-chart:before {\n  content: \"\\f080\";\n}\n.fa-twitter-square:before {\n  content: \"\\f081\";\n}\n.fa-facebook-square:before {\n  content: \"\\f082\";\n}\n.fa-camera-retro:before {\n  content: \"\\f083\";\n}\n.fa-key:before {\n  content: \"\\f084\";\n}\n.fa-gears:before,\n.fa-cogs:before {\n  content: \"\\f085\";\n}\n.fa-comments:before {\n  content: \"\\f086\";\n}\n.fa-thumbs-o-up:before {\n  content: \"\\f087\";\n}\n.fa-thumbs-o-down:before {\n  content: \"\\f088\";\n}\n.fa-star-half:before {\n  content: \"\\f089\";\n}\n.fa-heart-o:before {\n  content: \"\\f08a\";\n}\n.fa-sign-out:before {\n  content: \"\\f08b\";\n}\n.fa-linkedin-square:before {\n  content: \"\\f08c\";\n}\n.fa-thumb-tack:before {\n  content: \"\\f08d\";\n}\n.fa-external-link:before {\n  content: \"\\f08e\";\n}\n.fa-sign-in:before {\n  content: \"\\f090\";\n}\n.fa-trophy:before {\n  content: \"\\f091\";\n}\n.fa-github-square:before {\n  content: \"\\f092\";\n}\n.fa-upload:before {\n  content: \"\\f093\";\n}\n.fa-lemon-o:before {\n  content: \"\\f094\";\n}\n.fa-phone:before {\n  content: \"\\f095\";\n}\n.fa-square-o:before {\n  content: \"\\f096\";\n}\n.fa-bookmark-o:before {\n  content: \"\\f097\";\n}\n.fa-phone-square:before {\n  content: \"\\f098\";\n}\n.fa-twitter:before {\n  content: \"\\f099\";\n}\n.fa-facebook-f:before,\n.fa-facebook:before {\n  content: \"\\f09a\";\n}\n.fa-github:before {\n  content: \"\\f09b\";\n}\n.fa-unlock:before {\n  content: \"\\f09c\";\n}\n.fa-credit-card:before {\n  content: \"\\f09d\";\n}\n.fa-feed:before,\n.fa-rss:before {\n  content: \"\\f09e\";\n}\n.fa-hdd-o:before {\n  content: \"\\f0a0\";\n}\n.fa-bullhorn:before {\n  content: \"\\f0a1\";\n}\n.fa-bell:before {\n  content: \"\\f0f3\";\n}\n.fa-certificate:before {\n  content: \"\\f0a3\";\n}\n.fa-hand-o-right:before {\n  content: \"\\f0a4\";\n}\n.fa-hand-o-left:before {\n  content: \"\\f0a5\";\n}\n.fa-hand-o-up:before {\n  content: \"\\f0a6\";\n}\n.fa-hand-o-down:before {\n  content: \"\\f0a7\";\n}\n.fa-arrow-circle-left:before {\n  content: \"\\f0a8\";\n}\n.fa-arrow-circle-right:before {\n  content: \"\\f0a9\";\n}\n.fa-arrow-circle-up:before {\n  content: \"\\f0aa\";\n}\n.fa-arrow-circle-down:before {\n  content: \"\\f0ab\";\n}\n.fa-globe:before {\n  content: \"\\f0ac\";\n}\n.fa-wrench:before {\n  content: \"\\f0ad\";\n}\n.fa-tasks:before {\n  content: \"\\f0ae\";\n}\n.fa-filter:before {\n  content: \"\\f0b0\";\n}\n.fa-briefcase:before {\n  content: \"\\f0b1\";\n}\n.fa-arrows-alt:before {\n  content: \"\\f0b2\";\n}\n.fa-group:before,\n.fa-users:before {\n  content: \"\\f0c0\";\n}\n.fa-chain:before,\n.fa-link:before {\n  content: \"\\f0c1\";\n}\n.fa-cloud:before {\n  content: \"\\f0c2\";\n}\n.fa-flask:before {\n  content: \"\\f0c3\";\n}\n.fa-cut:before,\n.fa-scissors:before {\n  content: \"\\f0c4\";\n}\n.fa-copy:before,\n.fa-files-o:before {\n  content: \"\\f0c5\";\n}\n.fa-paperclip:before {\n  content: \"\\f0c6\";\n}\n.fa-save:before,\n.fa-floppy-o:before {\n  content: \"\\f0c7\";\n}\n.fa-square:before {\n  content: \"\\f0c8\";\n}\n.fa-navicon:before,\n.fa-reorder:before,\n.fa-bars:before {\n  content: \"\\f0c9\";\n}\n.fa-list-ul:before {\n  content: \"\\f0ca\";\n}\n.fa-list-ol:before {\n  content: \"\\f0cb\";\n}\n.fa-strikethrough:before {\n  content: \"\\f0cc\";\n}\n.fa-underline:before {\n  content: \"\\f0cd\";\n}\n.fa-table:before {\n  content: \"\\f0ce\";\n}\n.fa-magic:before {\n  content: \"\\f0d0\";\n}\n.fa-truck:before {\n  content: \"\\f0d1\";\n}\n.fa-pinterest:before {\n  content: \"\\f0d2\";\n}\n.fa-pinterest-square:before {\n  content: \"\\f0d3\";\n}\n.fa-google-plus-square:before {\n  content: \"\\f0d4\";\n}\n.fa-google-plus:before {\n  content: \"\\f0d5\";\n}\n.fa-money:before {\n  content: \"\\f0d6\";\n}\n.fa-caret-down:before {\n  content: \"\\f0d7\";\n}\n.fa-caret-up:before {\n  content: \"\\f0d8\";\n}\n.fa-caret-left:before {\n  content: \"\\f0d9\";\n}\n.fa-caret-right:before {\n  content: \"\\f0da\";\n}\n.fa-columns:before {\n  content: \"\\f0db\";\n}\n.fa-unsorted:before,\n.fa-sort:before {\n  content: \"\\f0dc\";\n}\n.fa-sort-down:before,\n.fa-sort-desc:before {\n  content: \"\\f0dd\";\n}\n.fa-sort-up:before,\n.fa-sort-asc:before {\n  content: \"\\f0de\";\n}\n.fa-envelope:before {\n  content: \"\\f0e0\";\n}\n.fa-linkedin:before {\n  content: \"\\f0e1\";\n}\n.fa-rotate-left:before,\n.fa-undo:before {\n  content: \"\\f0e2\";\n}\n.fa-legal:before,\n.fa-gavel:before {\n  content: \"\\f0e3\";\n}\n.fa-dashboard:before,\n.fa-tachometer:before {\n  content: \"\\f0e4\";\n}\n.fa-comment-o:before {\n  content: \"\\f0e5\";\n}\n.fa-comments-o:before {\n  content: \"\\f0e6\";\n}\n.fa-flash:before,\n.fa-bolt:before {\n  content: \"\\f0e7\";\n}\n.fa-sitemap:before {\n  content: \"\\f0e8\";\n}\n.fa-umbrella:before {\n  content: \"\\f0e9\";\n}\n.fa-paste:before,\n.fa-clipboard:before {\n  content: \"\\f0ea\";\n}\n.fa-lightbulb-o:before {\n  content: \"\\f0eb\";\n}\n.fa-exchange:before {\n  content: \"\\f0ec\";\n}\n.fa-cloud-download:before {\n  content: \"\\f0ed\";\n}\n.fa-cloud-upload:before {\n  content: \"\\f0ee\";\n}\n.fa-user-md:before {\n  content: \"\\f0f0\";\n}\n.fa-stethoscope:before {\n  content: \"\\f0f1\";\n}\n.fa-suitcase:before {\n  content: \"\\f0f2\";\n}\n.fa-bell-o:before {\n  content: \"\\f0a2\";\n}\n.fa-coffee:before {\n  content: \"\\f0f4\";\n}\n.fa-cutlery:before {\n  content: \"\\f0f5\";\n}\n.fa-file-text-o:before {\n  content: \"\\f0f6\";\n}\n.fa-building-o:before {\n  content: \"\\f0f7\";\n}\n.fa-hospital-o:before {\n  content: \"\\f0f8\";\n}\n.fa-ambulance:before {\n  content: \"\\f0f9\";\n}\n.fa-medkit:before {\n  content: \"\\f0fa\";\n}\n.fa-fighter-jet:before {\n  content: \"\\f0fb\";\n}\n.fa-beer:before {\n  content: \"\\f0fc\";\n}\n.fa-h-square:before {\n  content: \"\\f0fd\";\n}\n.fa-plus-square:before {\n  content: \"\\f0fe\";\n}\n.fa-angle-double-left:before {\n  content: \"\\f100\";\n}\n.fa-angle-double-right:before {\n  content: \"\\f101\";\n}\n.fa-angle-double-up:before {\n  content: \"\\f102\";\n}\n.fa-angle-double-down:before {\n  content: \"\\f103\";\n}\n.fa-angle-left:before {\n  content: \"\\f104\";\n}\n.fa-angle-right:before {\n  content: \"\\f105\";\n}\n.fa-angle-up:before {\n  content: \"\\f106\";\n}\n.fa-angle-down:before {\n  content: \"\\f107\";\n}\n.fa-desktop:before {\n  content: \"\\f108\";\n}\n.fa-laptop:before {\n  content: \"\\f109\";\n}\n.fa-tablet:before {\n  content: \"\\f10a\";\n}\n.fa-mobile-phone:before,\n.fa-mobile:before {\n  content: \"\\f10b\";\n}\n.fa-circle-o:before {\n  content: \"\\f10c\";\n}\n.fa-quote-left:before {\n  content: \"\\f10d\";\n}\n.fa-quote-right:before {\n  content: \"\\f10e\";\n}\n.fa-spinner:before {\n  content: \"\\f110\";\n}\n.fa-circle:before {\n  content: \"\\f111\";\n}\n.fa-mail-reply:before,\n.fa-reply:before {\n  content: \"\\f112\";\n}\n.fa-github-alt:before {\n  content: \"\\f113\";\n}\n.fa-folder-o:before {\n  content: \"\\f114\";\n}\n.fa-folder-open-o:before {\n  content: \"\\f115\";\n}\n.fa-smile-o:before {\n  content: \"\\f118\";\n}\n.fa-frown-o:before {\n  content: \"\\f119\";\n}\n.fa-meh-o:before {\n  content: \"\\f11a\";\n}\n.fa-gamepad:before {\n  content: \"\\f11b\";\n}\n.fa-keyboard-o:before {\n  content: \"\\f11c\";\n}\n.fa-flag-o:before {\n  content: \"\\f11d\";\n}\n.fa-flag-checkered:before {\n  content: \"\\f11e\";\n}\n.fa-terminal:before {\n  content: \"\\f120\";\n}\n.fa-code:before {\n  content: \"\\f121\";\n}\n.fa-mail-reply-all:before,\n.fa-reply-all:before {\n  content: \"\\f122\";\n}\n.fa-star-half-empty:before,\n.fa-star-half-full:before,\n.fa-star-half-o:before {\n  content: \"\\f123\";\n}\n.fa-location-arrow:before {\n  content: \"\\f124\";\n}\n.fa-crop:before {\n  content: \"\\f125\";\n}\n.fa-code-fork:before {\n  content: \"\\f126\";\n}\n.fa-unlink:before,\n.fa-chain-broken:before {\n  content: \"\\f127\";\n}\n.fa-question:before {\n  content: \"\\f128\";\n}\n.fa-info:before {\n  content: \"\\f129\";\n}\n.fa-exclamation:before {\n  content: \"\\f12a\";\n}\n.fa-superscript:before {\n  content: \"\\f12b\";\n}\n.fa-subscript:before {\n  content: \"\\f12c\";\n}\n.fa-eraser:before {\n  content: \"\\f12d\";\n}\n.fa-puzzle-piece:before {\n  content: \"\\f12e\";\n}\n.fa-microphone:before {\n  content: \"\\f130\";\n}\n.fa-microphone-slash:before {\n  content: \"\\f131\";\n}\n.fa-shield:before {\n  content: \"\\f132\";\n}\n.fa-calendar-o:before {\n  content: \"\\f133\";\n}\n.fa-fire-extinguisher:before {\n  content: \"\\f134\";\n}\n.fa-rocket:before {\n  content: \"\\f135\";\n}\n.fa-maxcdn:before {\n  content: \"\\f136\";\n}\n.fa-chevron-circle-left:before {\n  content: \"\\f137\";\n}\n.fa-chevron-circle-right:before {\n  content: \"\\f138\";\n}\n.fa-chevron-circle-up:before {\n  content: \"\\f139\";\n}\n.fa-chevron-circle-down:before {\n  content: \"\\f13a\";\n}\n.fa-html5:before {\n  content: \"\\f13b\";\n}\n.fa-css3:before {\n  content: \"\\f13c\";\n}\n.fa-anchor:before {\n  content: \"\\f13d\";\n}\n.fa-unlock-alt:before {\n  content: \"\\f13e\";\n}\n.fa-bullseye:before {\n  content: \"\\f140\";\n}\n.fa-ellipsis-h:before {\n  content: \"\\f141\";\n}\n.fa-ellipsis-v:before {\n  content: \"\\f142\";\n}\n.fa-rss-square:before {\n  content: \"\\f143\";\n}\n.fa-play-circle:before {\n  content: \"\\f144\";\n}\n.fa-ticket:before {\n  content: \"\\f145\";\n}\n.fa-minus-square:before {\n  content: \"\\f146\";\n}\n.fa-minus-square-o:before {\n  content: \"\\f147\";\n}\n.fa-level-up:before {\n  content: \"\\f148\";\n}\n.fa-level-down:before {\n  content: \"\\f149\";\n}\n.fa-check-square:before {\n  content: \"\\f14a\";\n}\n.fa-pencil-square:before {\n  content: \"\\f14b\";\n}\n.fa-external-link-square:before {\n  content: \"\\f14c\";\n}\n.fa-share-square:before {\n  content: \"\\f14d\";\n}\n.fa-compass:before {\n  content: \"\\f14e\";\n}\n.fa-toggle-down:before,\n.fa-caret-square-o-down:before {\n  content: \"\\f150\";\n}\n.fa-toggle-up:before,\n.fa-caret-square-o-up:before {\n  content: \"\\f151\";\n}\n.fa-toggle-right:before,\n.fa-caret-square-o-right:before {\n  content: \"\\f152\";\n}\n.fa-euro:before,\n.fa-eur:before {\n  content: \"\\f153\";\n}\n.fa-gbp:before {\n  content: \"\\f154\";\n}\n.fa-dollar:before,\n.fa-usd:before {\n  content: \"\\f155\";\n}\n.fa-rupee:before,\n.fa-inr:before {\n  content: \"\\f156\";\n}\n.fa-cny:before,\n.fa-rmb:before,\n.fa-yen:before,\n.fa-jpy:before {\n  content: \"\\f157\";\n}\n.fa-ruble:before,\n.fa-rouble:before,\n.fa-rub:before {\n  content: \"\\f158\";\n}\n.fa-won:before,\n.fa-krw:before {\n  content: \"\\f159\";\n}\n.fa-bitcoin:before,\n.fa-btc:before {\n  content: \"\\f15a\";\n}\n.fa-file:before {\n  content: \"\\f15b\";\n}\n.fa-file-text:before {\n  content: \"\\f15c\";\n}\n.fa-sort-alpha-asc:before {\n  content: \"\\f15d\";\n}\n.fa-sort-alpha-desc:before {\n  content: \"\\f15e\";\n}\n.fa-sort-amount-asc:before {\n  content: \"\\f160\";\n}\n.fa-sort-amount-desc:before {\n  content: \"\\f161\";\n}\n.fa-sort-numeric-asc:before {\n  content: \"\\f162\";\n}\n.fa-sort-numeric-desc:before {\n  content: \"\\f163\";\n}\n.fa-thumbs-up:before {\n  content: \"\\f164\";\n}\n.fa-thumbs-down:before {\n  content: \"\\f165\";\n}\n.fa-youtube-square:before {\n  content: \"\\f166\";\n}\n.fa-youtube:before {\n  content: \"\\f167\";\n}\n.fa-xing:before {\n  content: \"\\f168\";\n}\n.fa-xing-square:before {\n  content: \"\\f169\";\n}\n.fa-youtube-play:before {\n  content: \"\\f16a\";\n}\n.fa-dropbox:before {\n  content: \"\\f16b\";\n}\n.fa-stack-overflow:before {\n  content: \"\\f16c\";\n}\n.fa-instagram:before {\n  content: \"\\f16d\";\n}\n.fa-flickr:before {\n  content: \"\\f16e\";\n}\n.fa-adn:before {\n  content: \"\\f170\";\n}\n.fa-bitbucket:before {\n  content: \"\\f171\";\n}\n.fa-bitbucket-square:before {\n  content: \"\\f172\";\n}\n.fa-tumblr:before {\n  content: \"\\f173\";\n}\n.fa-tumblr-square:before {\n  content: \"\\f174\";\n}\n.fa-long-arrow-down:before {\n  content: \"\\f175\";\n}\n.fa-long-arrow-up:before {\n  content: \"\\f176\";\n}\n.fa-long-arrow-left:before {\n  content: \"\\f177\";\n}\n.fa-long-arrow-right:before {\n  content: \"\\f178\";\n}\n.fa-apple:before {\n  content: \"\\f179\";\n}\n.fa-windows:before {\n  content: \"\\f17a\";\n}\n.fa-android:before {\n  content: \"\\f17b\";\n}\n.fa-linux:before {\n  content: \"\\f17c\";\n}\n.fa-dribbble:before {\n  content: \"\\f17d\";\n}\n.fa-skype:before {\n  content: \"\\f17e\";\n}\n.fa-foursquare:before {\n  content: \"\\f180\";\n}\n.fa-trello:before {\n  content: \"\\f181\";\n}\n.fa-female:before {\n  content: \"\\f182\";\n}\n.fa-male:before {\n  content: \"\\f183\";\n}\n.fa-gittip:before,\n.fa-gratipay:before {\n  content: \"\\f184\";\n}\n.fa-sun-o:before {\n  content: \"\\f185\";\n}\n.fa-moon-o:before {\n  content: \"\\f186\";\n}\n.fa-archive:before {\n  content: \"\\f187\";\n}\n.fa-bug:before {\n  content: \"\\f188\";\n}\n.fa-vk:before {\n  content: \"\\f189\";\n}\n.fa-weibo:before {\n  content: \"\\f18a\";\n}\n.fa-renren:before {\n  content: \"\\f18b\";\n}\n.fa-pagelines:before {\n  content: \"\\f18c\";\n}\n.fa-stack-exchange:before {\n  content: \"\\f18d\";\n}\n.fa-arrow-circle-o-right:before {\n  content: \"\\f18e\";\n}\n.fa-arrow-circle-o-left:before {\n  content: \"\\f190\";\n}\n.fa-toggle-left:before,\n.fa-caret-square-o-left:before {\n  content: \"\\f191\";\n}\n.fa-dot-circle-o:before {\n  content: \"\\f192\";\n}\n.fa-wheelchair:before {\n  content: \"\\f193\";\n}\n.fa-vimeo-square:before {\n  content: \"\\f194\";\n}\n.fa-turkish-lira:before,\n.fa-try:before {\n  content: \"\\f195\";\n}\n.fa-plus-square-o:before {\n  content: \"\\f196\";\n}\n.fa-space-shuttle:before {\n  content: \"\\f197\";\n}\n.fa-slack:before {\n  content: \"\\f198\";\n}\n.fa-envelope-square:before {\n  content: \"\\f199\";\n}\n.fa-wordpress:before {\n  content: \"\\f19a\";\n}\n.fa-openid:before {\n  content: \"\\f19b\";\n}\n.fa-institution:before,\n.fa-bank:before,\n.fa-university:before {\n  content: \"\\f19c\";\n}\n.fa-mortar-board:before,\n.fa-graduation-cap:before {\n  content: \"\\f19d\";\n}\n.fa-yahoo:before {\n  content: \"\\f19e\";\n}\n.fa-google:before {\n  content: \"\\f1a0\";\n}\n.fa-reddit:before {\n  content: \"\\f1a1\";\n}\n.fa-reddit-square:before {\n  content: \"\\f1a2\";\n}\n.fa-stumbleupon-circle:before {\n  content: \"\\f1a3\";\n}\n.fa-stumbleupon:before {\n  content: \"\\f1a4\";\n}\n.fa-delicious:before {\n  content: \"\\f1a5\";\n}\n.fa-digg:before {\n  content: \"\\f1a6\";\n}\n.fa-pied-piper-pp:before {\n  content: \"\\f1a7\";\n}\n.fa-pied-piper-alt:before {\n  content: \"\\f1a8\";\n}\n.fa-drupal:before {\n  content: \"\\f1a9\";\n}\n.fa-joomla:before {\n  content: \"\\f1aa\";\n}\n.fa-language:before {\n  content: \"\\f1ab\";\n}\n.fa-fax:before {\n  content: \"\\f1ac\";\n}\n.fa-building:before {\n  content: \"\\f1ad\";\n}\n.fa-child:before {\n  content: \"\\f1ae\";\n}\n.fa-paw:before {\n  content: \"\\f1b0\";\n}\n.fa-spoon:before {\n  content: \"\\f1b1\";\n}\n.fa-cube:before {\n  content: \"\\f1b2\";\n}\n.fa-cubes:before {\n  content: \"\\f1b3\";\n}\n.fa-behance:before {\n  content: \"\\f1b4\";\n}\n.fa-behance-square:before {\n  content: \"\\f1b5\";\n}\n.fa-steam:before {\n  content: \"\\f1b6\";\n}\n.fa-steam-square:before {\n  content: \"\\f1b7\";\n}\n.fa-recycle:before {\n  content: \"\\f1b8\";\n}\n.fa-automobile:before,\n.fa-car:before {\n  content: \"\\f1b9\";\n}\n.fa-cab:before,\n.fa-taxi:before {\n  content: \"\\f1ba\";\n}\n.fa-tree:before {\n  content: \"\\f1bb\";\n}\n.fa-spotify:before {\n  content: \"\\f1bc\";\n}\n.fa-deviantart:before {\n  content: \"\\f1bd\";\n}\n.fa-soundcloud:before {\n  content: \"\\f1be\";\n}\n.fa-database:before {\n  content: \"\\f1c0\";\n}\n.fa-file-pdf-o:before {\n  content: \"\\f1c1\";\n}\n.fa-file-word-o:before {\n  content: \"\\f1c2\";\n}\n.fa-file-excel-o:before {\n  content: \"\\f1c3\";\n}\n.fa-file-powerpoint-o:before {\n  content: \"\\f1c4\";\n}\n.fa-file-photo-o:before,\n.fa-file-picture-o:before,\n.fa-file-image-o:before {\n  content: \"\\f1c5\";\n}\n.fa-file-zip-o:before,\n.fa-file-archive-o:before {\n  content: \"\\f1c6\";\n}\n.fa-file-sound-o:before,\n.fa-file-audio-o:before {\n  content: \"\\f1c7\";\n}\n.fa-file-movie-o:before,\n.fa-file-video-o:before {\n  content: \"\\f1c8\";\n}\n.fa-file-code-o:before {\n  content: \"\\f1c9\";\n}\n.fa-vine:before {\n  content: \"\\f1ca\";\n}\n.fa-codepen:before {\n  content: \"\\f1cb\";\n}\n.fa-jsfiddle:before {\n  content: \"\\f1cc\";\n}\n.fa-life-bouy:before,\n.fa-life-buoy:before,\n.fa-life-saver:before,\n.fa-support:before,\n.fa-life-ring:before {\n  content: \"\\f1cd\";\n}\n.fa-circle-o-notch:before {\n  content: \"\\f1ce\";\n}\n.fa-ra:before,\n.fa-resistance:before,\n.fa-rebel:before {\n  content: \"\\f1d0\";\n}\n.fa-ge:before,\n.fa-empire:before {\n  content: \"\\f1d1\";\n}\n.fa-git-square:before {\n  content: \"\\f1d2\";\n}\n.fa-git:before {\n  content: \"\\f1d3\";\n}\n.fa-y-combinator-square:before,\n.fa-yc-square:before,\n.fa-hacker-news:before {\n  content: \"\\f1d4\";\n}\n.fa-tencent-weibo:before {\n  content: \"\\f1d5\";\n}\n.fa-qq:before {\n  content: \"\\f1d6\";\n}\n.fa-wechat:before,\n.fa-weixin:before {\n  content: \"\\f1d7\";\n}\n.fa-send:before,\n.fa-paper-plane:before {\n  content: \"\\f1d8\";\n}\n.fa-send-o:before,\n.fa-paper-plane-o:before {\n  content: \"\\f1d9\";\n}\n.fa-history:before {\n  content: \"\\f1da\";\n}\n.fa-circle-thin:before {\n  content: \"\\f1db\";\n}\n.fa-header:before {\n  content: \"\\f1dc\";\n}\n.fa-paragraph:before {\n  content: \"\\f1dd\";\n}\n.fa-sliders:before {\n  content: \"\\f1de\";\n}\n.fa-share-alt:before {\n  content: \"\\f1e0\";\n}\n.fa-share-alt-square:before {\n  content: \"\\f1e1\";\n}\n.fa-bomb:before {\n  content: \"\\f1e2\";\n}\n.fa-soccer-ball-o:before,\n.fa-futbol-o:before {\n  content: \"\\f1e3\";\n}\n.fa-tty:before {\n  content: \"\\f1e4\";\n}\n.fa-binoculars:before {\n  content: \"\\f1e5\";\n}\n.fa-plug:before {\n  content: \"\\f1e6\";\n}\n.fa-slideshare:before {\n  content: \"\\f1e7\";\n}\n.fa-twitch:before {\n  content: \"\\f1e8\";\n}\n.fa-yelp:before {\n  content: \"\\f1e9\";\n}\n.fa-newspaper-o:before {\n  content: \"\\f1ea\";\n}\n.fa-wifi:before {\n  content: \"\\f1eb\";\n}\n.fa-calculator:before {\n  content: \"\\f1ec\";\n}\n.fa-paypal:before {\n  content: \"\\f1ed\";\n}\n.fa-google-wallet:before {\n  content: \"\\f1ee\";\n}\n.fa-cc-visa:before {\n  content: \"\\f1f0\";\n}\n.fa-cc-mastercard:before {\n  content: \"\\f1f1\";\n}\n.fa-cc-discover:before {\n  content: \"\\f1f2\";\n}\n.fa-cc-amex:before {\n  content: \"\\f1f3\";\n}\n.fa-cc-paypal:before {\n  content: \"\\f1f4\";\n}\n.fa-cc-stripe:before {\n  content: \"\\f1f5\";\n}\n.fa-bell-slash:before {\n  content: \"\\f1f6\";\n}\n.fa-bell-slash-o:before {\n  content: \"\\f1f7\";\n}\n.fa-trash:before {\n  content: \"\\f1f8\";\n}\n.fa-copyright:before {\n  content: \"\\f1f9\";\n}\n.fa-at:before {\n  content: \"\\f1fa\";\n}\n.fa-eyedropper:before {\n  content: \"\\f1fb\";\n}\n.fa-paint-brush:before {\n  content: \"\\f1fc\";\n}\n.fa-birthday-cake:before {\n  content: \"\\f1fd\";\n}\n.fa-area-chart:before {\n  content: \"\\f1fe\";\n}\n.fa-pie-chart:before {\n  content: \"\\f200\";\n}\n.fa-line-chart:before {\n  content: \"\\f201\";\n}\n.fa-lastfm:before {\n  content: \"\\f202\";\n}\n.fa-lastfm-square:before {\n  content: \"\\f203\";\n}\n.fa-toggle-off:before {\n  content: \"\\f204\";\n}\n.fa-toggle-on:before {\n  content: \"\\f205\";\n}\n.fa-bicycle:before {\n  content: \"\\f206\";\n}\n.fa-bus:before {\n  content: \"\\f207\";\n}\n.fa-ioxhost:before {\n  content: \"\\f208\";\n}\n.fa-angellist:before {\n  content: \"\\f209\";\n}\n.fa-cc:before {\n  content: \"\\f20a\";\n}\n.fa-shekel:before,\n.fa-sheqel:before,\n.fa-ils:before {\n  content: \"\\f20b\";\n}\n.fa-meanpath:before {\n  content: \"\\f20c\";\n}\n.fa-buysellads:before {\n  content: \"\\f20d\";\n}\n.fa-connectdevelop:before {\n  content: \"\\f20e\";\n}\n.fa-dashcube:before {\n  content: \"\\f210\";\n}\n.fa-forumbee:before {\n  content: \"\\f211\";\n}\n.fa-leanpub:before {\n  content: \"\\f212\";\n}\n.fa-sellsy:before {\n  content: \"\\f213\";\n}\n.fa-shirtsinbulk:before {\n  content: \"\\f214\";\n}\n.fa-simplybuilt:before {\n  content: \"\\f215\";\n}\n.fa-skyatlas:before {\n  content: \"\\f216\";\n}\n.fa-cart-plus:before {\n  content: \"\\f217\";\n}\n.fa-cart-arrow-down:before {\n  content: \"\\f218\";\n}\n.fa-diamond:before {\n  content: \"\\f219\";\n}\n.fa-ship:before {\n  content: \"\\f21a\";\n}\n.fa-user-secret:before {\n  content: \"\\f21b\";\n}\n.fa-motorcycle:before {\n  content: \"\\f21c\";\n}\n.fa-street-view:before {\n  content: \"\\f21d\";\n}\n.fa-heartbeat:before {\n  content: \"\\f21e\";\n}\n.fa-venus:before {\n  content: \"\\f221\";\n}\n.fa-mars:before {\n  content: \"\\f222\";\n}\n.fa-mercury:before {\n  content: \"\\f223\";\n}\n.fa-intersex:before,\n.fa-transgender:before {\n  content: \"\\f224\";\n}\n.fa-transgender-alt:before {\n  content: \"\\f225\";\n}\n.fa-venus-double:before {\n  content: \"\\f226\";\n}\n.fa-mars-double:before {\n  content: \"\\f227\";\n}\n.fa-venus-mars:before {\n  content: \"\\f228\";\n}\n.fa-mars-stroke:before {\n  content: \"\\f229\";\n}\n.fa-mars-stroke-v:before {\n  content: \"\\f22a\";\n}\n.fa-mars-stroke-h:before {\n  content: \"\\f22b\";\n}\n.fa-neuter:before {\n  content: \"\\f22c\";\n}\n.fa-genderless:before {\n  content: \"\\f22d\";\n}\n.fa-facebook-official:before {\n  content: \"\\f230\";\n}\n.fa-pinterest-p:before {\n  content: \"\\f231\";\n}\n.fa-whatsapp:before {\n  content: \"\\f232\";\n}\n.fa-server:before {\n  content: \"\\f233\";\n}\n.fa-user-plus:before {\n  content: \"\\f234\";\n}\n.fa-user-times:before {\n  content: \"\\f235\";\n}\n.fa-hotel:before,\n.fa-bed:before {\n  content: \"\\f236\";\n}\n.fa-viacoin:before {\n  content: \"\\f237\";\n}\n.fa-train:before {\n  content: \"\\f238\";\n}\n.fa-subway:before {\n  content: \"\\f239\";\n}\n.fa-medium:before {\n  content: \"\\f23a\";\n}\n.fa-yc:before,\n.fa-y-combinator:before {\n  content: \"\\f23b\";\n}\n.fa-optin-monster:before {\n  content: \"\\f23c\";\n}\n.fa-opencart:before {\n  content: \"\\f23d\";\n}\n.fa-expeditedssl:before {\n  content: \"\\f23e\";\n}\n.fa-battery-4:before,\n.fa-battery:before,\n.fa-battery-full:before {\n  content: \"\\f240\";\n}\n.fa-battery-3:before,\n.fa-battery-three-quarters:before {\n  content: \"\\f241\";\n}\n.fa-battery-2:before,\n.fa-battery-half:before {\n  content: \"\\f242\";\n}\n.fa-battery-1:before,\n.fa-battery-quarter:before {\n  content: \"\\f243\";\n}\n.fa-battery-0:before,\n.fa-battery-empty:before {\n  content: \"\\f244\";\n}\n.fa-mouse-pointer:before {\n  content: \"\\f245\";\n}\n.fa-i-cursor:before {\n  content: \"\\f246\";\n}\n.fa-object-group:before {\n  content: \"\\f247\";\n}\n.fa-object-ungroup:before {\n  content: \"\\f248\";\n}\n.fa-sticky-note:before {\n  content: \"\\f249\";\n}\n.fa-sticky-note-o:before {\n  content: \"\\f24a\";\n}\n.fa-cc-jcb:before {\n  content: \"\\f24b\";\n}\n.fa-cc-diners-club:before {\n  content: \"\\f24c\";\n}\n.fa-clone:before {\n  content: \"\\f24d\";\n}\n.fa-balance-scale:before {\n  content: \"\\f24e\";\n}\n.fa-hourglass-o:before {\n  content: \"\\f250\";\n}\n.fa-hourglass-1:before,\n.fa-hourglass-start:before {\n  content: \"\\f251\";\n}\n.fa-hourglass-2:before,\n.fa-hourglass-half:before {\n  content: \"\\f252\";\n}\n.fa-hourglass-3:before,\n.fa-hourglass-end:before {\n  content: \"\\f253\";\n}\n.fa-hourglass:before {\n  content: \"\\f254\";\n}\n.fa-hand-grab-o:before,\n.fa-hand-rock-o:before {\n  content: \"\\f255\";\n}\n.fa-hand-stop-o:before,\n.fa-hand-paper-o:before {\n  content: \"\\f256\";\n}\n.fa-hand-scissors-o:before {\n  content: \"\\f257\";\n}\n.fa-hand-lizard-o:before {\n  content: \"\\f258\";\n}\n.fa-hand-spock-o:before {\n  content: \"\\f259\";\n}\n.fa-hand-pointer-o:before {\n  content: \"\\f25a\";\n}\n.fa-hand-peace-o:before {\n  content: \"\\f25b\";\n}\n.fa-trademark:before {\n  content: \"\\f25c\";\n}\n.fa-registered:before {\n  content: \"\\f25d\";\n}\n.fa-creative-commons:before {\n  content: \"\\f25e\";\n}\n.fa-gg:before {\n  content: \"\\f260\";\n}\n.fa-gg-circle:before {\n  content: \"\\f261\";\n}\n.fa-tripadvisor:before {\n  content: \"\\f262\";\n}\n.fa-odnoklassniki:before {\n  content: \"\\f263\";\n}\n.fa-odnoklassniki-square:before {\n  content: \"\\f264\";\n}\n.fa-get-pocket:before {\n  content: \"\\f265\";\n}\n.fa-wikipedia-w:before {\n  content: \"\\f266\";\n}\n.fa-safari:before {\n  content: \"\\f267\";\n}\n.fa-chrome:before {\n  content: \"\\f268\";\n}\n.fa-firefox:before {\n  content: \"\\f269\";\n}\n.fa-opera:before {\n  content: \"\\f26a\";\n}\n.fa-internet-explorer:before {\n  content: \"\\f26b\";\n}\n.fa-tv:before,\n.fa-television:before {\n  content: \"\\f26c\";\n}\n.fa-contao:before {\n  content: \"\\f26d\";\n}\n.fa-500px:before {\n  content: \"\\f26e\";\n}\n.fa-amazon:before {\n  content: \"\\f270\";\n}\n.fa-calendar-plus-o:before {\n  content: \"\\f271\";\n}\n.fa-calendar-minus-o:before {\n  content: \"\\f272\";\n}\n.fa-calendar-times-o:before {\n  content: \"\\f273\";\n}\n.fa-calendar-check-o:before {\n  content: \"\\f274\";\n}\n.fa-industry:before {\n  content: \"\\f275\";\n}\n.fa-map-pin:before {\n  content: \"\\f276\";\n}\n.fa-map-signs:before {\n  content: \"\\f277\";\n}\n.fa-map-o:before {\n  content: \"\\f278\";\n}\n.fa-map:before {\n  content: \"\\f279\";\n}\n.fa-commenting:before {\n  content: \"\\f27a\";\n}\n.fa-commenting-o:before {\n  content: \"\\f27b\";\n}\n.fa-houzz:before {\n  content: \"\\f27c\";\n}\n.fa-vimeo:before {\n  content: \"\\f27d\";\n}\n.fa-black-tie:before {\n  content: \"\\f27e\";\n}\n.fa-fonticons:before {\n  content: \"\\f280\";\n}\n.fa-reddit-alien:before {\n  content: \"\\f281\";\n}\n.fa-edge:before {\n  content: \"\\f282\";\n}\n.fa-credit-card-alt:before {\n  content: \"\\f283\";\n}\n.fa-codiepie:before {\n  content: \"\\f284\";\n}\n.fa-modx:before {\n  content: \"\\f285\";\n}\n.fa-fort-awesome:before {\n  content: \"\\f286\";\n}\n.fa-usb:before {\n  content: \"\\f287\";\n}\n.fa-product-hunt:before {\n  content: \"\\f288\";\n}\n.fa-mixcloud:before {\n  content: \"\\f289\";\n}\n.fa-scribd:before {\n  content: \"\\f28a\";\n}\n.fa-pause-circle:before {\n  content: \"\\f28b\";\n}\n.fa-pause-circle-o:before {\n  content: \"\\f28c\";\n}\n.fa-stop-circle:before {\n  content: \"\\f28d\";\n}\n.fa-stop-circle-o:before {\n  content: \"\\f28e\";\n}\n.fa-shopping-bag:before {\n  content: \"\\f290\";\n}\n.fa-shopping-basket:before {\n  content: \"\\f291\";\n}\n.fa-hashtag:before {\n  content: \"\\f292\";\n}\n.fa-bluetooth:before {\n  content: \"\\f293\";\n}\n.fa-bluetooth-b:before {\n  content: \"\\f294\";\n}\n.fa-percent:before {\n  content: \"\\f295\";\n}\n.fa-gitlab:before {\n  content: \"\\f296\";\n}\n.fa-wpbeginner:before {\n  content: \"\\f297\";\n}\n.fa-wpforms:before {\n  content: \"\\f298\";\n}\n.fa-envira:before {\n  content: \"\\f299\";\n}\n.fa-universal-access:before {\n  content: \"\\f29a\";\n}\n.fa-wheelchair-alt:before {\n  content: \"\\f29b\";\n}\n.fa-question-circle-o:before {\n  content: \"\\f29c\";\n}\n.fa-blind:before {\n  content: \"\\f29d\";\n}\n.fa-audio-description:before {\n  content: \"\\f29e\";\n}\n.fa-volume-control-phone:before {\n  content: \"\\f2a0\";\n}\n.fa-braille:before {\n  content: \"\\f2a1\";\n}\n.fa-assistive-listening-systems:before {\n  content: \"\\f2a2\";\n}\n.fa-asl-interpreting:before,\n.fa-american-sign-language-interpreting:before {\n  content: \"\\f2a3\";\n}\n.fa-deafness:before,\n.fa-hard-of-hearing:before,\n.fa-deaf:before {\n  content: \"\\f2a4\";\n}\n.fa-glide:before {\n  content: \"\\f2a5\";\n}\n.fa-glide-g:before {\n  content: \"\\f2a6\";\n}\n.fa-signing:before,\n.fa-sign-language:before {\n  content: \"\\f2a7\";\n}\n.fa-low-vision:before {\n  content: \"\\f2a8\";\n}\n.fa-viadeo:before {\n  content: \"\\f2a9\";\n}\n.fa-viadeo-square:before {\n  content: \"\\f2aa\";\n}\n.fa-snapchat:before {\n  content: \"\\f2ab\";\n}\n.fa-snapchat-ghost:before {\n  content: \"\\f2ac\";\n}\n.fa-snapchat-square:before {\n  content: \"\\f2ad\";\n}\n.fa-pied-piper:before {\n  content: \"\\f2ae\";\n}\n.fa-first-order:before {\n  content: \"\\f2b0\";\n}\n.fa-yoast:before {\n  content: \"\\f2b1\";\n}\n.fa-themeisle:before {\n  content: \"\\f2b2\";\n}\n.fa-google-plus-circle:before,\n.fa-google-plus-official:before {\n  content: \"\\f2b3\";\n}\n.fa-fa:before,\n.fa-font-awesome:before {\n  content: \"\\f2b4\";\n}\n.fa-handshake-o:before {\n  content: \"\\f2b5\";\n}\n.fa-envelope-open:before {\n  content: \"\\f2b6\";\n}\n.fa-envelope-open-o:before {\n  content: \"\\f2b7\";\n}\n.fa-linode:before {\n  content: \"\\f2b8\";\n}\n.fa-address-book:before {\n  content: \"\\f2b9\";\n}\n.fa-address-book-o:before {\n  content: \"\\f2ba\";\n}\n.fa-vcard:before,\n.fa-address-card:before {\n  content: \"\\f2bb\";\n}\n.fa-vcard-o:before,\n.fa-address-card-o:before {\n  content: \"\\f2bc\";\n}\n.fa-user-circle:before {\n  content: \"\\f2bd\";\n}\n.fa-user-circle-o:before {\n  content: \"\\f2be\";\n}\n.fa-user-o:before {\n  content: \"\\f2c0\";\n}\n.fa-id-badge:before {\n  content: \"\\f2c1\";\n}\n.fa-drivers-license:before,\n.fa-id-card:before {\n  content: \"\\f2c2\";\n}\n.fa-drivers-license-o:before,\n.fa-id-card-o:before {\n  content: \"\\f2c3\";\n}\n.fa-quora:before {\n  content: \"\\f2c4\";\n}\n.fa-free-code-camp:before {\n  content: \"\\f2c5\";\n}\n.fa-telegram:before {\n  content: \"\\f2c6\";\n}\n.fa-thermometer-4:before,\n.fa-thermometer:before,\n.fa-thermometer-full:before {\n  content: \"\\f2c7\";\n}\n.fa-thermometer-3:before,\n.fa-thermometer-three-quarters:before {\n  content: \"\\f2c8\";\n}\n.fa-thermometer-2:before,\n.fa-thermometer-half:before {\n  content: \"\\f2c9\";\n}\n.fa-thermometer-1:before,\n.fa-thermometer-quarter:before {\n  content: \"\\f2ca\";\n}\n.fa-thermometer-0:before,\n.fa-thermometer-empty:before {\n  content: \"\\f2cb\";\n}\n.fa-shower:before {\n  content: \"\\f2cc\";\n}\n.fa-bathtub:before,\n.fa-s15:before,\n.fa-bath:before {\n  content: \"\\f2cd\";\n}\n.fa-podcast:before {\n  content: \"\\f2ce\";\n}\n.fa-window-maximize:before {\n  content: \"\\f2d0\";\n}\n.fa-window-minimize:before {\n  content: \"\\f2d1\";\n}\n.fa-window-restore:before {\n  content: \"\\f2d2\";\n}\n.fa-times-rectangle:before,\n.fa-window-close:before {\n  content: \"\\f2d3\";\n}\n.fa-times-rectangle-o:before,\n.fa-window-close-o:before {\n  content: \"\\f2d4\";\n}\n.fa-bandcamp:before {\n  content: \"\\f2d5\";\n}\n.fa-grav:before {\n  content: \"\\f2d6\";\n}\n.fa-etsy:before {\n  content: \"\\f2d7\";\n}\n.fa-imdb:before {\n  content: \"\\f2d8\";\n}\n.fa-ravelry:before {\n  content: \"\\f2d9\";\n}\n.fa-eercast:before {\n  content: \"\\f2da\";\n}\n.fa-microchip:before {\n  content: \"\\f2db\";\n}\n.fa-snowflake-o:before {\n  content: \"\\f2dc\";\n}\n.fa-superpowers:before {\n  content: \"\\f2dd\";\n}\n.fa-wpexplorer:before {\n  content: \"\\f2de\";\n}\n.fa-meetup:before {\n  content: \"\\f2e0\";\n}\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n.sr-only-focusable:active,\n.sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n#slideDeck {\n    height: 400px;\n    overflow-y: scroll;\n}\n::-webkit-scrollbar {\n    display: none;\n}\ndiv.slidedeck__slide {\n    background-color: #ccc;\n    margin-bottom: 0.5em;\n    border: 1px solid black;\n}\ntable.slides__table {\n    width: 300px;\n}\ntable.slides__table tr.selected {\n    background-color: #00b8d9;\n}\n.add {\n    font-family: \"FontAwesome\";\n}\ndiv.slidedeck__slide[draggable=\"true\"] {\n    background-color: #00b8d9;\n}\n.slides_background_rect {\n    fill: #ffffff;\n    stroke: #aaaaaa;\n}\n.slides_delay_rect {\n    fill: #dddddd;\n    stroke: #dddddd;\n}\n.slides_delay_resize,\n.slides_duration_resize {\n    fill: white;\n}\n.slides_rect {\n    fill: #f0f0f0;\n    stroke: #dddddd;\n    rx: 5px;\n    ry: 5px;\n}\n.slides_rect[selected=\"true\"] {\n    fill: #00b8d9;\n    stroke: #dddddd;\n}\n.slides_text {\n    fill: #000000;\n}\n.slides_delete_rect {\n    fill: #aaaaaa;\n}\n.slides_placeholder {\n    rx: 5px;\n    ry: 5px;\n    stroke-dasharray: 5;\n    fill-opacity: 0.1;\n    stroke: black;\n    stroke-width: 1px;\n}\n.slides_durationtext {\n    font-size: 12px;\n    font-weight: 600;\n}\napp-provenance-slides {\n    height: 50%;\n    width: 300px;\n    display: block;\n    background-color: #FFF;\n}\n.slides_background_rect {\n    fill: #FFFFFF;\n    opacity: .01;\n    stroke: #aaaaaa;\n}\n.slides_rect {\n    fill: #aaaaaa;\n    opacity: .7;\n    stroke: #dddddd;\n}\n.slides_delay_rect {\n    fill: #dddddd;\n    opacity: .7;\n    stroke: #dddddd;\n}\n.slides_rect[selected=true] {\n    fill: #00b8d9;\n    opacity: .7;\n    stroke: #dddddd;\n}"
+module.exports = "/*!\n *  Font Awesome 4.7.0 by @davegandy - http://fontawesome.io - @fontawesome\n *  License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)\n */\n/* FONT PATH\n * -------------------------- */\n@font-face {\n  font-family: 'FontAwesome';\n  src: url('fontawesome-webfont.eot?v=4.7.0');\n  src: url('fontawesome-webfont.eot?#iefix&v=4.7.0') format('embedded-opentype'), url('fontawesome-webfont.woff2?v=4.7.0') format('woff2'), url('fontawesome-webfont.woff?v=4.7.0') format('woff'), url('fontawesome-webfont.ttf?v=4.7.0') format('truetype'), url('fontawesome-webfont.svg?v=4.7.0#fontawesomeregular') format('svg');\n  font-weight: normal;\n  font-style: normal;\n}\n.fa {\n  display: inline-block;\n  font: normal normal normal 14px/1 FontAwesome;\n  font-size: inherit;\n  text-rendering: auto;\n  -webkit-font-smoothing: antialiased;\n  -moz-osx-font-smoothing: grayscale;\n}\n/* makes the font 33% larger relative to the icon container */\n.fa-lg {\n  font-size: 1.33333333em;\n  line-height: 0.75em;\n  vertical-align: -15%;\n}\n.fa-2x {\n  font-size: 2em;\n}\n.fa-3x {\n  font-size: 3em;\n}\n.fa-4x {\n  font-size: 4em;\n}\n.fa-5x {\n  font-size: 5em;\n}\n.fa-fw {\n  width: 1.28571429em;\n  text-align: center;\n}\n.fa-ul {\n  padding-left: 0;\n  margin-left: 2.14285714em;\n  list-style-type: none;\n}\n.fa-ul > li {\n  position: relative;\n}\n.fa-li {\n  position: absolute;\n  left: -2.14285714em;\n  width: 2.14285714em;\n  top: 0.14285714em;\n  text-align: center;\n}\n.fa-li.fa-lg {\n  left: -1.85714286em;\n}\n.fa-border {\n  padding: .2em .25em .15em;\n  border: solid 0.08em #eeeeee;\n  border-radius: .1em;\n}\n.fa-pull-left {\n  float: left;\n}\n.fa-pull-right {\n  float: right;\n}\n.fa.fa-pull-left {\n  margin-right: .3em;\n}\n.fa.fa-pull-right {\n  margin-left: .3em;\n}\n/* Deprecated as of 4.4.0 */\n.pull-right {\n  float: right;\n}\n.pull-left {\n  float: left;\n}\n.fa.pull-left {\n  margin-right: .3em;\n}\n.fa.pull-right {\n  margin-left: .3em;\n}\n.fa-spin {\n  -webkit-animation: fa-spin 2s infinite linear;\n  animation: fa-spin 2s infinite linear;\n}\n.fa-pulse {\n  -webkit-animation: fa-spin 1s infinite steps(8);\n  animation: fa-spin 1s infinite steps(8);\n}\n@-webkit-keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n@keyframes fa-spin {\n  0% {\n    -webkit-transform: rotate(0deg);\n    transform: rotate(0deg);\n  }\n  100% {\n    -webkit-transform: rotate(359deg);\n    transform: rotate(359deg);\n  }\n}\n.fa-rotate-90 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=1)\";\n  -webkit-transform: rotate(90deg);\n  transform: rotate(90deg);\n}\n.fa-rotate-180 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2)\";\n  -webkit-transform: rotate(180deg);\n  transform: rotate(180deg);\n}\n.fa-rotate-270 {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=3)\";\n  -webkit-transform: rotate(270deg);\n  transform: rotate(270deg);\n}\n.fa-flip-horizontal {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=0, mirror=1)\";\n  -webkit-transform: scale(-1, 1);\n  transform: scale(-1, 1);\n}\n.fa-flip-vertical {\n  -ms-filter: \"progid:DXImageTransform.Microsoft.BasicImage(rotation=2, mirror=1)\";\n  -webkit-transform: scale(1, -1);\n  transform: scale(1, -1);\n}\n:root .fa-rotate-90,\n:root .fa-rotate-180,\n:root .fa-rotate-270,\n:root .fa-flip-horizontal,\n:root .fa-flip-vertical {\n  -webkit-filter: none;\n          filter: none;\n}\n.fa-stack {\n  position: relative;\n  display: inline-block;\n  width: 2em;\n  height: 2em;\n  line-height: 2em;\n  vertical-align: middle;\n}\n.fa-stack-1x,\n.fa-stack-2x {\n  position: absolute;\n  left: 0;\n  width: 100%;\n  text-align: center;\n}\n.fa-stack-1x {\n  line-height: inherit;\n}\n.fa-stack-2x {\n  font-size: 2em;\n}\n.fa-inverse {\n  color: #ffffff;\n}\n/* Font Awesome uses the Unicode Private Use Area (PUA) to ensure screen\n   readers do not read off random characters that represent icons */\n.fa-glass:before {\n  content: \"\\f000\";\n}\n.fa-music:before {\n  content: \"\\f001\";\n}\n.fa-search:before {\n  content: \"\\f002\";\n}\n.fa-envelope-o:before {\n  content: \"\\f003\";\n}\n.fa-heart:before {\n  content: \"\\f004\";\n}\n.fa-star:before {\n  content: \"\\f005\";\n}\n.fa-star-o:before {\n  content: \"\\f006\";\n}\n.fa-user:before {\n  content: \"\\f007\";\n}\n.fa-film:before {\n  content: \"\\f008\";\n}\n.fa-th-large:before {\n  content: \"\\f009\";\n}\n.fa-th:before {\n  content: \"\\f00a\";\n}\n.fa-th-list:before {\n  content: \"\\f00b\";\n}\n.fa-check:before {\n  content: \"\\f00c\";\n}\n.fa-remove:before,\n.fa-close:before,\n.fa-times:before {\n  content: \"\\f00d\";\n}\n.fa-search-plus:before {\n  content: \"\\f00e\";\n}\n.fa-search-minus:before {\n  content: \"\\f010\";\n}\n.fa-power-off:before {\n  content: \"\\f011\";\n}\n.fa-signal:before {\n  content: \"\\f012\";\n}\n.fa-gear:before,\n.fa-cog:before {\n  content: \"\\f013\";\n}\n.fa-trash-o:before {\n  content: \"\\f014\";\n}\n.fa-home:before {\n  content: \"\\f015\";\n}\n.fa-file-o:before {\n  content: \"\\f016\";\n}\n.fa-clock-o:before {\n  content: \"\\f017\";\n}\n.fa-road:before {\n  content: \"\\f018\";\n}\n.fa-download:before {\n  content: \"\\f019\";\n}\n.fa-arrow-circle-o-down:before {\n  content: \"\\f01a\";\n}\n.fa-arrow-circle-o-up:before {\n  content: \"\\f01b\";\n}\n.fa-inbox:before {\n  content: \"\\f01c\";\n}\n.fa-play-circle-o:before {\n  content: \"\\f01d\";\n}\n.fa-rotate-right:before,\n.fa-repeat:before {\n  content: \"\\f01e\";\n}\n.fa-refresh:before {\n  content: \"\\f021\";\n}\n.fa-list-alt:before {\n  content: \"\\f022\";\n}\n.fa-lock:before {\n  content: \"\\f023\";\n}\n.fa-flag:before {\n  content: \"\\f024\";\n}\n.fa-headphones:before {\n  content: \"\\f025\";\n}\n.fa-volume-off:before {\n  content: \"\\f026\";\n}\n.fa-volume-down:before {\n  content: \"\\f027\";\n}\n.fa-volume-up:before {\n  content: \"\\f028\";\n}\n.fa-qrcode:before {\n  content: \"\\f029\";\n}\n.fa-barcode:before {\n  content: \"\\f02a\";\n}\n.fa-tag:before {\n  content: \"\\f02b\";\n}\n.fa-tags:before {\n  content: \"\\f02c\";\n}\n.fa-book:before {\n  content: \"\\f02d\";\n}\n.fa-bookmark:before {\n  content: \"\\f02e\";\n}\n.fa-print:before {\n  content: \"\\f02f\";\n}\n.fa-camera:before {\n  content: \"\\f030\";\n}\n.fa-font:before {\n  content: \"\\f031\";\n}\n.fa-bold:before {\n  content: \"\\f032\";\n}\n.fa-italic:before {\n  content: \"\\f033\";\n}\n.fa-text-height:before {\n  content: \"\\f034\";\n}\n.fa-text-width:before {\n  content: \"\\f035\";\n}\n.fa-align-left:before {\n  content: \"\\f036\";\n}\n.fa-align-center:before {\n  content: \"\\f037\";\n}\n.fa-align-right:before {\n  content: \"\\f038\";\n}\n.fa-align-justify:before {\n  content: \"\\f039\";\n}\n.fa-list:before {\n  content: \"\\f03a\";\n}\n.fa-dedent:before,\n.fa-outdent:before {\n  content: \"\\f03b\";\n}\n.fa-indent:before {\n  content: \"\\f03c\";\n}\n.fa-video-camera:before {\n  content: \"\\f03d\";\n}\n.fa-photo:before,\n.fa-image:before,\n.fa-picture-o:before {\n  content: \"\\f03e\";\n}\n.fa-pencil:before {\n  content: \"\\f040\";\n}\n.fa-map-marker:before {\n  content: \"\\f041\";\n}\n.fa-adjust:before {\n  content: \"\\f042\";\n}\n.fa-tint:before {\n  content: \"\\f043\";\n}\n.fa-edit:before,\n.fa-pencil-square-o:before {\n  content: \"\\f044\";\n}\n.fa-share-square-o:before {\n  content: \"\\f045\";\n}\n.fa-check-square-o:before {\n  content: \"\\f046\";\n}\n.fa-arrows:before {\n  content: \"\\f047\";\n}\n.fa-step-backward:before {\n  content: \"\\f048\";\n}\n.fa-fast-backward:before {\n  content: \"\\f049\";\n}\n.fa-backward:before {\n  content: \"\\f04a\";\n}\n.fa-play:before {\n  content: \"\\f04b\";\n}\n.fa-pause:before {\n  content: \"\\f04c\";\n}\n.fa-stop:before {\n  content: \"\\f04d\";\n}\n.fa-forward:before {\n  content: \"\\f04e\";\n}\n.fa-fast-forward:before {\n  content: \"\\f050\";\n}\n.fa-step-forward:before {\n  content: \"\\f051\";\n}\n.fa-eject:before {\n  content: \"\\f052\";\n}\n.fa-chevron-left:before {\n  content: \"\\f053\";\n}\n.fa-chevron-right:before {\n  content: \"\\f054\";\n}\n.fa-plus-circle:before {\n  content: \"\\f055\";\n}\n.fa-minus-circle:before {\n  content: \"\\f056\";\n}\n.fa-times-circle:before {\n  content: \"\\f057\";\n}\n.fa-check-circle:before {\n  content: \"\\f058\";\n}\n.fa-question-circle:before {\n  content: \"\\f059\";\n}\n.fa-info-circle:before {\n  content: \"\\f05a\";\n}\n.fa-crosshairs:before {\n  content: \"\\f05b\";\n}\n.fa-times-circle-o:before {\n  content: \"\\f05c\";\n}\n.fa-check-circle-o:before {\n  content: \"\\f05d\";\n}\n.fa-ban:before {\n  content: \"\\f05e\";\n}\n.fa-arrow-left:before {\n  content: \"\\f060\";\n}\n.fa-arrow-right:before {\n  content: \"\\f061\";\n}\n.fa-arrow-up:before {\n  content: \"\\f062\";\n}\n.fa-arrow-down:before {\n  content: \"\\f063\";\n}\n.fa-mail-forward:before,\n.fa-share:before {\n  content: \"\\f064\";\n}\n.fa-expand:before {\n  content: \"\\f065\";\n}\n.fa-compress:before {\n  content: \"\\f066\";\n}\n.fa-plus:before {\n  content: \"\\f067\";\n}\n.fa-minus:before {\n  content: \"\\f068\";\n}\n.fa-asterisk:before {\n  content: \"\\f069\";\n}\n.fa-exclamation-circle:before {\n  content: \"\\f06a\";\n}\n.fa-gift:before {\n  content: \"\\f06b\";\n}\n.fa-leaf:before {\n  content: \"\\f06c\";\n}\n.fa-fire:before {\n  content: \"\\f06d\";\n}\n.fa-eye:before {\n  content: \"\\f06e\";\n}\n.fa-eye-slash:before {\n  content: \"\\f070\";\n}\n.fa-warning:before,\n.fa-exclamation-triangle:before {\n  content: \"\\f071\";\n}\n.fa-plane:before {\n  content: \"\\f072\";\n}\n.fa-calendar:before {\n  content: \"\\f073\";\n}\n.fa-random:before {\n  content: \"\\f074\";\n}\n.fa-comment:before {\n  content: \"\\f075\";\n}\n.fa-magnet:before {\n  content: \"\\f076\";\n}\n.fa-chevron-up:before {\n  content: \"\\f077\";\n}\n.fa-chevron-down:before {\n  content: \"\\f078\";\n}\n.fa-retweet:before {\n  content: \"\\f079\";\n}\n.fa-shopping-cart:before {\n  content: \"\\f07a\";\n}\n.fa-folder:before {\n  content: \"\\f07b\";\n}\n.fa-folder-open:before {\n  content: \"\\f07c\";\n}\n.fa-arrows-v:before {\n  content: \"\\f07d\";\n}\n.fa-arrows-h:before {\n  content: \"\\f07e\";\n}\n.fa-bar-chart-o:before,\n.fa-bar-chart:before {\n  content: \"\\f080\";\n}\n.fa-twitter-square:before {\n  content: \"\\f081\";\n}\n.fa-facebook-square:before {\n  content: \"\\f082\";\n}\n.fa-camera-retro:before {\n  content: \"\\f083\";\n}\n.fa-key:before {\n  content: \"\\f084\";\n}\n.fa-gears:before,\n.fa-cogs:before {\n  content: \"\\f085\";\n}\n.fa-comments:before {\n  content: \"\\f086\";\n}\n.fa-thumbs-o-up:before {\n  content: \"\\f087\";\n}\n.fa-thumbs-o-down:before {\n  content: \"\\f088\";\n}\n.fa-star-half:before {\n  content: \"\\f089\";\n}\n.fa-heart-o:before {\n  content: \"\\f08a\";\n}\n.fa-sign-out:before {\n  content: \"\\f08b\";\n}\n.fa-linkedin-square:before {\n  content: \"\\f08c\";\n}\n.fa-thumb-tack:before {\n  content: \"\\f08d\";\n}\n.fa-external-link:before {\n  content: \"\\f08e\";\n}\n.fa-sign-in:before {\n  content: \"\\f090\";\n}\n.fa-trophy:before {\n  content: \"\\f091\";\n}\n.fa-github-square:before {\n  content: \"\\f092\";\n}\n.fa-upload:before {\n  content: \"\\f093\";\n}\n.fa-lemon-o:before {\n  content: \"\\f094\";\n}\n.fa-phone:before {\n  content: \"\\f095\";\n}\n.fa-square-o:before {\n  content: \"\\f096\";\n}\n.fa-bookmark-o:before {\n  content: \"\\f097\";\n}\n.fa-phone-square:before {\n  content: \"\\f098\";\n}\n.fa-twitter:before {\n  content: \"\\f099\";\n}\n.fa-facebook-f:before,\n.fa-facebook:before {\n  content: \"\\f09a\";\n}\n.fa-github:before {\n  content: \"\\f09b\";\n}\n.fa-unlock:before {\n  content: \"\\f09c\";\n}\n.fa-credit-card:before {\n  content: \"\\f09d\";\n}\n.fa-feed:before,\n.fa-rss:before {\n  content: \"\\f09e\";\n}\n.fa-hdd-o:before {\n  content: \"\\f0a0\";\n}\n.fa-bullhorn:before {\n  content: \"\\f0a1\";\n}\n.fa-bell:before {\n  content: \"\\f0f3\";\n}\n.fa-certificate:before {\n  content: \"\\f0a3\";\n}\n.fa-hand-o-right:before {\n  content: \"\\f0a4\";\n}\n.fa-hand-o-left:before {\n  content: \"\\f0a5\";\n}\n.fa-hand-o-up:before {\n  content: \"\\f0a6\";\n}\n.fa-hand-o-down:before {\n  content: \"\\f0a7\";\n}\n.fa-arrow-circle-left:before {\n  content: \"\\f0a8\";\n}\n.fa-arrow-circle-right:before {\n  content: \"\\f0a9\";\n}\n.fa-arrow-circle-up:before {\n  content: \"\\f0aa\";\n}\n.fa-arrow-circle-down:before {\n  content: \"\\f0ab\";\n}\n.fa-globe:before {\n  content: \"\\f0ac\";\n}\n.fa-wrench:before {\n  content: \"\\f0ad\";\n}\n.fa-tasks:before {\n  content: \"\\f0ae\";\n}\n.fa-filter:before {\n  content: \"\\f0b0\";\n}\n.fa-briefcase:before {\n  content: \"\\f0b1\";\n}\n.fa-arrows-alt:before {\n  content: \"\\f0b2\";\n}\n.fa-group:before,\n.fa-users:before {\n  content: \"\\f0c0\";\n}\n.fa-chain:before,\n.fa-link:before {\n  content: \"\\f0c1\";\n}\n.fa-cloud:before {\n  content: \"\\f0c2\";\n}\n.fa-flask:before {\n  content: \"\\f0c3\";\n}\n.fa-cut:before,\n.fa-scissors:before {\n  content: \"\\f0c4\";\n}\n.fa-copy:before,\n.fa-files-o:before {\n  content: \"\\f0c5\";\n}\n.fa-paperclip:before {\n  content: \"\\f0c6\";\n}\n.fa-save:before,\n.fa-floppy-o:before {\n  content: \"\\f0c7\";\n}\n.fa-square:before {\n  content: \"\\f0c8\";\n}\n.fa-navicon:before,\n.fa-reorder:before,\n.fa-bars:before {\n  content: \"\\f0c9\";\n}\n.fa-list-ul:before {\n  content: \"\\f0ca\";\n}\n.fa-list-ol:before {\n  content: \"\\f0cb\";\n}\n.fa-strikethrough:before {\n  content: \"\\f0cc\";\n}\n.fa-underline:before {\n  content: \"\\f0cd\";\n}\n.fa-table:before {\n  content: \"\\f0ce\";\n}\n.fa-magic:before {\n  content: \"\\f0d0\";\n}\n.fa-truck:before {\n  content: \"\\f0d1\";\n}\n.fa-pinterest:before {\n  content: \"\\f0d2\";\n}\n.fa-pinterest-square:before {\n  content: \"\\f0d3\";\n}\n.fa-google-plus-square:before {\n  content: \"\\f0d4\";\n}\n.fa-google-plus:before {\n  content: \"\\f0d5\";\n}\n.fa-money:before {\n  content: \"\\f0d6\";\n}\n.fa-caret-down:before {\n  content: \"\\f0d7\";\n}\n.fa-caret-up:before {\n  content: \"\\f0d8\";\n}\n.fa-caret-left:before {\n  content: \"\\f0d9\";\n}\n.fa-caret-right:before {\n  content: \"\\f0da\";\n}\n.fa-columns:before {\n  content: \"\\f0db\";\n}\n.fa-unsorted:before,\n.fa-sort:before {\n  content: \"\\f0dc\";\n}\n.fa-sort-down:before,\n.fa-sort-desc:before {\n  content: \"\\f0dd\";\n}\n.fa-sort-up:before,\n.fa-sort-asc:before {\n  content: \"\\f0de\";\n}\n.fa-envelope:before {\n  content: \"\\f0e0\";\n}\n.fa-linkedin:before {\n  content: \"\\f0e1\";\n}\n.fa-rotate-left:before,\n.fa-undo:before {\n  content: \"\\f0e2\";\n}\n.fa-legal:before,\n.fa-gavel:before {\n  content: \"\\f0e3\";\n}\n.fa-dashboard:before,\n.fa-tachometer:before {\n  content: \"\\f0e4\";\n}\n.fa-comment-o:before {\n  content: \"\\f0e5\";\n}\n.fa-comments-o:before {\n  content: \"\\f0e6\";\n}\n.fa-flash:before,\n.fa-bolt:before {\n  content: \"\\f0e7\";\n}\n.fa-sitemap:before {\n  content: \"\\f0e8\";\n}\n.fa-umbrella:before {\n  content: \"\\f0e9\";\n}\n.fa-paste:before,\n.fa-clipboard:before {\n  content: \"\\f0ea\";\n}\n.fa-lightbulb-o:before {\n  content: \"\\f0eb\";\n}\n.fa-exchange:before {\n  content: \"\\f0ec\";\n}\n.fa-cloud-download:before {\n  content: \"\\f0ed\";\n}\n.fa-cloud-upload:before {\n  content: \"\\f0ee\";\n}\n.fa-user-md:before {\n  content: \"\\f0f0\";\n}\n.fa-stethoscope:before {\n  content: \"\\f0f1\";\n}\n.fa-suitcase:before {\n  content: \"\\f0f2\";\n}\n.fa-bell-o:before {\n  content: \"\\f0a2\";\n}\n.fa-coffee:before {\n  content: \"\\f0f4\";\n}\n.fa-cutlery:before {\n  content: \"\\f0f5\";\n}\n.fa-file-text-o:before {\n  content: \"\\f0f6\";\n}\n.fa-building-o:before {\n  content: \"\\f0f7\";\n}\n.fa-hospital-o:before {\n  content: \"\\f0f8\";\n}\n.fa-ambulance:before {\n  content: \"\\f0f9\";\n}\n.fa-medkit:before {\n  content: \"\\f0fa\";\n}\n.fa-fighter-jet:before {\n  content: \"\\f0fb\";\n}\n.fa-beer:before {\n  content: \"\\f0fc\";\n}\n.fa-h-square:before {\n  content: \"\\f0fd\";\n}\n.fa-plus-square:before {\n  content: \"\\f0fe\";\n}\n.fa-angle-double-left:before {\n  content: \"\\f100\";\n}\n.fa-angle-double-right:before {\n  content: \"\\f101\";\n}\n.fa-angle-double-up:before {\n  content: \"\\f102\";\n}\n.fa-angle-double-down:before {\n  content: \"\\f103\";\n}\n.fa-angle-left:before {\n  content: \"\\f104\";\n}\n.fa-angle-right:before {\n  content: \"\\f105\";\n}\n.fa-angle-up:before {\n  content: \"\\f106\";\n}\n.fa-angle-down:before {\n  content: \"\\f107\";\n}\n.fa-desktop:before {\n  content: \"\\f108\";\n}\n.fa-laptop:before {\n  content: \"\\f109\";\n}\n.fa-tablet:before {\n  content: \"\\f10a\";\n}\n.fa-mobile-phone:before,\n.fa-mobile:before {\n  content: \"\\f10b\";\n}\n.fa-circle-o:before {\n  content: \"\\f10c\";\n}\n.fa-quote-left:before {\n  content: \"\\f10d\";\n}\n.fa-quote-right:before {\n  content: \"\\f10e\";\n}\n.fa-spinner:before {\n  content: \"\\f110\";\n}\n.fa-circle:before {\n  content: \"\\f111\";\n}\n.fa-mail-reply:before,\n.fa-reply:before {\n  content: \"\\f112\";\n}\n.fa-github-alt:before {\n  content: \"\\f113\";\n}\n.fa-folder-o:before {\n  content: \"\\f114\";\n}\n.fa-folder-open-o:before {\n  content: \"\\f115\";\n}\n.fa-smile-o:before {\n  content: \"\\f118\";\n}\n.fa-frown-o:before {\n  content: \"\\f119\";\n}\n.fa-meh-o:before {\n  content: \"\\f11a\";\n}\n.fa-gamepad:before {\n  content: \"\\f11b\";\n}\n.fa-keyboard-o:before {\n  content: \"\\f11c\";\n}\n.fa-flag-o:before {\n  content: \"\\f11d\";\n}\n.fa-flag-checkered:before {\n  content: \"\\f11e\";\n}\n.fa-terminal:before {\n  content: \"\\f120\";\n}\n.fa-code:before {\n  content: \"\\f121\";\n}\n.fa-mail-reply-all:before,\n.fa-reply-all:before {\n  content: \"\\f122\";\n}\n.fa-star-half-empty:before,\n.fa-star-half-full:before,\n.fa-star-half-o:before {\n  content: \"\\f123\";\n}\n.fa-location-arrow:before {\n  content: \"\\f124\";\n}\n.fa-crop:before {\n  content: \"\\f125\";\n}\n.fa-code-fork:before {\n  content: \"\\f126\";\n}\n.fa-unlink:before,\n.fa-chain-broken:before {\n  content: \"\\f127\";\n}\n.fa-question:before {\n  content: \"\\f128\";\n}\n.fa-info:before {\n  content: \"\\f129\";\n}\n.fa-exclamation:before {\n  content: \"\\f12a\";\n}\n.fa-superscript:before {\n  content: \"\\f12b\";\n}\n.fa-subscript:before {\n  content: \"\\f12c\";\n}\n.fa-eraser:before {\n  content: \"\\f12d\";\n}\n.fa-puzzle-piece:before {\n  content: \"\\f12e\";\n}\n.fa-microphone:before {\n  content: \"\\f130\";\n}\n.fa-microphone-slash:before {\n  content: \"\\f131\";\n}\n.fa-shield:before {\n  content: \"\\f132\";\n}\n.fa-calendar-o:before {\n  content: \"\\f133\";\n}\n.fa-fire-extinguisher:before {\n  content: \"\\f134\";\n}\n.fa-rocket:before {\n  content: \"\\f135\";\n}\n.fa-maxcdn:before {\n  content: \"\\f136\";\n}\n.fa-chevron-circle-left:before {\n  content: \"\\f137\";\n}\n.fa-chevron-circle-right:before {\n  content: \"\\f138\";\n}\n.fa-chevron-circle-up:before {\n  content: \"\\f139\";\n}\n.fa-chevron-circle-down:before {\n  content: \"\\f13a\";\n}\n.fa-html5:before {\n  content: \"\\f13b\";\n}\n.fa-css3:before {\n  content: \"\\f13c\";\n}\n.fa-anchor:before {\n  content: \"\\f13d\";\n}\n.fa-unlock-alt:before {\n  content: \"\\f13e\";\n}\n.fa-bullseye:before {\n  content: \"\\f140\";\n}\n.fa-ellipsis-h:before {\n  content: \"\\f141\";\n}\n.fa-ellipsis-v:before {\n  content: \"\\f142\";\n}\n.fa-rss-square:before {\n  content: \"\\f143\";\n}\n.fa-play-circle:before {\n  content: \"\\f144\";\n}\n.fa-ticket:before {\n  content: \"\\f145\";\n}\n.fa-minus-square:before {\n  content: \"\\f146\";\n}\n.fa-minus-square-o:before {\n  content: \"\\f147\";\n}\n.fa-level-up:before {\n  content: \"\\f148\";\n}\n.fa-level-down:before {\n  content: \"\\f149\";\n}\n.fa-check-square:before {\n  content: \"\\f14a\";\n}\n.fa-pencil-square:before {\n  content: \"\\f14b\";\n}\n.fa-external-link-square:before {\n  content: \"\\f14c\";\n}\n.fa-share-square:before {\n  content: \"\\f14d\";\n}\n.fa-compass:before {\n  content: \"\\f14e\";\n}\n.fa-toggle-down:before,\n.fa-caret-square-o-down:before {\n  content: \"\\f150\";\n}\n.fa-toggle-up:before,\n.fa-caret-square-o-up:before {\n  content: \"\\f151\";\n}\n.fa-toggle-right:before,\n.fa-caret-square-o-right:before {\n  content: \"\\f152\";\n}\n.fa-euro:before,\n.fa-eur:before {\n  content: \"\\f153\";\n}\n.fa-gbp:before {\n  content: \"\\f154\";\n}\n.fa-dollar:before,\n.fa-usd:before {\n  content: \"\\f155\";\n}\n.fa-rupee:before,\n.fa-inr:before {\n  content: \"\\f156\";\n}\n.fa-cny:before,\n.fa-rmb:before,\n.fa-yen:before,\n.fa-jpy:before {\n  content: \"\\f157\";\n}\n.fa-ruble:before,\n.fa-rouble:before,\n.fa-rub:before {\n  content: \"\\f158\";\n}\n.fa-won:before,\n.fa-krw:before {\n  content: \"\\f159\";\n}\n.fa-bitcoin:before,\n.fa-btc:before {\n  content: \"\\f15a\";\n}\n.fa-file:before {\n  content: \"\\f15b\";\n}\n.fa-file-text:before {\n  content: \"\\f15c\";\n}\n.fa-sort-alpha-asc:before {\n  content: \"\\f15d\";\n}\n.fa-sort-alpha-desc:before {\n  content: \"\\f15e\";\n}\n.fa-sort-amount-asc:before {\n  content: \"\\f160\";\n}\n.fa-sort-amount-desc:before {\n  content: \"\\f161\";\n}\n.fa-sort-numeric-asc:before {\n  content: \"\\f162\";\n}\n.fa-sort-numeric-desc:before {\n  content: \"\\f163\";\n}\n.fa-thumbs-up:before {\n  content: \"\\f164\";\n}\n.fa-thumbs-down:before {\n  content: \"\\f165\";\n}\n.fa-youtube-square:before {\n  content: \"\\f166\";\n}\n.fa-youtube:before {\n  content: \"\\f167\";\n}\n.fa-xing:before {\n  content: \"\\f168\";\n}\n.fa-xing-square:before {\n  content: \"\\f169\";\n}\n.fa-youtube-play:before {\n  content: \"\\f16a\";\n}\n.fa-dropbox:before {\n  content: \"\\f16b\";\n}\n.fa-stack-overflow:before {\n  content: \"\\f16c\";\n}\n.fa-instagram:before {\n  content: \"\\f16d\";\n}\n.fa-flickr:before {\n  content: \"\\f16e\";\n}\n.fa-adn:before {\n  content: \"\\f170\";\n}\n.fa-bitbucket:before {\n  content: \"\\f171\";\n}\n.fa-bitbucket-square:before {\n  content: \"\\f172\";\n}\n.fa-tumblr:before {\n  content: \"\\f173\";\n}\n.fa-tumblr-square:before {\n  content: \"\\f174\";\n}\n.fa-long-arrow-down:before {\n  content: \"\\f175\";\n}\n.fa-long-arrow-up:before {\n  content: \"\\f176\";\n}\n.fa-long-arrow-left:before {\n  content: \"\\f177\";\n}\n.fa-long-arrow-right:before {\n  content: \"\\f178\";\n}\n.fa-apple:before {\n  content: \"\\f179\";\n}\n.fa-windows:before {\n  content: \"\\f17a\";\n}\n.fa-android:before {\n  content: \"\\f17b\";\n}\n.fa-linux:before {\n  content: \"\\f17c\";\n}\n.fa-dribbble:before {\n  content: \"\\f17d\";\n}\n.fa-skype:before {\n  content: \"\\f17e\";\n}\n.fa-foursquare:before {\n  content: \"\\f180\";\n}\n.fa-trello:before {\n  content: \"\\f181\";\n}\n.fa-female:before {\n  content: \"\\f182\";\n}\n.fa-male:before {\n  content: \"\\f183\";\n}\n.fa-gittip:before,\n.fa-gratipay:before {\n  content: \"\\f184\";\n}\n.fa-sun-o:before {\n  content: \"\\f185\";\n}\n.fa-moon-o:before {\n  content: \"\\f186\";\n}\n.fa-archive:before {\n  content: \"\\f187\";\n}\n.fa-bug:before {\n  content: \"\\f188\";\n}\n.fa-vk:before {\n  content: \"\\f189\";\n}\n.fa-weibo:before {\n  content: \"\\f18a\";\n}\n.fa-renren:before {\n  content: \"\\f18b\";\n}\n.fa-pagelines:before {\n  content: \"\\f18c\";\n}\n.fa-stack-exchange:before {\n  content: \"\\f18d\";\n}\n.fa-arrow-circle-o-right:before {\n  content: \"\\f18e\";\n}\n.fa-arrow-circle-o-left:before {\n  content: \"\\f190\";\n}\n.fa-toggle-left:before,\n.fa-caret-square-o-left:before {\n  content: \"\\f191\";\n}\n.fa-dot-circle-o:before {\n  content: \"\\f192\";\n}\n.fa-wheelchair:before {\n  content: \"\\f193\";\n}\n.fa-vimeo-square:before {\n  content: \"\\f194\";\n}\n.fa-turkish-lira:before,\n.fa-try:before {\n  content: \"\\f195\";\n}\n.fa-plus-square-o:before {\n  content: \"\\f196\";\n}\n.fa-space-shuttle:before {\n  content: \"\\f197\";\n}\n.fa-slack:before {\n  content: \"\\f198\";\n}\n.fa-envelope-square:before {\n  content: \"\\f199\";\n}\n.fa-wordpress:before {\n  content: \"\\f19a\";\n}\n.fa-openid:before {\n  content: \"\\f19b\";\n}\n.fa-institution:before,\n.fa-bank:before,\n.fa-university:before {\n  content: \"\\f19c\";\n}\n.fa-mortar-board:before,\n.fa-graduation-cap:before {\n  content: \"\\f19d\";\n}\n.fa-yahoo:before {\n  content: \"\\f19e\";\n}\n.fa-google:before {\n  content: \"\\f1a0\";\n}\n.fa-reddit:before {\n  content: \"\\f1a1\";\n}\n.fa-reddit-square:before {\n  content: \"\\f1a2\";\n}\n.fa-stumbleupon-circle:before {\n  content: \"\\f1a3\";\n}\n.fa-stumbleupon:before {\n  content: \"\\f1a4\";\n}\n.fa-delicious:before {\n  content: \"\\f1a5\";\n}\n.fa-digg:before {\n  content: \"\\f1a6\";\n}\n.fa-pied-piper-pp:before {\n  content: \"\\f1a7\";\n}\n.fa-pied-piper-alt:before {\n  content: \"\\f1a8\";\n}\n.fa-drupal:before {\n  content: \"\\f1a9\";\n}\n.fa-joomla:before {\n  content: \"\\f1aa\";\n}\n.fa-language:before {\n  content: \"\\f1ab\";\n}\n.fa-fax:before {\n  content: \"\\f1ac\";\n}\n.fa-building:before {\n  content: \"\\f1ad\";\n}\n.fa-child:before {\n  content: \"\\f1ae\";\n}\n.fa-paw:before {\n  content: \"\\f1b0\";\n}\n.fa-spoon:before {\n  content: \"\\f1b1\";\n}\n.fa-cube:before {\n  content: \"\\f1b2\";\n}\n.fa-cubes:before {\n  content: \"\\f1b3\";\n}\n.fa-behance:before {\n  content: \"\\f1b4\";\n}\n.fa-behance-square:before {\n  content: \"\\f1b5\";\n}\n.fa-steam:before {\n  content: \"\\f1b6\";\n}\n.fa-steam-square:before {\n  content: \"\\f1b7\";\n}\n.fa-recycle:before {\n  content: \"\\f1b8\";\n}\n.fa-automobile:before,\n.fa-car:before {\n  content: \"\\f1b9\";\n}\n.fa-cab:before,\n.fa-taxi:before {\n  content: \"\\f1ba\";\n}\n.fa-tree:before {\n  content: \"\\f1bb\";\n}\n.fa-spotify:before {\n  content: \"\\f1bc\";\n}\n.fa-deviantart:before {\n  content: \"\\f1bd\";\n}\n.fa-soundcloud:before {\n  content: \"\\f1be\";\n}\n.fa-database:before {\n  content: \"\\f1c0\";\n}\n.fa-file-pdf-o:before {\n  content: \"\\f1c1\";\n}\n.fa-file-word-o:before {\n  content: \"\\f1c2\";\n}\n.fa-file-excel-o:before {\n  content: \"\\f1c3\";\n}\n.fa-file-powerpoint-o:before {\n  content: \"\\f1c4\";\n}\n.fa-file-photo-o:before,\n.fa-file-picture-o:before,\n.fa-file-image-o:before {\n  content: \"\\f1c5\";\n}\n.fa-file-zip-o:before,\n.fa-file-archive-o:before {\n  content: \"\\f1c6\";\n}\n.fa-file-sound-o:before,\n.fa-file-audio-o:before {\n  content: \"\\f1c7\";\n}\n.fa-file-movie-o:before,\n.fa-file-video-o:before {\n  content: \"\\f1c8\";\n}\n.fa-file-code-o:before {\n  content: \"\\f1c9\";\n}\n.fa-vine:before {\n  content: \"\\f1ca\";\n}\n.fa-codepen:before {\n  content: \"\\f1cb\";\n}\n.fa-jsfiddle:before {\n  content: \"\\f1cc\";\n}\n.fa-life-bouy:before,\n.fa-life-buoy:before,\n.fa-life-saver:before,\n.fa-support:before,\n.fa-life-ring:before {\n  content: \"\\f1cd\";\n}\n.fa-circle-o-notch:before {\n  content: \"\\f1ce\";\n}\n.fa-ra:before,\n.fa-resistance:before,\n.fa-rebel:before {\n  content: \"\\f1d0\";\n}\n.fa-ge:before,\n.fa-empire:before {\n  content: \"\\f1d1\";\n}\n.fa-git-square:before {\n  content: \"\\f1d2\";\n}\n.fa-git:before {\n  content: \"\\f1d3\";\n}\n.fa-y-combinator-square:before,\n.fa-yc-square:before,\n.fa-hacker-news:before {\n  content: \"\\f1d4\";\n}\n.fa-tencent-weibo:before {\n  content: \"\\f1d5\";\n}\n.fa-qq:before {\n  content: \"\\f1d6\";\n}\n.fa-wechat:before,\n.fa-weixin:before {\n  content: \"\\f1d7\";\n}\n.fa-send:before,\n.fa-paper-plane:before {\n  content: \"\\f1d8\";\n}\n.fa-send-o:before,\n.fa-paper-plane-o:before {\n  content: \"\\f1d9\";\n}\n.fa-history:before {\n  content: \"\\f1da\";\n}\n.fa-circle-thin:before {\n  content: \"\\f1db\";\n}\n.fa-header:before {\n  content: \"\\f1dc\";\n}\n.fa-paragraph:before {\n  content: \"\\f1dd\";\n}\n.fa-sliders:before {\n  content: \"\\f1de\";\n}\n.fa-share-alt:before {\n  content: \"\\f1e0\";\n}\n.fa-share-alt-square:before {\n  content: \"\\f1e1\";\n}\n.fa-bomb:before {\n  content: \"\\f1e2\";\n}\n.fa-soccer-ball-o:before,\n.fa-futbol-o:before {\n  content: \"\\f1e3\";\n}\n.fa-tty:before {\n  content: \"\\f1e4\";\n}\n.fa-binoculars:before {\n  content: \"\\f1e5\";\n}\n.fa-plug:before {\n  content: \"\\f1e6\";\n}\n.fa-slideshare:before {\n  content: \"\\f1e7\";\n}\n.fa-twitch:before {\n  content: \"\\f1e8\";\n}\n.fa-yelp:before {\n  content: \"\\f1e9\";\n}\n.fa-newspaper-o:before {\n  content: \"\\f1ea\";\n}\n.fa-wifi:before {\n  content: \"\\f1eb\";\n}\n.fa-calculator:before {\n  content: \"\\f1ec\";\n}\n.fa-paypal:before {\n  content: \"\\f1ed\";\n}\n.fa-google-wallet:before {\n  content: \"\\f1ee\";\n}\n.fa-cc-visa:before {\n  content: \"\\f1f0\";\n}\n.fa-cc-mastercard:before {\n  content: \"\\f1f1\";\n}\n.fa-cc-discover:before {\n  content: \"\\f1f2\";\n}\n.fa-cc-amex:before {\n  content: \"\\f1f3\";\n}\n.fa-cc-paypal:before {\n  content: \"\\f1f4\";\n}\n.fa-cc-stripe:before {\n  content: \"\\f1f5\";\n}\n.fa-bell-slash:before {\n  content: \"\\f1f6\";\n}\n.fa-bell-slash-o:before {\n  content: \"\\f1f7\";\n}\n.fa-trash:before {\n  content: \"\\f1f8\";\n}\n.fa-copyright:before {\n  content: \"\\f1f9\";\n}\n.fa-at:before {\n  content: \"\\f1fa\";\n}\n.fa-eyedropper:before {\n  content: \"\\f1fb\";\n}\n.fa-paint-brush:before {\n  content: \"\\f1fc\";\n}\n.fa-birthday-cake:before {\n  content: \"\\f1fd\";\n}\n.fa-area-chart:before {\n  content: \"\\f1fe\";\n}\n.fa-pie-chart:before {\n  content: \"\\f200\";\n}\n.fa-line-chart:before {\n  content: \"\\f201\";\n}\n.fa-lastfm:before {\n  content: \"\\f202\";\n}\n.fa-lastfm-square:before {\n  content: \"\\f203\";\n}\n.fa-toggle-off:before {\n  content: \"\\f204\";\n}\n.fa-toggle-on:before {\n  content: \"\\f205\";\n}\n.fa-bicycle:before {\n  content: \"\\f206\";\n}\n.fa-bus:before {\n  content: \"\\f207\";\n}\n.fa-ioxhost:before {\n  content: \"\\f208\";\n}\n.fa-angellist:before {\n  content: \"\\f209\";\n}\n.fa-cc:before {\n  content: \"\\f20a\";\n}\n.fa-shekel:before,\n.fa-sheqel:before,\n.fa-ils:before {\n  content: \"\\f20b\";\n}\n.fa-meanpath:before {\n  content: \"\\f20c\";\n}\n.fa-buysellads:before {\n  content: \"\\f20d\";\n}\n.fa-connectdevelop:before {\n  content: \"\\f20e\";\n}\n.fa-dashcube:before {\n  content: \"\\f210\";\n}\n.fa-forumbee:before {\n  content: \"\\f211\";\n}\n.fa-leanpub:before {\n  content: \"\\f212\";\n}\n.fa-sellsy:before {\n  content: \"\\f213\";\n}\n.fa-shirtsinbulk:before {\n  content: \"\\f214\";\n}\n.fa-simplybuilt:before {\n  content: \"\\f215\";\n}\n.fa-skyatlas:before {\n  content: \"\\f216\";\n}\n.fa-cart-plus:before {\n  content: \"\\f217\";\n}\n.fa-cart-arrow-down:before {\n  content: \"\\f218\";\n}\n.fa-diamond:before {\n  content: \"\\f219\";\n}\n.fa-ship:before {\n  content: \"\\f21a\";\n}\n.fa-user-secret:before {\n  content: \"\\f21b\";\n}\n.fa-motorcycle:before {\n  content: \"\\f21c\";\n}\n.fa-street-view:before {\n  content: \"\\f21d\";\n}\n.fa-heartbeat:before {\n  content: \"\\f21e\";\n}\n.fa-venus:before {\n  content: \"\\f221\";\n}\n.fa-mars:before {\n  content: \"\\f222\";\n}\n.fa-mercury:before {\n  content: \"\\f223\";\n}\n.fa-intersex:before,\n.fa-transgender:before {\n  content: \"\\f224\";\n}\n.fa-transgender-alt:before {\n  content: \"\\f225\";\n}\n.fa-venus-double:before {\n  content: \"\\f226\";\n}\n.fa-mars-double:before {\n  content: \"\\f227\";\n}\n.fa-venus-mars:before {\n  content: \"\\f228\";\n}\n.fa-mars-stroke:before {\n  content: \"\\f229\";\n}\n.fa-mars-stroke-v:before {\n  content: \"\\f22a\";\n}\n.fa-mars-stroke-h:before {\n  content: \"\\f22b\";\n}\n.fa-neuter:before {\n  content: \"\\f22c\";\n}\n.fa-genderless:before {\n  content: \"\\f22d\";\n}\n.fa-facebook-official:before {\n  content: \"\\f230\";\n}\n.fa-pinterest-p:before {\n  content: \"\\f231\";\n}\n.fa-whatsapp:before {\n  content: \"\\f232\";\n}\n.fa-server:before {\n  content: \"\\f233\";\n}\n.fa-user-plus:before {\n  content: \"\\f234\";\n}\n.fa-user-times:before {\n  content: \"\\f235\";\n}\n.fa-hotel:before,\n.fa-bed:before {\n  content: \"\\f236\";\n}\n.fa-viacoin:before {\n  content: \"\\f237\";\n}\n.fa-train:before {\n  content: \"\\f238\";\n}\n.fa-subway:before {\n  content: \"\\f239\";\n}\n.fa-medium:before {\n  content: \"\\f23a\";\n}\n.fa-yc:before,\n.fa-y-combinator:before {\n  content: \"\\f23b\";\n}\n.fa-optin-monster:before {\n  content: \"\\f23c\";\n}\n.fa-opencart:before {\n  content: \"\\f23d\";\n}\n.fa-expeditedssl:before {\n  content: \"\\f23e\";\n}\n.fa-battery-4:before,\n.fa-battery:before,\n.fa-battery-full:before {\n  content: \"\\f240\";\n}\n.fa-battery-3:before,\n.fa-battery-three-quarters:before {\n  content: \"\\f241\";\n}\n.fa-battery-2:before,\n.fa-battery-half:before {\n  content: \"\\f242\";\n}\n.fa-battery-1:before,\n.fa-battery-quarter:before {\n  content: \"\\f243\";\n}\n.fa-battery-0:before,\n.fa-battery-empty:before {\n  content: \"\\f244\";\n}\n.fa-mouse-pointer:before {\n  content: \"\\f245\";\n}\n.fa-i-cursor:before {\n  content: \"\\f246\";\n}\n.fa-object-group:before {\n  content: \"\\f247\";\n}\n.fa-object-ungroup:before {\n  content: \"\\f248\";\n}\n.fa-sticky-note:before {\n  content: \"\\f249\";\n}\n.fa-sticky-note-o:before {\n  content: \"\\f24a\";\n}\n.fa-cc-jcb:before {\n  content: \"\\f24b\";\n}\n.fa-cc-diners-club:before {\n  content: \"\\f24c\";\n}\n.fa-clone:before {\n  content: \"\\f24d\";\n}\n.fa-balance-scale:before {\n  content: \"\\f24e\";\n}\n.fa-hourglass-o:before {\n  content: \"\\f250\";\n}\n.fa-hourglass-1:before,\n.fa-hourglass-start:before {\n  content: \"\\f251\";\n}\n.fa-hourglass-2:before,\n.fa-hourglass-half:before {\n  content: \"\\f252\";\n}\n.fa-hourglass-3:before,\n.fa-hourglass-end:before {\n  content: \"\\f253\";\n}\n.fa-hourglass:before {\n  content: \"\\f254\";\n}\n.fa-hand-grab-o:before,\n.fa-hand-rock-o:before {\n  content: \"\\f255\";\n}\n.fa-hand-stop-o:before,\n.fa-hand-paper-o:before {\n  content: \"\\f256\";\n}\n.fa-hand-scissors-o:before {\n  content: \"\\f257\";\n}\n.fa-hand-lizard-o:before {\n  content: \"\\f258\";\n}\n.fa-hand-spock-o:before {\n  content: \"\\f259\";\n}\n.fa-hand-pointer-o:before {\n  content: \"\\f25a\";\n}\n.fa-hand-peace-o:before {\n  content: \"\\f25b\";\n}\n.fa-trademark:before {\n  content: \"\\f25c\";\n}\n.fa-registered:before {\n  content: \"\\f25d\";\n}\n.fa-creative-commons:before {\n  content: \"\\f25e\";\n}\n.fa-gg:before {\n  content: \"\\f260\";\n}\n.fa-gg-circle:before {\n  content: \"\\f261\";\n}\n.fa-tripadvisor:before {\n  content: \"\\f262\";\n}\n.fa-odnoklassniki:before {\n  content: \"\\f263\";\n}\n.fa-odnoklassniki-square:before {\n  content: \"\\f264\";\n}\n.fa-get-pocket:before {\n  content: \"\\f265\";\n}\n.fa-wikipedia-w:before {\n  content: \"\\f266\";\n}\n.fa-safari:before {\n  content: \"\\f267\";\n}\n.fa-chrome:before {\n  content: \"\\f268\";\n}\n.fa-firefox:before {\n  content: \"\\f269\";\n}\n.fa-opera:before {\n  content: \"\\f26a\";\n}\n.fa-internet-explorer:before {\n  content: \"\\f26b\";\n}\n.fa-tv:before,\n.fa-television:before {\n  content: \"\\f26c\";\n}\n.fa-contao:before {\n  content: \"\\f26d\";\n}\n.fa-500px:before {\n  content: \"\\f26e\";\n}\n.fa-amazon:before {\n  content: \"\\f270\";\n}\n.fa-calendar-plus-o:before {\n  content: \"\\f271\";\n}\n.fa-calendar-minus-o:before {\n  content: \"\\f272\";\n}\n.fa-calendar-times-o:before {\n  content: \"\\f273\";\n}\n.fa-calendar-check-o:before {\n  content: \"\\f274\";\n}\n.fa-industry:before {\n  content: \"\\f275\";\n}\n.fa-map-pin:before {\n  content: \"\\f276\";\n}\n.fa-map-signs:before {\n  content: \"\\f277\";\n}\n.fa-map-o:before {\n  content: \"\\f278\";\n}\n.fa-map:before {\n  content: \"\\f279\";\n}\n.fa-commenting:before {\n  content: \"\\f27a\";\n}\n.fa-commenting-o:before {\n  content: \"\\f27b\";\n}\n.fa-houzz:before {\n  content: \"\\f27c\";\n}\n.fa-vimeo:before {\n  content: \"\\f27d\";\n}\n.fa-black-tie:before {\n  content: \"\\f27e\";\n}\n.fa-fonticons:before {\n  content: \"\\f280\";\n}\n.fa-reddit-alien:before {\n  content: \"\\f281\";\n}\n.fa-edge:before {\n  content: \"\\f282\";\n}\n.fa-credit-card-alt:before {\n  content: \"\\f283\";\n}\n.fa-codiepie:before {\n  content: \"\\f284\";\n}\n.fa-modx:before {\n  content: \"\\f285\";\n}\n.fa-fort-awesome:before {\n  content: \"\\f286\";\n}\n.fa-usb:before {\n  content: \"\\f287\";\n}\n.fa-product-hunt:before {\n  content: \"\\f288\";\n}\n.fa-mixcloud:before {\n  content: \"\\f289\";\n}\n.fa-scribd:before {\n  content: \"\\f28a\";\n}\n.fa-pause-circle:before {\n  content: \"\\f28b\";\n}\n.fa-pause-circle-o:before {\n  content: \"\\f28c\";\n}\n.fa-stop-circle:before {\n  content: \"\\f28d\";\n}\n.fa-stop-circle-o:before {\n  content: \"\\f28e\";\n}\n.fa-shopping-bag:before {\n  content: \"\\f290\";\n}\n.fa-shopping-basket:before {\n  content: \"\\f291\";\n}\n.fa-hashtag:before {\n  content: \"\\f292\";\n}\n.fa-bluetooth:before {\n  content: \"\\f293\";\n}\n.fa-bluetooth-b:before {\n  content: \"\\f294\";\n}\n.fa-percent:before {\n  content: \"\\f295\";\n}\n.fa-gitlab:before {\n  content: \"\\f296\";\n}\n.fa-wpbeginner:before {\n  content: \"\\f297\";\n}\n.fa-wpforms:before {\n  content: \"\\f298\";\n}\n.fa-envira:before {\n  content: \"\\f299\";\n}\n.fa-universal-access:before {\n  content: \"\\f29a\";\n}\n.fa-wheelchair-alt:before {\n  content: \"\\f29b\";\n}\n.fa-question-circle-o:before {\n  content: \"\\f29c\";\n}\n.fa-blind:before {\n  content: \"\\f29d\";\n}\n.fa-audio-description:before {\n  content: \"\\f29e\";\n}\n.fa-volume-control-phone:before {\n  content: \"\\f2a0\";\n}\n.fa-braille:before {\n  content: \"\\f2a1\";\n}\n.fa-assistive-listening-systems:before {\n  content: \"\\f2a2\";\n}\n.fa-asl-interpreting:before,\n.fa-american-sign-language-interpreting:before {\n  content: \"\\f2a3\";\n}\n.fa-deafness:before,\n.fa-hard-of-hearing:before,\n.fa-deaf:before {\n  content: \"\\f2a4\";\n}\n.fa-glide:before {\n  content: \"\\f2a5\";\n}\n.fa-glide-g:before {\n  content: \"\\f2a6\";\n}\n.fa-signing:before,\n.fa-sign-language:before {\n  content: \"\\f2a7\";\n}\n.fa-low-vision:before {\n  content: \"\\f2a8\";\n}\n.fa-viadeo:before {\n  content: \"\\f2a9\";\n}\n.fa-viadeo-square:before {\n  content: \"\\f2aa\";\n}\n.fa-snapchat:before {\n  content: \"\\f2ab\";\n}\n.fa-snapchat-ghost:before {\n  content: \"\\f2ac\";\n}\n.fa-snapchat-square:before {\n  content: \"\\f2ad\";\n}\n.fa-pied-piper:before {\n  content: \"\\f2ae\";\n}\n.fa-first-order:before {\n  content: \"\\f2b0\";\n}\n.fa-yoast:before {\n  content: \"\\f2b1\";\n}\n.fa-themeisle:before {\n  content: \"\\f2b2\";\n}\n.fa-google-plus-circle:before,\n.fa-google-plus-official:before {\n  content: \"\\f2b3\";\n}\n.fa-fa:before,\n.fa-font-awesome:before {\n  content: \"\\f2b4\";\n}\n.fa-handshake-o:before {\n  content: \"\\f2b5\";\n}\n.fa-envelope-open:before {\n  content: \"\\f2b6\";\n}\n.fa-envelope-open-o:before {\n  content: \"\\f2b7\";\n}\n.fa-linode:before {\n  content: \"\\f2b8\";\n}\n.fa-address-book:before {\n  content: \"\\f2b9\";\n}\n.fa-address-book-o:before {\n  content: \"\\f2ba\";\n}\n.fa-vcard:before,\n.fa-address-card:before {\n  content: \"\\f2bb\";\n}\n.fa-vcard-o:before,\n.fa-address-card-o:before {\n  content: \"\\f2bc\";\n}\n.fa-user-circle:before {\n  content: \"\\f2bd\";\n}\n.fa-user-circle-o:before {\n  content: \"\\f2be\";\n}\n.fa-user-o:before {\n  content: \"\\f2c0\";\n}\n.fa-id-badge:before {\n  content: \"\\f2c1\";\n}\n.fa-drivers-license:before,\n.fa-id-card:before {\n  content: \"\\f2c2\";\n}\n.fa-drivers-license-o:before,\n.fa-id-card-o:before {\n  content: \"\\f2c3\";\n}\n.fa-quora:before {\n  content: \"\\f2c4\";\n}\n.fa-free-code-camp:before {\n  content: \"\\f2c5\";\n}\n.fa-telegram:before {\n  content: \"\\f2c6\";\n}\n.fa-thermometer-4:before,\n.fa-thermometer:before,\n.fa-thermometer-full:before {\n  content: \"\\f2c7\";\n}\n.fa-thermometer-3:before,\n.fa-thermometer-three-quarters:before {\n  content: \"\\f2c8\";\n}\n.fa-thermometer-2:before,\n.fa-thermometer-half:before {\n  content: \"\\f2c9\";\n}\n.fa-thermometer-1:before,\n.fa-thermometer-quarter:before {\n  content: \"\\f2ca\";\n}\n.fa-thermometer-0:before,\n.fa-thermometer-empty:before {\n  content: \"\\f2cb\";\n}\n.fa-shower:before {\n  content: \"\\f2cc\";\n}\n.fa-bathtub:before,\n.fa-s15:before,\n.fa-bath:before {\n  content: \"\\f2cd\";\n}\n.fa-podcast:before {\n  content: \"\\f2ce\";\n}\n.fa-window-maximize:before {\n  content: \"\\f2d0\";\n}\n.fa-window-minimize:before {\n  content: \"\\f2d1\";\n}\n.fa-window-restore:before {\n  content: \"\\f2d2\";\n}\n.fa-times-rectangle:before,\n.fa-window-close:before {\n  content: \"\\f2d3\";\n}\n.fa-times-rectangle-o:before,\n.fa-window-close-o:before {\n  content: \"\\f2d4\";\n}\n.fa-bandcamp:before {\n  content: \"\\f2d5\";\n}\n.fa-grav:before {\n  content: \"\\f2d6\";\n}\n.fa-etsy:before {\n  content: \"\\f2d7\";\n}\n.fa-imdb:before {\n  content: \"\\f2d8\";\n}\n.fa-ravelry:before {\n  content: \"\\f2d9\";\n}\n.fa-eercast:before {\n  content: \"\\f2da\";\n}\n.fa-microchip:before {\n  content: \"\\f2db\";\n}\n.fa-snowflake-o:before {\n  content: \"\\f2dc\";\n}\n.fa-superpowers:before {\n  content: \"\\f2dd\";\n}\n.fa-wpexplorer:before {\n  content: \"\\f2de\";\n}\n.fa-meetup:before {\n  content: \"\\f2e0\";\n}\n.sr-only {\n  position: absolute;\n  width: 1px;\n  height: 1px;\n  padding: 0;\n  margin: -1px;\n  overflow: hidden;\n  clip: rect(0, 0, 0, 0);\n  border: 0;\n}\n.sr-only-focusable:active,\n.sr-only-focusable:focus {\n  position: static;\n  width: auto;\n  height: auto;\n  margin: 0;\n  overflow: visible;\n  clip: auto;\n}\n#slideDeck {\n    height: 150px;\n    overflow-y: scroll;\n}\n::-webkit-scrollbar {\n    display: none;\n}\ndiv.slidedeck__slide {\n    background-color: #ccc;\n    margin-bottom: 0.5em;\n    border: 1px solid black;\n}\ntable.slides__table {\n    width: 300px;\n}\ntable.slides__table tr.selected {\n    background-color: #00b8d9;\n}\n.add {\n    font-family: \"FontAwesome\";\n}\ndiv.slidedeck__slide[draggable=\"true\"] {\n    background-color: #00b8d9;\n}\n.slides_background_rect {\n    fill: #ffffff;\n    stroke: #aaaaaa;\n}\n.slides_delay_rect {\n    fill: #dddddd;\n    stroke: #dddddd;\n}\n.slides_duration_resize {\n    fill: rgb(155, 155, 255);\n}\n.slides_delay_resize {\n    fill: rgb(255, 155, 155);\n}\n.slides_rect {\n    fill: #f0f0f0;\n    stroke: #dddddd;\n    rx: 5px;\n    ry: 5px;\n}\n.slides_rect[selected=\"true\"] {\n    fill: #00b8d9;\n    stroke: #dddddd;\n}\n.slides_text {\n    fill: #000000;\n}\n.slides_delete_rect {\n    fill: #aaaaaa;\n}\n.slides_placeholder {\n    rx: 5px;\n    ry: 5px;\n    stroke-dasharray: 5;\n    fill-opacity: 0.1;\n    stroke: black;\n    stroke-width: 1px;\n}\n.slides_durationtext {\n    font-weight: 600;\n}\n#player_placeholder {\n    stroke-dasharray: none;\n}\n#annotation-box {\n    stroke-dasharray: none;\n    fill: blue;\n    fill-opacity: 0.05;\n}\nsvg.annotation-area {\n    position: absolute;\n}\nrect.add_annotation {\n    position: absolute;\n    stroke: black;\n    stroke-width: 1px;\n}\napp-provenance-slides {\n    height: 150px;\n    width: 100%;\n    display: block;\n    background-color: #FFF;\n}\n.slides_background_rect {\n    fill: #FFFFFF;\n    opacity: .01;\n    stroke: #aaaaaa;\n}\n.slides_rect {\n    fill: #aaaaaa;\n    opacity: .7;\n    stroke: #dddddd;\n}\n.slides_delay_rect {\n    fill: #dddddd;\n    opacity: .7;\n    stroke: #dddddd;\n}\n.slides_rect[selected=true] {\n    fill: #00b8d9;\n    opacity: .7;\n    stroke: #dddddd;\n}"
 
 /***/ }),
 
@@ -4853,8 +6721,8 @@ module.exports = "/*!\n *  Font Awesome 4.7.0 by @davegandy - http://fontawesome
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceSlidesComponent", function() { return ProvenanceSlidesComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "./packages/@visualstorytelling/provenance-core/dist/provenance-core.es5.js");
-/* harmony import */ var _visualstorytelling_slide_deck_visualization__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/slide-deck-visualization */ "./packages/@visualstorytelling/slide-deck-visualization/dist/slide-deck-visualization.es5.js");
+/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
+/* harmony import */ var _visualstorytelling_slide_deck_visualization__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/slide-deck-visualization */ "../slide-deck-visualization/dist/slide-deck-visualization.es5.js");
 /* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
@@ -4901,6 +6769,66 @@ var ProvenanceSlidesComponent = /** @class */ (function () {
 
 /***/ }),
 
+/***/ "./src/app/provenance-task-list/provenance-task-list.component.css":
+/*!*************************************************************************!*\
+  !*** ./src/app/provenance-task-list/provenance-task-list.component.css ***!
+  \*************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ""
+
+/***/ }),
+
+/***/ "./src/app/provenance-task-list/provenance-task-list.component.ts":
+/*!************************************************************************!*\
+  !*** ./src/app/provenance-task-list/provenance-task-list.component.ts ***!
+  \************************************************************************/
+/*! exports provided: ProvenanceTaskListComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceTaskListComponent", function() { return ProvenanceTaskListComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
+/* harmony import */ var _visualstorytelling_provenance_task_list__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/provenance-task-list */ "../provenance-task-list/dist/provenance-task-list.es5.js");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var ProvenanceTaskListComponent = /** @class */ (function () {
+    function ProvenanceTaskListComponent(elementRef, provenance) {
+        this.elementRef = elementRef;
+        this.provenance = provenance;
+    }
+    ProvenanceTaskListComponent.prototype.ngOnInit = function () {
+        this._taskList = new _visualstorytelling_provenance_task_list__WEBPACK_IMPORTED_MODULE_2__["ProvenanceTaskList"](this.provenance.graph, this.elementRef.nativeElement);
+    };
+    ProvenanceTaskListComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-provenance-task-list',
+            template: '<div></div>',
+            styles: [__webpack_require__(/*! ./provenance-task-list.component.css */ "./src/app/provenance-task-list/provenance-task-list.component.css")]
+        }),
+        __metadata("design:paramtypes", [_angular_core__WEBPACK_IMPORTED_MODULE_0__["ElementRef"],
+            _provenance_service__WEBPACK_IMPORTED_MODULE_1__["ProvenanceService"]])
+    ], ProvenanceTaskListComponent);
+    return ProvenanceTaskListComponent;
+}());
+
+
+
+/***/ }),
+
 /***/ "./src/app/provenance-visualization/provenance-visualization.component.css":
 /*!*********************************************************************************!*\
   !*** ./src/app/provenance-visualization/provenance-visualization.component.css ***!
@@ -4908,7 +6836,7 @@ var ProvenanceSlidesComponent = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "app-provenance-visualization {\n    height: 50%;\n    width: 300px;\n    display: block;\n    background-color: white;\n}\n\n.node {\n    fill: lightsteelblue;\n    stroke: steelblue;\n    cursor: pointer;\n}\n\n.node circle {\n    stroke-width: .3px;\n    opacity: 0.6;\n}\n\n.node circle.keynode {\n    stroke: #000000;\n}\n\n.node circle.intent_none {\n    fill: #b0c4de;\n}\n\n.node circle.intent_exploration {\n    fill: #60aa85;\n}\n\n.node circle.intent_configuration {\n    fill: #b8852c;\n}\n\n.node circle.intent_selection {\n    fill: #286090;\n}\n\n.node circle.intent_derivation {\n    fill: #a94442;\n}\n\n.node circle.intent_provenance {\n    fill: #9210dd;\n}\n\n.node.branch-active {    \n    background-color: #ccc;\n}\n\n.node.branch-active text {\n    display: block;\n}\n\n.node.branch-active.node circle {\n    opacity: 1;\n    \n}\n\n.node.node-active {    \n    stroke: #4ba3bd;    \n}\n\n.node.node-active circle {\n    r: 3;\n}\n\n.node text {\n    display: none;\n    /* fill: white; */\n    fill: #000;\n    stroke-width: 0;\n    font-family: sans-serif;\n}\n\n.link {\n    fill: none;\n    /* stroke: white; */\n    stroke: #000;\n    stroke-width: .2px;\n}\n\n.link.active {\n    /* stroke: white; */\n    stroke: #000;\n    stroke-width: 0.8px;\n}"
+module.exports = "app-provenance-visualization {\n    height: 50%;\n    width: 300px;\n    display: block;\n    background-color: white;\n}\n\n.node {\n    fill: lightsteelblue;\n    stroke: steelblue;\n    cursor: pointer;\n}\n\n.node circle {\n    stroke-width: 0.3px;\n    opacity: 0.6;\n}\n\n.node circle.keynode {\n    stroke: #000000;\n}\n\n.node circle.intent_none {\n    fill: #b0c4de;\n}\n\n.node circle.intent_exploration {\n    fill: #60aa85;\n}\n\n.node circle.intent_configuration {\n    fill: #b8852c;\n}\n\n.node circle.intent_selection {\n    fill: #286090;\n}\n\n.node circle.intent_derivation {\n    fill: #a94442;\n}\n\n.node circle.intent_provenance {\n    fill: #9210dd;\n}\n\n.node circle.intent_wrapped {\n    fill: white;\n    stroke: black;\n    stroke-dasharray: 3;\n    stroke-width: .6px;\n}\n\n.node.branch-active {\n    background-color: #ccc;\n}\n\n.node.branch-active text {\n    display: block;\n}\n\n.node.branch-active.node circle {\n    opacity: 1;\n}\n\n.node.node-active {}\n\n.node.node-active circle {\n    stroke: black;\n    stroke-width: 1.5px;\n}\n\n.node text {\n    /* fill: white; */\n    fill: #000;\n    stroke-width: 0;\n    font-family: sans-serif;\n}\n\n.link {\n    fill: none;\n    /* stroke: white; */\n    stroke: #000;\n    stroke-width: .2px;\n}\n\n.link.active {\n    /* stroke: white; */\n    stroke: #000;\n    stroke-width: 0.8px;\n}\n\n.titleAggregation {\n    font-family: sans-serif;\n    font-size: 25px;\n}\n\n.dataAggregation-Box {\n    margin: 8px 0px 0px 12px;\n    font-family: sans-serif;\n}\n\n.aggButton {\n    width: 43%;\n    margin: 0px 10px 0px 5px;\n    font-size: 16px;\n    font-family: sans-serif;\n}\n\n.circle-text {\n    font-size: 6px;\n    display: block;\n}\n\n.circle-label {\n    font-size: 7px;\n}\n\n.hiddenClass {\n    display: none;\n}"
 
 /***/ }),
 
@@ -4924,7 +6852,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceVisualizationComponent", function() { return ProvenanceVisualizationComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _provenance_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provenance.service */ "./src/app/provenance.service.ts");
-/* harmony import */ var _visualstorytelling_provenance_tree_visualization__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/provenance-tree-visualization */ "./packages/@visualstorytelling/provenance-tree-visualization/dist/provenance-tree-visualization.es5.js");
+/* harmony import */ var _visualstorytelling_provenance_tree_visualization__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/provenance-tree-visualization */ "../provenance-tree-visualization/dist/provenance-tree-visualization.es5.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -4972,7 +6900,7 @@ var ProvenanceVisualizationComponent = /** @class */ (function () {
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ProvenanceService", function() { return ProvenanceService; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
-/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "./packages/@visualstorytelling/provenance-core/dist/provenance-core.es5.js");
+/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
 var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -4982,21 +6910,128 @@ var __decorate = (undefined && undefined.__decorate) || function (decorators, ta
 var __metadata = (undefined && undefined.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (undefined && undefined.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 
 
+var SAVE_STATUS = {
+    IDLE: 'idle',
+    SAVING: 'saving'
+};
 var ProvenanceService = /** @class */ (function () {
     function ProvenanceService() {
-        this.graph = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceGraph"]({ name: 'brainvis', version: '1.0.0' });
-        this.registry = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ActionFunctionRegistry"]();
-        this.tracker = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceTracker"](this.registry, this.graph);
-        this.traverser = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceGraphTraverser"](this.registry, this.graph, this.tracker);
-        // todo: remove objects from window (used for dev / debug)
-        var w = window;
-        w.graph = this.graph;
-        w.registry = this.registry;
-        w.tracker = this.tracker;
-        w.traverser = this.traverser;
+        var _this = this;
+        this.initialized = false;
+        this.saveStatus = SAVE_STATUS.IDLE;
+        this.init().then(function () { return _this.initialized = true; });
     }
+    ProvenanceService.prototype.saveGraph = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var serializedGraph, saveResult, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.saveStatus = SAVE_STATUS.SAVING;
+                        serializedGraph = JSON.stringify(Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["serializeProvenanceGraph"])(this.graph));
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, , 4]);
+                        return [4 /*yield*/, fetch('https://us-central1-brainvis.cloudfunctions.net/save', {
+                                method: 'POST',
+                                body: JSON.stringify({ graph: serializedGraph })
+                            }).then(function (result) { return result.json(); })];
+                    case 2:
+                        saveResult = _a.sent();
+                        window.history.pushState({}, 'Brainvis', "/?graph=" + saveResult.key);
+                        return [3 /*break*/, 4];
+                    case 3:
+                        e_1 = _a.sent();
+                        console.log(e_1);
+                        return [3 /*break*/, 4];
+                    case 4:
+                        this.saveStatus = SAVE_STATUS.IDLE;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ProvenanceService.prototype.tryRestoreGraph = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var parts, getResult, graph;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        parts = window.location.href.split('graph=');
+                        if (!(parts.length === 2)) return [3 /*break*/, 2];
+                        return [4 /*yield*/, fetch("https://us-central1-brainvis.cloudfunctions.net/get?key=" + parts[1])
+                                .then(function (result) { return result.json(); })];
+                    case 1:
+                        getResult = _a.sent();
+                        graph = Object(_visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["restoreProvenanceGraph"])(JSON.parse(getResult.graph));
+                        graph.current = graph.root;
+                        return [2 /*return*/, graph];
+                    case 2: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    ProvenanceService.prototype.init = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, w;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4 /*yield*/, this.tryRestoreGraph()];
+                    case 1:
+                        _a.graph = (_b.sent()) || new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceGraph"]({ name: 'brainvis', version: '1.0.0' });
+                        console.log(this.graph);
+                        this.registry = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ActionFunctionRegistry"]();
+                        this.tracker = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceTracker"](this.registry, this.graph);
+                        this.traverser = new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_1__["ProvenanceGraphTraverser"](this.registry, this.graph, this.tracker);
+                        w = window;
+                        w.graph = this.graph;
+                        w.registry = this.registry;
+                        w.tracker = this.tracker;
+                        w.traverser = this.traverser;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     ProvenanceService = __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Injectable"])({
             providedIn: 'root'
@@ -5028,7 +7063,7 @@ module.exports = ":host {\n    position: absolute;\n    top:0;\n    left: 0;\n  
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<button\n  mat-button\n  color=\"primary\"\n  id=\"alignButton\"\n  (click)=\"newAnnotation()\"\n>\n  Add annotation\n</button>\n\n<div *ngFor=\"let annotation of annotations\">\n  <input\n    draggable=\"true\"\n    (dragend)=\"dragEnd(annotation, $event)\"\n    [value]=\"annotation.data.text || ''\"\n    placeholder=\"Change me\"\n    (change)=\"updateAnnotation(annotation, $event.target.value)\"\n    [style.left.px]=\"annotationXY(annotation).x\"\n    [style.top.px]=\"annotationXY(annotation).y\"\n  />\n</div>"
+module.exports = "<div *ngFor=\"let annotation of annotations\">\n  <input\n    draggable=\"true\"\n    (dragend)=\"dragEnd(annotation, $event)\"\n    [value]=\"annotation.data.text || ''\"\n    placeholder=\"Change me\"\n    (change)=\"updateAnnotation(annotation, $event.target.value)\"\n    [style.left.px]=\"annotationXY(annotation).x\"\n    [style.top.px]=\"annotationXY(annotation).y\"\n  />\n</div>"
 
 /***/ }),
 
@@ -5044,7 +7079,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideAnnotationsComponent", function() { return SlideAnnotationsComponent; });
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
 /* harmony import */ var _provenance_slides_provenance_slides_component__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../provenance-slides/provenance-slides.component */ "./src/app/provenance-slides/provenance-slides.component.ts");
-/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "./packages/@visualstorytelling/provenance-core/dist/provenance-core.es5.js");
+/* harmony import */ var _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @visualstorytelling/provenance-core */ "../provenance-core/dist/provenance-core.es5.js");
 /* harmony import */ var _annotate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../annotate */ "./src/app/annotate.ts");
 var __assign = (undefined && undefined.__assign) || Object.assign || function(t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
@@ -5075,7 +7110,9 @@ var SlideAnnotationsComponent = /** @class */ (function () {
         this.console = console;
     }
     SlideAnnotationsComponent.prototype.ngOnInit = function () {
-        console.log(this.slides.deck.selectedSlide);
+        if (this.slides && this.slides.deck) {
+            console.log(this.slides.deck.selectedSlide);
+        }
     };
     Object.defineProperty(SlideAnnotationsComponent.prototype, "annotations", {
         get: function () {
@@ -5101,7 +7138,9 @@ var SlideAnnotationsComponent = /** @class */ (function () {
         return ({ x: 0, y: 0 });
     };
     SlideAnnotationsComponent.prototype.newAnnotation = function () {
-        this.slides.deck.selectedSlide.addAnnotation(new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_2__["SlideAnnotation"]({ text: '' }));
+        if (this.slides.deck.selectedSlide) {
+            this.slides.deck.selectedSlide.addAnnotation(new _visualstorytelling_provenance_core__WEBPACK_IMPORTED_MODULE_2__["SlideAnnotation"]({ text: '' }));
+        }
     };
     __decorate([
         Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
@@ -5116,6 +7155,95 @@ var SlideAnnotationsComponent = /** @class */ (function () {
         __metadata("design:paramtypes", [])
     ], SlideAnnotationsComponent);
     return SlideAnnotationsComponent;
+}());
+
+
+
+/***/ }),
+
+/***/ "./src/app/ui/slides-container/slides-container.component.css":
+/*!********************************************************************!*\
+  !*** ./src/app/ui/slides-container/slides-container.component.css ***!
+  \********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = ".animationContainer {\n    position: absolute;\n    bottom: 0;\n    width: 100vw;\n    z-index: 11;\n}\n\n#slidesnav-trigger {    \n    position: relative;\n    bottom: 10px;\n    color: orange;\n}"
+
+/***/ }),
+
+/***/ "./src/app/ui/slides-container/slides-container.component.html":
+/*!*********************************************************************!*\
+  !*** ./src/app/ui/slides-container/slides-container.component.html ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = "<div class=\"animationContainer\" [@slideContainer]=\"opened\">\n    <button mat-icon-button id=\"slidesnav-trigger\" mat-icon-button (click)=\"toggleBottomDrawer()\">\n        <mat-icon>menu</mat-icon>\n    </button>\n    <button mat-button color=\"primary\" id=\"annotationButton\" (click)=\"slideAnnotations.newAnnotation()\">\n        Add annotation\n    </button>\n    <ng-content></ng-content>\n</div>"
+
+/***/ }),
+
+/***/ "./src/app/ui/slides-container/slides-container.component.ts":
+/*!*******************************************************************!*\
+  !*** ./src/app/ui/slides-container/slides-container.component.ts ***!
+  \*******************************************************************/
+/*! exports provided: SlidesContainerComponent */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlidesContainerComponent", function() { return SlidesContainerComponent; });
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @angular/core */ "./node_modules/@angular/core/fesm5/core.js");
+/* harmony import */ var _angular_animations__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/animations */ "./node_modules/@angular/animations/fesm5/animations.js");
+/* harmony import */ var src_app_slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! src/app/slide-annotations/slide-annotations.component */ "./src/app/slide-annotations/slide-annotations.component.ts");
+var __decorate = (undefined && undefined.__decorate) || function (decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+var __metadata = (undefined && undefined.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
+};
+
+
+
+var SlidesContainerComponent = /** @class */ (function () {
+    function SlidesContainerComponent() {
+        this.opened = false;
+    }
+    SlidesContainerComponent.prototype.ngOnInit = function () {
+    };
+    SlidesContainerComponent.prototype.toggleBottomDrawer = function () {
+        this.opened = !this.opened;
+    };
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", src_app_slide_annotations_slide_annotations_component__WEBPACK_IMPORTED_MODULE_2__["SlideAnnotationsComponent"])
+    ], SlidesContainerComponent.prototype, "slideAnnotations", void 0);
+    __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Input"])(),
+        __metadata("design:type", Object)
+    ], SlidesContainerComponent.prototype, "opened", void 0);
+    SlidesContainerComponent = __decorate([
+        Object(_angular_core__WEBPACK_IMPORTED_MODULE_0__["Component"])({
+            selector: 'app-slides-container',
+            template: __webpack_require__(/*! ./slides-container.component.html */ "./src/app/ui/slides-container/slides-container.component.html"),
+            styles: [__webpack_require__(/*! ./slides-container.component.css */ "./src/app/ui/slides-container/slides-container.component.css")],
+            animations: [
+                Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["trigger"])('slideContainer', [
+                    Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["state"])('true', Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["style"])({
+                        transform: 'translateY(0)'
+                    })),
+                    Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["state"])('false', Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["style"])({
+                        transform: 'translateY(150px)'
+                    })),
+                    Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["transition"])('0 <=> 1', Object(_angular_animations__WEBPACK_IMPORTED_MODULE_1__["animate"])(100)),
+                ])
+            ]
+        })
+    ], SlidesContainerComponent);
+    return SlidesContainerComponent;
 }());
 
 
@@ -5198,7 +7326,7 @@ __webpack_require__(/*! ./init.ts */ "./src/init.ts");
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /mnt/c/Users/maarten/workspace/brainvis/src/main.ts */"./src/main.ts");
+module.exports = __webpack_require__(/*! /home/tom/Projects/prov/brainvis/src/main.ts */"./src/main.ts");
 
 
 /***/ })
