@@ -34,7 +34,7 @@ export class ProvenanceService {
         method: 'POST',
         body: JSON.stringify({ graph: serializedGraph })
       }).then(result => result.json());
-      window.history.pushState({}, 'Brainvis', `/?graph=${saveResult.key}`);
+      window.history.pushState({}, 'Brainvis', `?graph=${saveResult.key}`);
     } catch (e) {
       console.log(e);
     }
