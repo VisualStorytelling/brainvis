@@ -5,7 +5,16 @@ app-brainvis-canvas {
   position: absolute;
   bottom: 0;
   width: 100%;
+  height: 0%;
   background-color: rgba(0,0,0,.8);
+}
+/*New Container for elements on the top of the screen to make way for timeline at the bottom*/
+#top-container
+{
+  position: absolute;
+  top: 0;
+  width: 25%;
+  background-color: rgba(0,0,0,.0);
 }
 mat-sidenav {
   overflow: visible;
@@ -18,6 +27,7 @@ mat-sidenav-container, mat-sidenav-content {
 }
 
 #sidenav-trigger {
+  color: orange;
   position: absolute;
   left: -50px;
 }

@@ -1,0 +1,9 @@
+<div class="animationContainer" [@slideContainer]="opened">
+    <button mat-icon-button id="slidesnav-trigger" mat-icon-button (click)="toggleBottomDrawer()">
+        <mat-icon>menu</mat-icon>
+    </button>
+    <button mat-button color="primary" id="annotationButton" (click)="slideAnnotations.newAnnotation()">
+        Add annotation
+    </button>
+    <ng-content></ng-content>
+</div>

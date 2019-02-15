@@ -29,7 +29,7 @@ export default class AnnotationAnchor extends THREE.Object3D implements IInterse
         this.camera = camera;
         this.visible = true;
 
-        const geometrySphere = new THREE.SphereGeometry(5, 32, 32);
+        const geometrySphere = new THREE.SphereGeometry(1, 32, 32);
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
         this.sphere = new THREE.Mesh(geometrySphere, material);
