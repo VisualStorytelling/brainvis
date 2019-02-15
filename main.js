@@ -6975,7 +6975,7 @@ var ProvenanceService = /** @class */ (function () {
                             }).then(function (result) { return result.json(); })];
                     case 2:
                         saveResult = _a.sent();
-                        window.history.pushState({}, 'Brainvis', "/?graph=" + saveResult.key);
+                        window.history.pushState({}, 'Brainvis', "?graph=" + saveResult.key);
                         return [3 /*break*/, 4];
                     case 3:
                         e_1 = _a.sent();
