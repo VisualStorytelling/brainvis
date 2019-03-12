@@ -2,13 +2,6 @@
   "name": "brainvis",
   "version": "0.0.0",
   "homepage": "https://visualstorytelling.github.io/brainvis",
-  "workspaces": [
-    "packages/ami",
-    "packages/@visualstorytelling/provenance-core",
-    "packages/@visualstorytelling/provenance-tree-visualization",
-    "packages/@visualstorytelling/slide-deck-visualization",
-    "packages/@visualstorytelling/provenance-task-list"
-  ],
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
