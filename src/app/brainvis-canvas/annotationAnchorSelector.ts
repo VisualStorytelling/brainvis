@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 // const { Object3D } = THREE;
-import { IIntersectionListener } from './intersectionManager';
+import { IIntersectionListener } from './selectionHelpers/intersectionManager';
 
 export default class AnnotationAnchorSelector extends THREE.EventDispatcher implements IIntersectionListener {
     private objects: THREE.Object3D;

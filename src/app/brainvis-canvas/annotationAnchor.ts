@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { IntersectionManager, IIntersectionListener } from './intersectionManager';
+import { IntersectionManager, IIntersectionListener } from './selectionHelpers/intersectionManager';
 import { Vector3 } from 'three';
 import DragControls from 'three-dragcontrols';
 

@@ -1,24 +1,17 @@
-import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { View } from './view';
-
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
 
-import { IOrientation, ISlicePosition } from './types';
-
-import Trackball from './trackball';
+import { Component, ElementRef, OnInit } from '@angular/core';
+import { IOrientation, ISlicePosition, View } from './types';
+import { Trackball } from './trackball';
 import SliceManipulatorWidget from './sliceManipulatorWidget';
-import STLLoader from './stlLoader';
-import { IntersectionManager, StaticGeometryListener } from './intersectionManager';
-import ObjectSelector from './objectSelector';
-
-// import AnnotationAnchorSelector from './annotationAnchorSelector';
-import SegmentationVoxels from './segmentationVoxels';
-
+import STLLoader from './loaders/stlLoader';
+import { IntersectionManager, StaticGeometryListener } from './selectionHelpers/intersectionManager';
+import ObjectSelector from './selectionHelpers/objectSelector';
+import SegmentationVoxels from './selectionHelpers/segmentationVoxels';
 import { ProvenanceService } from '../provenance.service';
-import { registerActions } from './provenanceActions';
-import { addListeners } from './provenanceListeners';
-
+import { registerActions } from './provenanceHelpers/provenanceActions';
+import { addListeners } from './provenanceHelpers/provenanceListeners';
 import { Settings } from './settings';
 
 @Component({

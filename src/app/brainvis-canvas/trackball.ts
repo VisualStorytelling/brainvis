@@ -13,7 +13,7 @@
  */
 
 import * as THREE from 'three';
-import { View } from './view';
+import { View } from './types';
 
 export enum STATE {
   NONE = -1,
@@ -26,7 +26,7 @@ export enum STATE {
   CUSTOM = 99
 }
 
-export default class Trackball extends THREE.EventDispatcher {
+export class Trackball extends THREE.EventDispatcher {
   private state: STATE = STATE.NONE;
   private previousState: STATE = STATE.NONE;
   private views: View[];

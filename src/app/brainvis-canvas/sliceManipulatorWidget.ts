@@ -4,7 +4,7 @@
 
 import * as AMI from 'ami.js';
 import * as THREE from 'three';
-import { IntersectionManager, IIntersectionListener } from './intersectionManager';
+import { IntersectionManager, IIntersectionListener } from './selectionHelpers/intersectionManager';
 
 export default class SliceManipulatorWidget extends THREE.Object3D implements IIntersectionListener {
     private camera: THREE.Camera;

@@ -1,5 +1,5 @@
 import { ActionFunction, ActionFunctionRegistry } from '@visualstorytelling/provenance-core';
-import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunction} => ({
   setControlZoom: (args, transitionTime) => Promise.resolve(canvas.setControlZoom(args, transitionTime)),
