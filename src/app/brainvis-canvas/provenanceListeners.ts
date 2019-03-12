@@ -1,6 +1,7 @@
 import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 import { debounce } from 'lodash';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { Settings } from './settings';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
   canvas.addEventListener('cameraStart', (startEvent) => {
@@ -59,7 +60,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.showSliceChange.subscribe(val => {
+  canvas.settings.showSliceChange.subscribe(val => {
     tracker.applyAction({
       metadata: {userIntent: 'configuration'},
       do: 'showSlice',
@@ -69,7 +70,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.showSliceHandleChange.subscribe(val => {
+  canvas.settings.showSliceHandleChange.subscribe(val => {
     tracker.applyAction({
       metadata: {userIntent: 'configuration'},
       do: 'showSliceHandle',
@@ -79,7 +80,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.showObjectsChange.subscribe(val => {
+  canvas.settings.showObjectsChange.subscribe(val => {
     tracker.applyAction({
       metadata: {userIntent: 'configuration'},
       do: 'showObjects',
@@ -89,7 +90,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.editModeChange.subscribe(val => {
+  canvas.settings.editModeChange.subscribe(val => {
     tracker.applyAction({
       metadata: {userIntent: 'configuration'},
       do: 'editMode',
@@ -99,7 +100,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.alignModeChange.subscribe(val => {
+  canvas.settings.alignModeChange.subscribe(val => {
     tracker.applyAction({
       metadata: {userIntent: 'configuration'},
       do: 'alignMode',
@@ -109,7 +110,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
+  canvas.settings.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
     tracker.applyAction({
       metadata: {userIntent: 'selection'},
       do: 'selectedObjects',

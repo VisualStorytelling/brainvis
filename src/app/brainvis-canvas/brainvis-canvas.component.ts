@@ -19,174 +19,16 @@ import { ProvenanceService } from '../provenance.service';
 import { registerActions } from './provenanceActions';
 import { addListeners } from './provenanceListeners';
 
+import { Settings } from './settings';
+
 @Component({
   selector: 'app-brainvis-canvas',
   template: '',
   styleUrls: ['./brainvis-canvas.component.css']
 })
 export class BrainvisCanvasComponent extends THREE.EventDispatcher implements OnInit {
-  private doViews = false;
-
-  private _showSlice = true;
-  private _showSliceDisabled = false;
-  private _showSliceHandle = true;
-  private _showSliceHandleDisabled = false;
-  private _showObjects = true;
-  private _showObjectsDisabled = false;
-  private _editMode = false;
-  private _editModeDisabled = true;
-  private _quadView = false;
-  private _quadViewDisabled = false;
-  private _alignMode = false;
-  private _sliceMouseDown = false;
-  private objectSelector: ObjectSelector;
-  private _segmentationIsDeleting = false;
-  private _segmentationSize = 3;
-
-  private _thresholdLowerBound = 0;
-  private _thresholdUpperBound = 1426;
-  private _thresholdMinValue = 10;
-  private _thresholdMaxValue = 90;
-
-  private _colorMap = 'grayscale';
-  // private annotationAnchorSelector: AnnotationAnchorSelector;
-
-  @Input() set showSlice(showSlice: boolean) {
-    this._showSlice = showSlice;
-    this.showSliceChange.emit(showSlice);
-  }
-  @Output() showSliceChange = new EventEmitter<boolean>();
-  get showSlice() { return this._showSlice; }
-
-  @Input() set showSliceDisabled(showSliceDisabled: boolean) {
-    this._showSliceDisabled = showSliceDisabled;
-  }
-  get showSliceDisabled() { return this._showSliceDisabled; }
-
-  @Input() set showSliceHandle(showSliceHandle: boolean) {
-    this._showSliceHandle = showSliceHandle;
-    this.showSliceHandleChange.emit(showSliceHandle);
-  }
-  @Output() showSliceHandleChange = new EventEmitter<boolean>();
-  get showSliceHandle() { return this._showSliceHandle; }
-
-  @Input() set showSliceHandleDisabled(showSliceHandleDisabled: boolean) {
-    this._showSliceHandleDisabled = showSliceHandleDisabled;
-  }
-  get showSliceHandleDisabled() { return this._showSliceHandleDisabled; }
-
-  @Input() set showObjects(showObjects: boolean) {
-    this._showObjects = showObjects;
-    this.showObjectsChange.emit(showObjects);
-  }
-  @Output() showObjectsChange = new EventEmitter<boolean>();
-  get showObjects() { return this._showObjects; }
-
-  @Input() set showObjectsDisabled(showObjectsDisabled: boolean) {
-    this._showObjectsDisabled = showObjectsDisabled;
-  }
-  get showObjectsDisabled() { return this._showObjectsDisabled; }
-
-  @Input() set editMode(editMode: boolean) {
-    this._editMode = editMode;
-    this.editModeChange.emit(editMode);
-  }
-  @Output() editModeChange = new EventEmitter<boolean>();
-  get editMode() { return this._editMode; }
-
-  @Input() set editModeDisabled(editModeDisabled: boolean) {
-    this._editModeDisabled = editModeDisabled;
-  }
-  get editModeDisabled() { return this._editModeDisabled; }
-
-  @Input() set quadView(quadView: boolean) {
-    this._quadView = quadView;
-    this.quadViewChange.emit(quadView);
-  }
-  @Output() quadViewChange = new EventEmitter<boolean>();
-  get quadView() { return this._quadView; }
-
-  @Input() set quadViewDisabled(quadViewDisabled: boolean) {
-    this._quadViewDisabled = quadViewDisabled;
-  }
-  get quadViewDisabled() { return this._quadViewDisabled; }
-
-  @Input() set alignMode(alignMode: boolean) {
-    this._alignMode = alignMode;
-    this.toggleAlignMode(alignMode);
-    this.alignModeChange.emit(alignMode);
-  }
-  @Output() alignModeChange = new EventEmitter<boolean>();
-  get alignMode() { return this._alignMode; }
-
-  @Input() set selectedObjects(newSelectedObjects: THREE.Object3D[]) {
-    const oldSelectedObjects = this.objectSelector.getObjects();
-    this.objectSelector.setSelection(newSelectedObjects);
-    this.selectedObjectsChange.emit([newSelectedObjects, oldSelectedObjects]);
-  }
-  @Output() selectedObjectsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
-  get selectedObjects() { return this.objectSelector.getObjects(); }
-
-  @Input() set segmentationSize(value: number) {
-    this._segmentationSize = value;
-    this.segmentationSizeChange.emit(value);
-  }
-  @Output() segmentationSizeChange = new EventEmitter<number>();
-  get segmentationSize() { return this._segmentationSize; }
-
-  set thresholdLowerBound(value: number) {
-    this._thresholdLowerBound = value;
-  }
-  get thresholdLowerBound() { return this._thresholdLowerBound; }
-
-  set thresholdUpperBound(value: number) {
-    this._thresholdUpperBound = value;
-  }
-  get thresholdUpperBound() { return this._thresholdUpperBound; }
-
-  @Input() set thresholdMinValue(value: number) {
-    this._thresholdMinValue = value;
-    if (this.stackHelper) {
-      this.stackHelper.slice.lowerThreshold = this._thresholdMinValue;
-      this.stackHelper.slice.intensityAuto = false;
-    }
-    this.thresholdMinValueChange.emit(value);
-  }
-  get thresholdMinValue() { return this._thresholdMinValue; }
-  @Output() thresholdMinValueChange = new EventEmitter<number>();
-
-  @Input() set thresholdMaxValue(value: number) {
-    this._thresholdMaxValue = value;
-    if (this.stackHelper) {
-      this.stackHelper.slice.upperThreshold = this._thresholdMaxValue;
-      this.stackHelper.slice.intensityAuto = false;
-      // this.stackHelper.slice.thicknessMethod = 1;
-      // this.stackHelper.slice.thickness = 2;
-      // this.stackHelper.slice.steps = 2;
-    }
-    this.thresholdMaxValueChange.emit(value);
-  }
-  get thresholdMaxValue() { return this._thresholdMaxValue; }
-  @Output() thresholdMaxValueChange = new EventEmitter<number>();
-
-  @Input() set colorMap(value: string) {
-    this._colorMap = value;
-    if (this.stackHelper) {
-      this.stackHelper.slice.colorMap = this._colorMap;
-    }
-    this.colorMapValueChange.emit(value);
-  }
-  get colorMap() { return this._colorMap; }
-  @Output() colorMapValueChange = new EventEmitter<string>();
-
-
-  // @Input() set annotationAnchors(newAnchors: THREE.Object3D[]) {
-  //   const oldAnchors = this.annotationAnchorSelector.getObjects();
-  //   this.annotationAnchorSelector.setSelection(newAnchors);
-  //   this.annotationAnchorsChange.emit([newAnchors, oldAnchors]);
-  // }
-  // @Output() annotationAnchorsChange = new EventEmitter<[THREE.Object3D[], THREE.Object3D[]]>();
-  // get annotationAnchors() { return this.annotationAnchorSelector.getObjects(); }
+  public settings = Settings.getInstance(this);
+  public objectSelector: ObjectSelector;
 
   private width: number;
   private height: number;
@@ -245,7 +87,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private renderer = new THREE.WebGLRenderer();
   private controls: Trackball;
 
-  private stackHelper: AMI.StackHelper;
+  public stackHelper: AMI.StackHelper;
   private volumeRenderer: AMI.VolumeRenderingHelper;
   private sliceManipulator: SliceManipulatorWidget;
 
@@ -282,7 +124,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     this.scene.background = new THREE.Color('black');
 
-    // if (this._quadView) {
+    // if (this.settings.quadView) {
       this.views.forEach((v: View) => {
         const newCamera = new THREE.PerspectiveCamera(v.fov, this.width / this.height, 0.1, 10000);
         newCamera.position.copy(v.eye);
@@ -302,7 +144,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     canvasElm.style.display = 'block';
 
     // Setup controls
-    if (this._quadView) {
+    if (this.settings.quadView) {
       this.controls = new Trackball(this.views, 1, this.renderer.domElement);
     } else {
       this.views[1].left = 0;
@@ -390,7 +232,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
         this.sliceManipulator.addEventListener('zoomChange', this.onSlicePlaneZoomChange);
         this.sliceManipulator.addEventListener('orientationChange', this.onSlicePlaneOrientationChange);
-        this.sliceManipulator.visible = this._showSliceHandle;
+        this.sliceManipulator.visible = this.settings.showSliceHandle;
 
         this.intersectionManager.addListener(this.sliceManipulator);
 
@@ -488,14 +330,14 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     });
 
     this.objectSelector.addEventListener('objectSelection', (event: any) => {
-      this.selectedObjects = event.newObject;
+      this.settings.selectedObjects = event.newObject;
     });
 
     this.renderer.domElement.addEventListener('resize', this.onResize, false);
   }
 
   onResize() {
-    // if (this._quadView) {
+    // if (this.settings.quadView) {
       this.views.forEach((v: View) => {
         v.camera.aspect = window.innerWidth / window.innerWidth;
         v.camera.updateProjectionMatrix();
@@ -542,11 +384,11 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     requestAnimationFrame(this.animate);
 
     // update from settings
-    this.objects.visible = this._showObjects;
+    this.objects.visible = this.settings.showObjects;
     if (this.stackHelper) {
-      this.stackHelper._slice.visible = this._showSlice;
-      this.stackHelper._border.visible = this._showSlice;
-      this.sliceManipulator.visible = this._showSliceHandle;
+      this.stackHelper._slice.visible = this.settings.showSlice;
+      this.stackHelper._border.visible = this.settings.showSlice;
+      this.sliceManipulator.visible = this.settings.showSliceHandle;
     }
 
     // update light position
@@ -569,7 +411,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   render() {
-    if (this._quadView) {
+    if (this.settings.quadView) {
       this.views.forEach((v: View) => {
         const camera: THREE.PerspectiveCamera = v.camera;
         // v.updateCamera( camera, this.scene, mouseX, mouseY );
@@ -656,18 +498,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.cachedCameraOrigin = this.controls.camera.position.clone();
       this.cachedCameraTarget = this.controls.target.clone();
       this.cachedCameraUp = this.controls.camera.up.clone();
-      this.cachedObjectsShown = this.showObjects;
-      this.cachedSliceHandleShown = this.showSliceHandle;
-      this.cachedSliceShown = this.showSlice;
+      this.cachedObjectsShown = this.settings.showObjects;
+      this.cachedSliceHandleShown = this.settings.showSliceHandle;
+      this.cachedSliceShown = this.settings.showSlice;
 
       // Switch controls and settings that are appropriate for this mode
-      this._showObjects = false;
-      this.showObjectsDisabled = true;
-      this._showSliceHandle = false;
-      this.showSliceHandleDisabled = true;
-      this._showSlice = true;
-      this.showSliceDisabled = true;
-      this.editModeDisabled = false;
+      this.settings.showObjects = false;
+      this.settings.showObjectsDisabled = true;
+      this.settings.showSliceHandle = false;
+      this.settings.showSliceHandleDisabled = true;
+      this.settings.showSlice = true;
+      this.settings.showSliceDisabled = true;
+      this.settings.editModeDisabled = false;
 
       // store the camera position for later restoration
       const cameraPosition: THREE.Vector3 = this.stackHelper.slice.planePosition.clone();
@@ -693,13 +535,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.controls.changeCamera(this.cachedCameraOrigin, this.cachedCameraTarget, this.cachedCameraUp, 0);
 
       // reset to old settings before align mode
-      this._showSlice = this.cachedSliceShown;
-      this.showSliceDisabled = false;
-      this._showSliceHandle = this.cachedSliceHandleShown;
-      this.showSliceHandleDisabled = false;
-      this._showObjects = this.cachedObjectsShown;
-      this.showObjectsDisabled = false;
-      this.editModeDisabled = true;
+      this.settings.showSlice = this.cachedSliceShown;
+      this.settings.showSliceDisabled = false;
+      this.settings.showSliceHandle = this.cachedSliceHandleShown;
+      this.settings.showSliceHandleDisabled = false;
+      this.settings.showObjects = this.cachedObjectsShown;
+      this.settings.showObjectsDisabled = false;
+      this.settings.editModeDisabled = true;
     }
   }
 
@@ -742,13 +584,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       this.moveCameraTo2DSlice();
     } else {
       this.moveCameraFrom2DSlice();
-      this.editMode = false;
+      this.settings.editMode = false;
     }
   }
 
   mousewheel(event) {
     // TODO: check bounds
-    if (this._alignMode === false) { return; }
+    if (this.settings.alignMode === false) { return; }
 
     event.preventDefault();
     event.stopPropagation();
@@ -790,32 +632,32 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   sliceMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
-    if (intersection && this.editMode) {
-      this._sliceMouseDown = true;
+    if (intersection && this.settings.editMode) {
+      this.settings.sliceMouseDown = true;
 
       if (this.segmentationVoxels.getGridPoint(intersection.point)) {
-        this._segmentationIsDeleting = true;
-        this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, false);
+        this.settings.segmentationIsDeleting = true;
+        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
       } else {
-        this._segmentationIsDeleting = false;
-        this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, true);
+        this.settings.segmentationIsDeleting = false;
+        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
       }
     }
   }
 
   sliceMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
     if (intersection) {
-      this._sliceMouseDown = false;
-      this._segmentationIsDeleting = false;
+      this.settings.sliceMouseDown = false;
+      this.settings.segmentationIsDeleting = false;
     }
   }
 
   sliceMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
-    if (intersection && this.editMode && this._sliceMouseDown) {
-      if (this._segmentationIsDeleting) {
-        this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, false);
+    if (intersection && this.settings.editMode && this.settings.sliceMouseDown) {
+      if (this.settings.segmentationIsDeleting) {
+        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
       } else {
-        this.segmentationVoxels.paintAt(intersection.point, this.segmentationSize, true);
+        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
       }
     }
   }

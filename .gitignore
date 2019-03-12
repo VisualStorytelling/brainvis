@@ -39,5 +39,6 @@ testem.log
 Thumbs.db
 .idea/
 yarn-error.log
+.gitmodules
 
 packages/

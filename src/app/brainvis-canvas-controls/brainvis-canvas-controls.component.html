@@ -1,22 +1,22 @@
-<mat-slide-toggle [(ngModel)]="canvas.showSliceHandle" [(disabled)]="canvas.showSliceHandleDisabled">
+<mat-slide-toggle [(ngModel)]="canvas.settings.showSliceHandle" [(disabled)]="canvas.settings.showSliceHandleDisabled">
   Show slice handle
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showSlice" [(disabled)]="canvas.showSliceDisabled">
+<mat-slide-toggle [(ngModel)]="canvas.settings.showSlice" [(disabled)]="canvas.settings.showSliceDisabled">
   Show slice
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.showObjects" [(disabled)]="canvas.showObjectsDisabled">
+<mat-slide-toggle [(ngModel)]="canvas.settings.showObjects" [(disabled)]="canvas.settings.showObjectsDisabled">
   Show segmented objects
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.quadView" [(disabled)]="canvas.quadViewDisabled">
+<mat-slide-toggle [(ngModel)]="canvas.settings.quadView" [(disabled)]="canvas.settings.quadViewDisabled">
   Quad view
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.alignMode">
+<mat-slide-toggle [(ngModel)]="canvas.settings.alignMode">
   Align camera to slice
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.editMode" [(disabled)]="canvas.editModeDisabled">
+<mat-slide-toggle [(ngModel)]="canvas.settings.editMode" [(disabled)]="canvas.settings.editModeDisabled">
   Segmentation mode
 </mat-slide-toggle>
-<mat-slider [(ngModel)]="canvas.segmentationSize" [(disabled)]="canvas.editModeDisabled" [min]='min' [max]='max' [step]='step' >
+<mat-slider [(ngModel)]="canvas.settings.segmentationSize" [(disabled)]="canvas.settings.editModeDisabled" [min]='min' [max]='max' [step]='step' >
   Segmentation size
 </mat-slider>
 <mat-form-field>

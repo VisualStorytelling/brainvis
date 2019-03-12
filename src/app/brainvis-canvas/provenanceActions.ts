@@ -8,13 +8,13 @@ const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunc
       Promise.resolve(canvas.setSlicePlanePosition({position, direction}, transitionTime)),
   setSlicePlaneZoom: (position, direction, transitionTime) =>
       Promise.resolve(canvas.setSlicePlaneZoom({position, direction}, transitionTime)),
-  showSlice: (value: boolean) => Promise.resolve(canvas.showSlice = value),
-  showObjects: (value: boolean) => Promise.resolve(canvas.showObjects = value),
-  editMode: (value: boolean) => Promise.resolve(canvas.editMode = value),
-  alignMode: (value: boolean) => Promise.resolve(canvas.alignMode = value),
-  showSliceHandle: (value: boolean) => Promise.resolve(canvas.showSliceHandle = value),
+  showSlice: (value: boolean) => Promise.resolve(canvas.settings.showSlice = value),
+  showObjects: (value: boolean) => Promise.resolve(canvas.settings.showObjects = value),
+  editMode: (value: boolean) => Promise.resolve(canvas.settings.editMode = value),
+  alignMode: (value: boolean) => Promise.resolve(canvas.settings.alignMode = value),
+  showSliceHandle: (value: boolean) => Promise.resolve(canvas.settings.showSliceHandle = value),
   // showSegmentedObjects: (value: boolean) => Promise.resolve(canvas.showObjects = value),
-  selectedObjects: (value: THREE.Object3D[]) => Promise.resolve(canvas.selectedObjects = value),
+  selectedObjects: (value: THREE.Object3D[]) => Promise.resolve(canvas.settings.selectedObjects = value),
 });
 
 export const registerActions = (registry: ActionFunctionRegistry, canvas: BrainvisCanvasComponent) => {
