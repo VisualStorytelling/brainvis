@@ -27,4 +27,8 @@
     </mat-select>
   </mat-form-field>
 <app-styled-slider [canvas]="canvas"></app-styled-slider>
-
+<button mat-icon-button (click)="provenance.saveGraph()">
+  <mat-icon>backup</mat-icon>
+  Save provenance tree
+  <mat-progress-spinner *ngIf="provenance.saveStatus === 'saving'" [diameter]="20" mode="indeterminate"></mat-progress-spinner>
+</button>

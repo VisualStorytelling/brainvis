@@ -2,6 +2,7 @@ import { Component, Input, OnInit, ViewEncapsulation  } from '@angular/core';
 import { Options } from 'ng5-slider';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
 import { StyledSliderComponent } from './styled-slider/styled-slider.component';
+import { ProvenanceService } from '../provenance.service';
 
 @Component({
   selector: 'app-brainvis-canvas-controls',
@@ -9,6 +10,8 @@ import { StyledSliderComponent } from './styled-slider/styled-slider.component';
   styleUrls: ['./brainvis-canvas-controls.component.scss']
 })
 export class BrainvisCanvasControlsComponent {
+  constructor(public provenance: ProvenanceService) {}
+
   @Input() canvas: BrainvisCanvasComponent;
 
   private availableColorMaps = [
