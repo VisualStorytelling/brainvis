@@ -1,121 +1,158 @@
 app-provenance-visualization {
-    height: 50%;
-    width: 300px;
-    display: block;
-    background-color: white;
+  height: 100%;
+  width: 300px;
+  display: block;
+  background-color: white;
 }
 
 .node {
-    fill: lightsteelblue;
-    stroke: steelblue;
-    cursor: pointer;
+  fill: lightsteelblue;
+  stroke: steelblue;
+  cursor: pointer;
 }
 
 .node circle {
-    stroke-width: 0.3px;
-    opacity: 0.6;
+  stroke-width: 0.3px;
+  opacity: 0.6;
 }
 
 .node circle.keynode {
-    stroke: #000000;
+  stroke: #000000;
 }
 
 .node circle.intent_none {
-    fill: #b0c4de;
+  fill: #b0c4de;
 }
 
 .node circle.intent_exploration {
-    fill: #60aa85;
+  fill: #60aa85;
 }
 
 .node circle.intent_configuration {
-    fill: #b8852c;
+  fill: #b8852c;
 }
 
 .node circle.intent_selection {
-    fill: #286090;
+  fill: #286090;
 }
 
 .node circle.intent_derivation {
-    fill: #a94442;
+  fill: #a94442;
 }
 
 .node circle.intent_provenance {
-    fill: #9210dd;
+  fill: #9210dd;
 }
 
 .node circle.intent_wrapped {
-    fill: white;
-    stroke: black;
-    stroke-dasharray: 3;
-    stroke-width: .6px;
+  fill: white;
+  stroke: black;
+  stroke-dasharray: 3;
+  stroke-width: 0.6px;
 }
 
 .node.branch-active {
-    background-color: #ccc;
+  background-color: #ccc;
 }
 
 .node.branch-active text {
-    display: block;
+  display: block;
 }
 
 .node.branch-active.node circle {
-    opacity: 1;
+  opacity: 1;
 }
 
-.node.node-active {}
+.node.node-active .circle-label {
+  font-size: 7px;
+  font-weight: bold;
+}
 
 .node.node-active circle {
-    stroke: black;
-    stroke-width: 1.5px;
+  stroke: black;
+  stroke-width: 1.5px;
+  r: 4;
 }
 
 .node text {
-    /* fill: white; */
-    fill: #000;
-    stroke-width: 0;
-    font-family: sans-serif;
+  /* fill: white; */
+  fill: #000;
+  stroke-width: 0;
+  font-family: sans-serif;
 }
 
 .link {
-    fill: none;
-    /* stroke: white; */
-    stroke: #000;
-    stroke-width: .2px;
+  fill: none;
+  /* stroke: white; */
+  stroke: #000;
+  stroke-width: 0.2px;
 }
 
 .link.active {
-    /* stroke: white; */
-    stroke: #000;
-    stroke-width: 0.8px;
+  /* stroke: white; */
+  stroke: #000;
+  stroke-width: 0.8px;
 }
 
 .titleAggregation {
-    font-family: sans-serif;
-    font-size: 25px;
+  font-family: sans-serif;
+  font-size: 25px;
 }
 
 .dataAggregation-Box {
-    margin: 8px 0px 0px 12px;
-    font-family: sans-serif;
+  margin: 8px 0px 0px 12px;
+  font-family: sans-serif;
 }
 
 .aggButton {
-    width: 43%;
-    margin: 0px 10px 0px 5px;
-    font-size: 16px;
-    font-family: sans-serif;
+  width: 43%;
+  margin: 0px 10px 0px 5px;
+  font-size: 16px;
+  font-family: sans-serif;
 }
 
 .circle-text {
-    font-size: 6px;
-    display: block;
+  font-size: 6px;
+  display: block;
 }
 
 .circle-label {
-    font-size: 7px;
+  font-size: 7px;
 }
 
 .hiddenClass {
-    display: none;
+  display: none;
+}
+/*CSS For Aggregation controls*/
+.sliderContainer {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
+.sliderContainer p {
+  padding-right: 10px;
+  font-weight: 600;
+}
+output {
+  position: relative;
+  line-height: 20px;
+  text-align: center;
+  border-radius: 3px;
+  padding: 5px 10px;
+  margin-left: 8px;
+  height: 20px;
+  width: 20px;
+  background-color: red;
+  color: #fff;
+}
+output:after {
+  position: absolute;
+  top: 8px;
+  left: -7px;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-right: 7px solid #ccc;
+  border-bottom: 7px solid transparent;
+  content: '';
 }
