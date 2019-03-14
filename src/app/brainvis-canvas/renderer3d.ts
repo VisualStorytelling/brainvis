@@ -1,22 +1,14 @@
 import * as THREE from 'three';
-import { TrackballControls } from 'ami.js';
+import * as AMI from 'ami.js';
+import { IAMIRenderer, View } from './utils/types';
+import { AMIRenderer } from './amiRenderer';
 
-export class Renderer3D {
-  private _color = 0x121212;
-  private _targetID = 1;
-  private _initialized = false;
-
-  private _domElement: HTMLCanvasElement;
-  private _renderer: THREE.WebGLRenderer;
-  private _camera: THREE.PerspectiveCamera;
-  private _controls: TrackballControls;
-  private _scene: THREE.Scene;
-  private _light: THREE.Light;
-
-  constructor(domElement: HTMLCanvasElement, color: number, targetID: number) {
-    this._domElement = domElement;
-    this._color = color; // 0x121212
-    this._targetID = targetID; // 1
+export class Renderer3D extends AMIRenderer implements IAMIRenderer {
+  constructor(view: View) {
+    super(view);
+    this._domElement = document.getElementById(view.domId);
+    this._color = view.color; // 0x121212
+    this._targetID = view.targetID; // 1
   }
 
   init() {
@@ -48,7 +40,7 @@ export class Renderer3D {
     this._camera.position.z = 250;
 
     // controls
-    this._controls = new TrackballControls(
+    this._controls = new AMI.TrackballControl(
       this._camera,
       this._domElement
     );
@@ -66,6 +58,78 @@ export class Renderer3D {
     this._light.position.copy(this._camera.position);
     this._scene.add(this._light);
 
+    // resize event
+    this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);
+
     this._initialized = true;
+  }
+
+  initHelpersStack(stack) {
+      if (!this._initialized) {
+          throw new UninitializedError();
+      }
+
+      this._stackHelper = new AMI.StackHelper(stack);
+      this._stackHelper.bbox.visible = false;
+      this._stackHelper.borderColor = this._sliceColor;
+      this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
+      this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
+
+      // set camera
+      // const worldbb = stack.worldBoundingBox();
+      // const lpsDims = new THREE.Vector3(
+      //     (worldbb[1] - worldbb[0]) / 2,
+      //     (worldbb[3] - worldbb[2]) / 2,
+      //     (worldbb[5] - worldbb[4]) / 2
+      // );
+
+      // // box: {halfDimensions, center}
+      // const box = {
+      //     center: stack.worldCenter().clone(),
+      //     halfDimensions: new THREE.Vector3(
+      //         lpsDims.x + 10,
+      //         lpsDims.y + 10,
+      //         lpsDims.z + 10
+      //     )
+      // };
+
+      // // init and zoom
+      // const canvas = {
+      //     width: this._domElement.clientWidth,
+      //     height: this._domElement.clientHeight
+      // };
+
+      // this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
+      // this._camera.box = box;
+      // this._camera.canvas = canvas;
+      // this._camera.orientation = this._sliceOrientation;
+      // this._camera.update();
+      // this._camera.fitBox(2, 1);
+
+      // this._stackHelper.orientation = this._camera.stackOrientation;
+      // this._stackHelper.index = Math.floor(
+      //     this._stackHelper.orientationMaxIndex / 2
+      // );
+      this._scene.add(this._stackHelper);
+  }
+
+  lookAt(vec: THREE.Vector3) {
+    this._camera.lookAt(vec);
+  }
+
+  render() {
+    if (!this._initialized) {
+      throw new UninitializedError();
+    }
+
+    this._controls.update();
+    this._light.position.copy(this._camera.position);
+    this._renderer.render(this._scene, this._camera);
+  }
+
+  onWindowResize() {
+    this._camera.aspect = this._domElement.clientWidth / this._domElement.clientHeight;
+    this._camera.updateProjectionMatrix();
+    this._renderer.setSize(this._domElement.clientWidth, this._domElement.clientHeight);
   }
 }

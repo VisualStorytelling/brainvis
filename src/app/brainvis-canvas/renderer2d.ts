@@ -1,34 +1,16 @@
 import * as THREE from 'three';
-import {
-  CamerasOrthographic,
-  ControlsOrthographic,
-  HelpersStack,
-  HelpersLocalizer
-} from 'ami.js';
+import * as AMI from 'ami.js';
+import { IAMIRenderer, View } from './utils/types';
+import { AMIRenderer } from './amiRenderer';
 
-export class Renderer2D {
-  private _color = 0x121212;
-  private _sliceOrientation = 'axial';
-  private _sliceColor = 0xff1744;
-  private _targetID = 1;
-  private _initialized = false;
-
-  private _domElement: HTMLCanvasElement;
-  private _renderer: THREE.WebGLRenderer;
-  private _camera: CamerasOrthographic;
-  private _controls: ControlsOrthographic;
-  private _scene: THREE.Scene;
-  private _light: THREE.Light;
-  private _stackHelper: HelpersStack;
-  private _localizerHelper: HelpersLocalizer;
-  private _localizerScene: THREE.Scene;
-
-  constructor(domElement: HTMLCanvasElement, color: number, sliceOrientation: string, sliceColor: number, targetID: number) {
-    this._domElement = domElement;
-    this._color = color; // 0x121212
-    this._sliceOrientation = sliceOrientation; // 'axial'
-    this._sliceColor = sliceColor; // 0xff1744
-    this._targetID = targetID; // 1
+export class Renderer2D extends AMIRenderer implements IAMIRenderer {
+  constructor(view: View) {
+    super(view);
+    this._domElement = <HTMLElement>document.getElementById(view.domId);
+    this._color = view.color; // 0x121212
+    this._sliceOrientation = view.sliceOrientation; // 'axial'
+    this._sliceColor = view.sliceColor; // 0xff1744
+    this._targetID = view.targetID; // 1
   }
 
   init() {
@@ -51,7 +33,7 @@ export class Renderer2D {
     this._domElement.appendChild(this._renderer.domElement);
 
     // camera
-    this._camera = new CamerasOrthographic(
+    this._camera = new AMI.OrthographicCamera(
       this._domElement.clientWidth / -2,
       this._domElement.clientWidth / 2,
       this._domElement.clientHeight / 2,
@@ -61,7 +43,7 @@ export class Renderer2D {
     );
 
     // controls
-    this._controls = new ControlsOrthographic(
+    this._controls = new AMI.TrackballOrthoControl(
       this._camera,
       this._domElement
     );
@@ -76,52 +58,52 @@ export class Renderer2D {
   }
 
   initHelpersStack(stack) {
-    if (!this._initialized) {
-      throw new UninitializedError();
-    }
+      if (!this._initialized) {
+          throw new UninitializedError();
+      }
 
-    this._stackHelper = new HelpersStack(stack);
-    this._stackHelper.bbox.visible = false;
-    this._stackHelper.borderColor = this._sliceColor;
-    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
-    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
+      this._stackHelper = new AMI.StackHelper(stack);
+      this._stackHelper.bbox.visible = false;
+      this._stackHelper.borderColor = this._sliceColor;
+      this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
+      this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
-    // set camera
-    const worldbb = stack.worldBoundingBox();
-    const lpsDims = new THREE.Vector3(
-      (worldbb[1] - worldbb[0]) / 2,
-      (worldbb[3] - worldbb[2]) / 2,
-      (worldbb[5] - worldbb[4]) / 2
-    );
+      // set camera
+      const worldbb = stack.worldBoundingBox();
+      const lpsDims = new THREE.Vector3(
+          (worldbb[1] - worldbb[0]) / 2,
+          (worldbb[3] - worldbb[2]) / 2,
+          (worldbb[5] - worldbb[4]) / 2
+      );
 
-    // box: {halfDimensions, center}
-    const box = {
-      center: stack.worldCenter().clone(),
-      halfDimensions: new THREE.Vector3(
-        lpsDims.x + 10,
-        lpsDims.y + 10,
-        lpsDims.z + 10
-      )
-    };
+      // box: {halfDimensions, center}
+      const box = {
+          center: stack.worldCenter().clone(),
+          halfDimensions: new THREE.Vector3(
+              lpsDims.x + 10,
+              lpsDims.y + 10,
+              lpsDims.z + 10
+          )
+      };
 
-    // init and zoom
-    const canvas = {
-      width: this._domElement.clientWidth,
-      height: this._domElement.clientHeight
-    };
+      // init and zoom
+      const canvas = {
+          width: this._domElement.clientWidth,
+          height: this._domElement.clientHeight
+      };
 
-    this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
-    this._camera.box = box;
-    this._camera.canvas = canvas;
-    this._camera.orientation = this._sliceOrientation;
-    this._camera.update();
-    this._camera.fitBox(2, 1);
+      this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
+      this._camera.box = box;
+      this._camera.canvas = canvas;
+      this._camera.orientation = this._sliceOrientation;
+      this._camera.update();
+      this._camera.fitBox(2, 1);
 
-    this._stackHelper.orientation = this._camera.stackOrientation;
-    this._stackHelper.index = Math.floor(
-      this._stackHelper.orientationMaxIndex / 2
-    );
-    this._scene.add(this._stackHelper);
+      this._stackHelper.orientation = this._camera.stackOrientation;
+      this._stackHelper.index = Math.floor(
+          this._stackHelper.orientationMaxIndex / 2
+      );
+      this._scene.add(this._stackHelper);
   }
 
   initHelpersLocalizer(stack, referencePlane, localizers) {
@@ -129,7 +111,7 @@ export class Renderer2D {
       throw new UninitializedError();
     }
 
-    this._localizerHelper = new HelpersLocalizer(
+    this._localizerHelper = new AMI.LocalizerHelper(
       stack,
       this._stackHelper.slice.geometry,
       referencePlane
@@ -147,6 +129,55 @@ export class Renderer2D {
     this._localizerScene.add(this._localizerHelper);
   }
 
+  updateLocalizer(targetLocalizersHelpers) {
+    const refHelper = this._stackHelper;
+    const plane = refHelper.slice.cartesianEquation();
+    this._localizerHelper.referencePlane = plane;
+
+    // bit of a hack... works fine for this application
+    for (let i = 0; i < targetLocalizersHelpers.length; i++) {
+      for (let j = 0; j < 3; j++) {
+        const targetPlane = targetLocalizersHelpers[i]['plane' + (j + 1)];
+        if (
+          targetPlane &&
+          plane.x.toFixed(6) === targetPlane.x.toFixed(6) &&
+          plane.y.toFixed(6) === targetPlane.y.toFixed(6) &&
+          plane.z.toFixed(6) === targetPlane.z.toFixed(6)
+        ) {
+          targetLocalizersHelpers[i]['plane' + (j + 1)] = plane;
+        }
+      }
+    }
+
+    // update the geometry will create a new mesh
+    this._localizerHelper.geometry = refHelper.slice.geometry;
+  }
+
+  updateClipPlane(clipPlane) {
+    const vertices = this._stackHelper.slice.geometry.vertices;
+    const p1 = new THREE.Vector3(vertices[0].x, vertices[0].y, vertices[0].z).applyMatrix4(
+      this._stackHelper._stack.ijk2LPS
+    );
+    const p2 = new THREE.Vector3(vertices[1].x, vertices[1].y, vertices[1].z).applyMatrix4(
+      this._stackHelper._stack.ijk2LPS
+    );
+    const p3 = new THREE.Vector3(vertices[2].x, vertices[2].y, vertices[2].z).applyMatrix4(
+      this._stackHelper._stack.ijk2LPS
+    );
+
+    clipPlane.setFromCoplanarPoints(p1, p2, p3);
+
+    const cameraDirection = new THREE.Vector3(1, 1, 1);
+    cameraDirection.applyQuaternion(this._camera.quaternion);
+
+    if (cameraDirection.dot(clipPlane.normal) > 0) {
+      clipPlane.negate();
+    }
+
+    // resize event
+    this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);
+  }
+
   render() {
     if (!this._initialized) {
       throw new UninitializedError();
@@ -158,9 +189,37 @@ export class Renderer2D {
 
     // mesh
     this._renderer.clearDepth();
+    // data.forEach(function(object, key) {
+    //   object.materialFront.clippingPlanes = [clipPlane1];
+    //   object.materialBack.clippingPlanes = [clipPlane1];
+    //   r1.renderer.render(object.scene, r1.camera, redTextureTarget, true);
+    //   r1.renderer.clearDepth();
+    //   redContourHelper.contourWidth = object.selected ? 3 : 2;
+    //   redContourHelper.contourOpacity = object.selected ? 1 : 0.8;
+    //   r1.renderer.render(redContourScene, r1.camera);
+    //   r1.renderer.clearDepth();
+    // });
 
     // localizer
     this._renderer.clearDepth();
     this._renderer.render(this._localizerScene, this._camera);
+  }
+
+  onWindowResize() {
+    this._camera.canvas = {
+      width: this._domElement.clientWidth,
+      height: this._domElement.clientHeight,
+    };
+    this._camera.fitBox(2, 1);
+    this._renderer.setSize(
+      this._domElement.clientWidth,
+      this._domElement.clientHeight
+    );
+
+    // update info to draw borders properly
+    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
+    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
+    this._localizerHelper.canvasWidth = this._domElement.clientWidth;
+    this._localizerHelper.canvasHeight = this._domElement.clientHeight;
   }
 }

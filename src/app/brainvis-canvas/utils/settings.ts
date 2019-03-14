@@ -1,5 +1,5 @@
 import { Input, Output, EventEmitter } from '@angular/core';
-import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 export class Settings {
     private static instance: Settings;
@@ -127,9 +127,9 @@ export class Settings {
 
     @Input() set thresholdMinValue(value: number) {
         Settings.instance._thresholdMinValue = value;
-        if (Settings.instance.canvas.stackHelper) {
-            Settings.instance.canvas.stackHelper.slice.lowerThreshold = Settings.instance._thresholdMinValue;
-            Settings.instance.canvas.stackHelper.slice.intensityAuto = false;
+        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.lowerThreshold = Settings.instance._thresholdMinValue;
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.intensityAuto = false;
         }
         Settings.instance.thresholdMinValueChange.emit(value);
     }
@@ -137,9 +137,9 @@ export class Settings {
 
     @Input() set thresholdMaxValue(value: number) {
         Settings.instance._thresholdMaxValue = value;
-        if (Settings.instance.canvas.stackHelper) {
-            Settings.instance.canvas.stackHelper.slice.upperThreshold = Settings.instance._thresholdMaxValue;
-            Settings.instance.canvas.stackHelper.slice.intensityAuto = false;
+        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.upperThreshold = Settings.instance._thresholdMaxValue;
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.intensityAuto = false;
             // Settings.instance.stackHelper.slice.thicknessMethod = 1;
             // Settings.instance.stackHelper.slice.thickness = 2;
             // Settings.instance.stackHelper.slice.steps = 2;
@@ -150,8 +150,8 @@ export class Settings {
 
     @Input() set colorMap(value: string) {
         Settings.instance._colorMap = value;
-        if (Settings.instance.canvas.stackHelper) {
-            Settings.instance.canvas.stackHelper.slice.colorMap = Settings.instance._colorMap;
+        if (Settings.instance.canvas.initialized && Settings.instance.canvas.perspectiveRenderer.stackHelper) {
+            Settings.instance.canvas.perspectiveRenderer.stackHelper.slice.colorMap = Settings.instance._colorMap;
         }
         Settings.instance.colorMapValueChange.emit(value);
     }

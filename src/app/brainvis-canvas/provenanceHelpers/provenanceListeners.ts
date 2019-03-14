@@ -1,7 +1,7 @@
 import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 import { debounce } from 'lodash';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
-import { Settings } from '../settings';
+import { Settings } from '../utils/settings';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
   canvas.addEventListener('cameraStart', (startEvent) => {

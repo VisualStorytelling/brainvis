@@ -2,8 +2,8 @@ import { ActionFunction, ActionFunctionRegistry } from '@visualstorytelling/prov
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 
 const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunction} => ({
-  setControlZoom: (args, transitionTime) => Promise.resolve(canvas.setControlZoom(args, transitionTime)),
-  setControlOrientation: (args, transitionTime) => Promise.resolve(canvas.setControlOrientation(args, transitionTime)),
+  // setControlZoom: (args, transitionTime) => Promise.resolve(canvas.setControlZoom(args, transitionTime)),
+  // setControlOrientation: (args, transitionTime) => Promise.resolve(canvas.setControlOrientation(args, transitionTime)),
   setSlicePlaneOrientation: (position, direction, transitionTime) =>
       Promise.resolve(canvas.setSlicePlanePosition({position, direction}, transitionTime)),
   setSlicePlaneZoom: (position, direction, transitionTime) =>

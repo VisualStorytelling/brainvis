@@ -165,12 +165,10 @@ export class Trackball extends THREE.EventDispatcher {
     };
   }());
 
-  constructor(views: View[], viewNumber: number, domElement: HTMLCanvasElement) {
+  constructor(camera: any, domElement: HTMLCanvasElement) {
     super();
 
-    this.views = views;
-    this.viewNumber = viewNumber;
-    this.camera = views[viewNumber].camera;
+    this.camera = camera;
     this.domElement = (domElement !== undefined) ? domElement : document;
 
     //  for reset
