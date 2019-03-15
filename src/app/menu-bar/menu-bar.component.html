@@ -1,0 +1,63 @@
+<mat-toolbar color="primary" style="width: 100%">
+  <mat-toolbar-row>
+    <mat-icon>school</mat-icon>
+    <span>&nbsp;</span>
+    <span>Brainvis</span>
+    <span>&nbsp;</span>
+    <mat-button-toggle
+      name="showSliceHandle"
+      [checked]="canvas.settings.showSliceHandle"
+      (change)="canvas.settings.showSliceHandle = $event.source.checked"
+      matTooltip="Show slice handle"
+    >
+      <mat-icon class="example-icon">arrow_right_alt</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle
+      [checked]="canvas.settings.showSlice"
+      (change)="canvas.settings.showSlice = $event.source.checked"
+      matTooltip="Show slice"
+    >
+      <mat-icon class="example-icon">aspect_ratio</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle
+      [checked]="canvas.settings.showObjects"
+      (change)="canvas.settings.showObjects = $event.source.checked"
+      matTooltip="Show segmented objects"
+    >
+      <mat-icon class="example-icon">rounded_corner</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle
+      [checked]="canvas.settings.quadView"
+      (change)="canvas.settings.quadView = $event.source.checked"
+      matTooltip="Quad view"
+    >
+      <mat-icon class="example-icon">videocam</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle
+      [checked]="canvas.settings.alignMode"
+      (change)="canvas.settings.alignMode = $event.source.checked"
+      matTooltip="Align camera to slice"
+    >
+      <mat-icon class="example-icon">featured_video</mat-icon>
+    </mat-button-toggle>
+    <mat-button-toggle
+      [checked]="false"
+      (change)="false"
+      matTooltip="Segmentation mode"
+    >
+      <mat-icon class="example-icon">edit</mat-icon>
+    </mat-button-toggle>
+    <mat-menu #appMenu="matMenu">
+        <app-styled-slider [canvas]="canvas"></app-styled-slider>
+        <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
+    </mat-menu>
+    <button color="primary" mat-raised-button [matMenuTriggerFor]="appMenu">
+      <mat-icon>exposure</mat-icon>
+    </button>
+    <button mat-raised-button matTooltip="Save tree in cloud"><mat-icon class="example-icon">backup</mat-icon></button>
+
+    <div id="right">
+      {{ now }}
+    </div>
+  </mat-toolbar-row>
+</mat-toolbar>

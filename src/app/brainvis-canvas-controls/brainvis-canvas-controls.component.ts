@@ -5,12 +5,14 @@ import { ProvenanceService } from '../provenance.service';
 @Component({
   selector: 'app-brainvis-canvas-controls',
   templateUrl: './brainvis-canvas-controls.component.html',
-  styleUrls: ['./brainvis-canvas-controls.component.scss']
+  styleUrls: ['./brainvis-canvas-controls.component.scss'],
 })
 export class BrainvisCanvasControlsComponent {
   @Input() canvas: BrainvisCanvasComponent;
 
-  constructor(public provenance: ProvenanceService) {}
+  constructor(public provenance: ProvenanceService) {
+
+  }
 
   private availableColorMaps = [
     {value: 'grayscale', viewValue: 'Grayscale'},

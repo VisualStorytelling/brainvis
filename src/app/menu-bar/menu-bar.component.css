@@ -1,0 +1,17 @@
+mat-button-toggle, button {
+    color: white;
+    background-color: transparent;
+}
+mat-button-toggle.mat-button-toggle-checked {
+    background-color: rgba(255,255,255,.4);
+}
+#right {
+    position: absolute;
+    right: 1em;
+}
+mat-toolbar {
+    min-height: 0;
+}
+mat-toolbar-row {
+    height: auto;
+}

@@ -27,6 +27,7 @@ import { SlidesContainerComponent } from './ui/slides-container/slides-container
 
 import { Ng5SliderModule } from 'ng5-slider';
 import { StyledSliderComponent } from './brainvis-canvas-controls/styled-slider/styled-slider.component';
+import { MenuBarComponent } from './menu-bar/menu-bar.component';
 
 
 @NgModule({
@@ -40,6 +41,7 @@ import { StyledSliderComponent } from './brainvis-canvas-controls/styled-slider/
     StyledSliderComponent,
     ProvenanceTaskListComponent,
     SlidesContainerComponent,
+    MenuBarComponent,
   ],
   imports: [
     BrowserModule,

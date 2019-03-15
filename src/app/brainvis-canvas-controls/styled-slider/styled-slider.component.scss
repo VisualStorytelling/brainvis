@@ -1,5 +1,8 @@
 // We need to use ::ng-deep to overcome view encapsulation
 ::ng-deep {
+    .custom-slider {
+      min-width: 300px;
+    }
     .custom-slider .ng5-slider .ng5-slider-bar {
       background: #ffe4d1;
       height: 2px;
