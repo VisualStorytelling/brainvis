@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import * as AMI from 'ami.js';
 import { IAMIRenderer, View } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
+import { BrainvisCanvasComponent } from './brainvis-canvas.component';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
-  constructor(view: View) {
-    super(view);
+  constructor(view: View, canvas: BrainvisCanvasComponent) {
+    super(view, canvas);
     this._domElement = document.getElementById(view.domId);
     this._color = view.color; // 0x121212
+    this._sliceColor = view.sliceColor; // 0xff1744
     this._targetID = view.targetID; // 1
   }
 

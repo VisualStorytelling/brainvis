@@ -106,7 +106,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   private clipPlaneCoronal = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
   private clipPlaneSagittal = new THREE.Plane(new THREE.Vector3(0, 0, 0), 0);
 
-
   // public stackHelper: AMI.StackHelper;
   // private volumeRenderer: AMI.VolumeRenderingHelper;
   private sliceManipulator: SliceManipulatorWidget;
@@ -152,10 +151,10 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
     // this.scene.background = new THREE.Color('black');
 
-    this._axialRenderer = new Renderer2D(this.views[0]);
-    this._perspectiveRenderer = new Renderer3D(this.views[1]);
-    this._coronalRenderer = new Renderer2D(this.views[2]);
-    this._sagittalRenderer = new Renderer2D(this.views[3]);
+    this._axialRenderer = new Renderer2D(this.views[0], this);
+    this._perspectiveRenderer = new Renderer3D(this.views[1], this);
+    this._coronalRenderer = new Renderer2D(this.views[2], this);
+    this._sagittalRenderer = new Renderer2D(this.views[3], this);
 
     this._perspectiveRenderer.init();
     this._axialRenderer.init();
@@ -203,12 +202,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   loadData() {
-    const t1 = [
+    const brain_files = [
       // tslint:disable-next-line
       '36747136', '36747150', '36747164', '36747178', '36747192', '36747206', '36747220', '36747234', '36747248', '36747262', '36747276', '36747290', '36747304', '36747318', '36747332', '36747346', '36747360', '36747374', '36747388', '36747402', '36747416', '36747430', '36747444', '36747458', '36747472', '36747486', '36747500', '36747514', '36747528', '36747542', '36747556', '36747570', '36747584', '36747598', '36747612', '36747626', '36747640', '36747654', '36747668', '36747682', '36747696', '36747710', '36747724', '36747738', '36747752', '36747766', '36747780', '36747794', '36747808', '36747822', '36747836', '36747850', '36747864', '36747878', '36747892', '36747906', '36747920', '36747934', '36747948', '36747962', '36747976', '36747990', '36748004', '36748018', '36748032', '36748046', '36748060', '36748074', '36748088', '36748102', '36748116', '36748130', '36748144', '36748158', '36748172', '36748186', '36748578', '36748592', '36748606', '36748620', '36748634', '36748648', '36748662', '36748676', '36748690', '36748704', '36748718', '36748732', '36748746', '36748760', '36748774', '36748788', '36748802', '36748816', '36748830', '36748844', '36748858', '36748872', '36748886', '36748900', '36748914', '36748928', '36748942', '36748956', '36748970', '36748984', '36748998', '36749012', '36749026', '36749040', '36749054', '36749068', '36749082', '36749096', '36749110', '36749124', '36749138', '36749152', '36749166', '36749180', '36749194', '36749208', '36749222', '36749236', '36749250', '36749264', '36749278', '36749292', '36749306', '36749320', '36749334', '36749348', '36749362', '36749376', '36749390', '36749404', '36749418', '36749446', '36749460', '36749474', '36749488', '36749502', '36749516', '36749530', '36749544', '36749558', '36749572', '36749586', '36749600', '36749614', '36749628', '36749642', '36749656', '36749670', '36749684', '36749698', '36749712', '36749726', '36749740', '36749754', '36749768', '36749782', '36749796', '36749810', '36749824', '36749838', '36749852', '36749866', '36749880', '36749894', '36749908', '36749922', '36749936', '36749950', '36749964'
     ];
 
-    const files = t1.map(function (v) {
+    const pet_filenames = [
+      // tslint:disable-next-line
+      '000000.dcm', '000001.dcm', '000002.dcm', '000003.dcm', '000004.dcm', '000005.dcm', '000006.dcm', '000007.dcm', '000008.dcm', '000009.dcm', '000010.dcm', '000011.dcm', '000012.dcm', '000013.dcm', '000014.dcm', '000015.dcm', '000016.dcm', '000017.dcm', '000018.dcm', '000019.dcm', '000020.dcm', '000021.dcm', '000022.dcm', '000023.dcm', '000024.dcm', '000025.dcm', '000026.dcm', '000027.dcm', '000028.dcm', '000029.dcm', '000030.dcm', '000031.dcm', '000032.dcm', '000033.dcm', '000034.dcm', '000035.dcm', '000036.dcm', '000037.dcm', '000038.dcm', '000039.dcm', '000040.dcm', '000041.dcm', '000042.dcm', '000043.dcm', '000044.dcm', '000045.dcm', '000046.dcm', '000047.dcm', '000048.dcm', '000049.dcm', '000050.dcm', '000051.dcm', '000052.dcm', '000053.dcm', '000054.dcm', '000055.dcm', '000056.dcm', '000057.dcm', '000058.dcm', '000059.dcm', '000060.dcm', '000061.dcm', '000062.dcm', '000063.dcm', '000064.dcm', '000065.dcm', '000066.dcm', '000067.dcm', '000068.dcm', '000069.dcm', '000070.dcm', '000071.dcm', '000072.dcm', '000073.dcm', '000074.dcm', '000075.dcm', '000076.dcm', '000077.dcm', '000078.dcm', '000079.dcm', '000080.dcm', '000081.dcm', '000082.dcm', '000083.dcm', '000084.dcm', '000085.dcm', '000086.dcm', '000087.dcm', '000088.dcm', '000089.dcm', '000090.dcm', '000091.dcm', '000092.dcm', '000093.dcm', '000094.dcm', '000095.dcm', '000096.dcm', '000097.dcm', '000098.dcm', '000099.dcm', '000100.dcm', '000101.dcm', '000102.dcm', '000103.dcm', '000104.dcm', '000105.dcm', '000106.dcm', '000107.dcm', '000108.dcm', '000109.dcm', '000110.dcm', '000111.dcm', '000112.dcm', '000113.dcm', '000114.dcm', '000115.dcm', '000116.dcm', '000117.dcm', '000118.dcm', '000119.dcm', '000120.dcm', '000121.dcm', '000122.dcm', '000123.dcm', '000124.dcm', '000125.dcm', '000126.dcm', '000127.dcm', '000128.dcm', '000129.dcm', '000130.dcm', '000131.dcm', '000132.dcm', '000133.dcm', '000134.dcm', '000135.dcm', '000136.dcm', '000137.dcm', '000138.dcm', '000139.dcm', '000140.dcm', '000141.dcm', '000142.dcm', '000143.dcm', '000144.dcm', '000145.dcm', '000146.dcm', '000147.dcm', '000148.dcm', '000149.dcm', '000150.dcm', '000151.dcm', '000152.dcm', '000153.dcm', '000154.dcm', '000155.dcm', '000156.dcm', '000157.dcm', '000158.dcm', '000159.dcm', '000160.dcm', '000161.dcm', '000162.dcm', '000163.dcm', '000164.dcm', '000165.dcm', '000166.dcm', '000167.dcm', '000168.dcm', '000169.dcm', '000170.dcm', '000171.dcm', '000172.dcm', '000173.dcm', '000174.dcm', '000175.dcm', '000176.dcm', '000177.dcm', '000178.dcm', '000179.dcm', '000180.dcm', '000181.dcm', '000182.dcm', '000183.dcm', '000184.dcm', '000185.dcm', '000186.dcm', '000187.dcm', '000188.dcm', '000189.dcm', '000190.dcm', '000191.dcm', '000192.dcm', '000193.dcm', '000194.dcm', '000195.dcm', '000196.dcm', '000197.dcm', '000198.dcm', '000199.dcm', '000200.dcm', '000201.dcm', '000202.dcm', '000203.dcm', '000204.dcm', '000205.dcm', '000206.dcm', '000207.dcm', '000208.dcm', '000209.dcm', '000210.dcm', '000211.dcm', '000212.dcm', '000213.dcm', '000214.dcm', '000215.dcm', '000216.dcm', '000217.dcm', '000218.dcm', '000219.dcm', '000220.dcm', '000221.dcm', '000222.dcm', '000223.dcm', '000224.dcm', '000225.dcm', '000226.dcm', '000227.dcm', '000228.dcm', '000229.dcm', '000230.dcm', '000231.dcm', '000232.dcm', '000233.dcm', '000234.dcm', '000235.dcm', '000236.dcm', '000237.dcm', '000238.dcm', '000239.dcm', '000240.dcm', '000241.dcm', '000242.dcm', '000243.dcm', '000244.dcm', '000245.dcm', '000246.dcm', '000247.dcm', '000248.dcm', '000249.dcm', '000250.dcm', '000251.dcm', '000252.dcm', '000253.dcm', '000254.dcm', '000255.dcm', '000256.dcm', '000257.dcm', '000258.dcm', '000259.dcm', '000260.dcm', '000261.dcm', '000262.dcm', '000263.dcm', '000264.dcm', '000265.dcm', '000266.dcm', '000267.dcm', '000268.dcm', '000269.dcm', '000270.dcm', '000271.dcm', '000272.dcm', '000273.dcm', '000274.dcm', '000275.dcm', '000276.dcm', '000277.dcm', '000278.dcm', '000279.dcm', '000280.dcm', '000281.dcm', '000282.dcm', '000283.dcm', '000284.dcm', '000285.dcm', '000286.dcm', '000287.dcm', '000288.dcm', '000289.dcm', '000290.dcm', '000291.dcm', '000292.dcm', '000293.dcm', '000294.dcm', '000295.dcm', '000296.dcm', '000297.dcm', '000298.dcm',
+    ];
+
+    const files = brain_files.map(function (v) {
+      // return 'https://cdn.rawgit.com/FNNDSC/data/master/dicom/rsna_2/PET/' + v;
       return 'https://cdn.rawgit.com/FNNDSC/data/master/dicom/adi_brain/' + v;
     });
 
@@ -242,20 +247,19 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         bcc._perspectiveRenderer.scene.add(boxHelper);
 
         // Freeform slice
-        bcc._perspectiveRenderer.initHelpersStack(stack);
-        // bcc._perspectiveRenderer.scene.add(bcc._axialRenderer.scene);
+        // bcc._perspectiveRenderer.initHelpersStack(stack);
 
         // red slice
         bcc._axialRenderer.initHelpersStack(stack);
-        // bcc._perspectiveRenderer.scene.add(bcc._axialRenderer.scene);
+        bcc._perspectiveRenderer.scene.add(bcc._axialRenderer.scene);
 
         // yellow slice
         bcc._coronalRenderer.initHelpersStack(stack);
-        // bcc._perspectiveRenderer.scene.add(bcc._coronalRenderer.scene);
+        bcc._perspectiveRenderer.scene.add(bcc._coronalRenderer.scene);
 
         // green slice
         bcc._sagittalRenderer.initHelpersStack(stack);
-        // bcc._perspectiveRenderer.scene.add(bcc._sagittalRenderer.scene);
+        bcc._perspectiveRenderer.scene.add(bcc._sagittalRenderer.scene);
 
         // Set initial threshold values for white balance
         bcc.settings.thresholdLowerBound = bcc._axialRenderer.stackHelper.stack.minMax[0];
@@ -304,148 +308,30 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
           { plane: plane2, color: new THREE.Color(bcc._coronalRenderer.stackHelper.borderColor) },
         ]);
 
-        function onAxialChanged() {
-          bcc._axialRenderer.updateLocalizer([bcc._coronalRenderer.localizerHelper, bcc._sagittalRenderer.localizerHelper]);
-          bcc._axialRenderer.updateClipPlane(bcc.clipPlaneAxial);
+        // // event listeners
+        bcc._perspectiveRenderer.addEventListeners();
+        bcc._axialRenderer.addEventListeners();
+        bcc._coronalRenderer.addEventListeners();
+        bcc._sagittalRenderer.addEventListeners();
 
-          if (bcc.contourHelper) {
-            bcc.contourHelper.geometry = bcc._axialRenderer.stackHelper.slice.geometry;
-          }
-        }
+        // bcc._coronalRenderer.controls.addEventListener('OnScroll', onScroll);
+        // bcc._sagittalRenderer.controls.addEventListener('OnScroll', onScroll);
 
-        function onCoronalChanged() {
-          bcc._coronalRenderer.updateLocalizer([bcc._axialRenderer.localizerHelper, bcc._sagittalRenderer.localizerHelper]);
-          bcc._coronalRenderer.updateClipPlane(bcc.clipPlaneCoronal);
-        }
-
-        function onSagittalChanged() {
-          bcc._sagittalRenderer.updateLocalizer([bcc._axialRenderer.localizerHelper, bcc._coronalRenderer.localizerHelper]);
-          bcc._sagittalRenderer.updateClipPlane(bcc.clipPlaneSagittal);
-        }
-
-        function onClick(event) {
-          const canvas = event.target.parentElement;
-          const id = event.target.id;
-          const mouse = {
-            x: ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1,
-            y: -((event.clientY - canvas.offsetTop) / canvas.clientHeight) * 2 + 1,
-          };
-
-          const camera = bcc.getCorrectCamera(id);
-          const stackHelper = bcc.getCorrectStackHelper(id);
-          const scene = bcc.getCorrectScene(id);
-
-          const raycaster = new THREE.Raycaster();
-          raycaster.setFromCamera(mouse, camera);
-
-          // TODO reinstate single click
-          // const intersects = raycaster.intersectObjects(scene.children, true);
-          // if (intersects.length > 0) {
-          //   if (intersects[0].object) {
-          //     const refObject = intersects[0].object;
-          //     refObject.selected = !refObject.selected;
-
-          //     let color = refObject.color;
-          //     if (refObject.selected) {
-          //       color = 0xccff00;
-          //     }
-
-          //     // update materials colors
-          //     refObject.material.color.setHex(color);
-          //     refObject.materialFront.color.setHex(color);
-          //     refObject.materialBack.color.setHex(color);
-          //   }
-          // }
-        }
-        // r0.domElement.addEventListener('click', onClick);
-
-        function onScroll(event) {
-          const id = event.target.domElement.id;
-          const stackHelper = bcc.getCorrectStackHelper(id);
-
-          if (event.delta > 0) {
-            if (stackHelper.index >= stackHelper.orientationMaxIndex - 1) {
-              return false;
-            }
-            stackHelper.index += 1;
-          } else {
-            if (stackHelper.index <= 0) {
-              return false;
-            }
-            stackHelper.index -= 1;
-          }
-
-          onAxialChanged();
-          onCoronalChanged();
-          onSagittalChanged();
-        }
-
-        function onDoubleClick(event) {
-          const canvas = event.target.parentElement;
-          const id = event.target.id;
-          const mouse = {
-            x: ((event.clientX - canvas.offsetLeft) / canvas.clientWidth) * 2 - 1,
-            y: -((event.clientY - canvas.offsetTop) / canvas.clientHeight) * 2 + 1,
-          };
-
-          let camera = null;
-          let stackHelper = null;
-          let scene = null;
-          switch (id) {
-            case '0':
-              camera = bcc._perspectiveRenderer.camera;
-              stackHelper = bcc._axialRenderer.stackHelper;
-              scene = bcc._perspectiveRenderer.scene;
-              break;
-            case '1':
-              camera = bcc._axialRenderer.camera;
-              stackHelper = bcc._axialRenderer.stackHelper;
-              scene = bcc._axialRenderer.scene;
-              break;
-            case '2':
-              camera = bcc._coronalRenderer.camera;
-              stackHelper = bcc._coronalRenderer.stackHelper;
-              scene = bcc._coronalRenderer.scene;
-              break;
-            case '3':
-              camera = bcc._sagittalRenderer.camera;
-              stackHelper = bcc._sagittalRenderer.stackHelper;
-              scene = bcc._sagittalRenderer.scene;
-              break;
-          }
-
-          const raycaster = new THREE.Raycaster();
-          raycaster.setFromCamera(mouse, camera);
-
-          const intersects = raycaster.intersectObjects(scene.children, true);
-          if (intersects.length > 0) {
-            const ijk = AMI.UtilsCore.worldToData(stackHelper.stack.lps2IJK, intersects[0].point);
-
-            bcc._axialRenderer.stackHelper.index = ijk.getComponent((bcc._axialRenderer.stackHelper.orientation + 2) % 3);
-            bcc._coronalRenderer.stackHelper.index = ijk.getComponent((bcc._coronalRenderer.stackHelper.orientation + 2) % 3);
-            bcc._sagittalRenderer.stackHelper.index = ijk.getComponent((bcc._sagittalRenderer.stackHelper.orientation + 2) % 3);
-
-            onAxialChanged();
-            onCoronalChanged();
-            onSagittalChanged();
-          }
-        }
-
-        // event listeners
-        bcc._perspectiveRenderer.domElement.addEventListener('dblclick', onDoubleClick);
-        bcc._axialRenderer.domElement.addEventListener('dblclick', onDoubleClick);
-        bcc._coronalRenderer.domElement.addEventListener('dblclick', onDoubleClick);
-        bcc._sagittalRenderer.domElement.addEventListener('dblclick', onDoubleClick);
+        // // event listeners
+        // bcc._perspectiveRenderer.domElement.addEventListener('dblclick', onDoubleClick);
+        // bcc._axialRenderer.domElement.addEventListener('dblclick', onDoubleClick);
+        // bcc._coronalRenderer.domElement.addEventListener('dblclick', onDoubleClick);
+        // bcc._sagittalRenderer.domElement.addEventListener('dblclick', onDoubleClick);
 
         // Stup freeform slice handler for the perspective view
-        bcc._perspectiveRenderer.stackHelper.slice.aabbSpace = 'LPS';
-        bcc._perspectiveRenderer.stackHelper.slice.planePosition.x = centerLPS.x;
-        bcc._perspectiveRenderer.stackHelper.slice.planePosition.y = centerLPS.y;
-        bcc._perspectiveRenderer.stackHelper.slice.planePosition.z = centerLPS.z;
-        bcc._perspectiveRenderer.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
-        bcc._perspectiveRenderer.stackHelper.slice.colorMap = 'grayscale';
-        bcc._perspectiveRenderer.stackHelper.slice._update();
-        bcc._perspectiveRenderer.stackHelper.border.helpersSlice = bcc._perspectiveRenderer.stackHelper.slice;
+        // bcc._perspectiveRenderer.stackHelper.slice.aabbSpace = 'LPS';
+        // bcc._perspectiveRenderer.stackHelper.slice.planePosition.x = centerLPS.x;
+        // bcc._perspectiveRenderer.stackHelper.slice.planePosition.y = centerLPS.y;
+        // bcc._perspectiveRenderer.stackHelper.slice.planePosition.z = centerLPS.z;
+        // bcc._perspectiveRenderer.stackHelper.slice.planeDirection = new THREE.Vector3(1, 0, 0).normalize();
+        // bcc._perspectiveRenderer.stackHelper.slice.colorMap = 'grayscale';
+        // bcc._perspectiveRenderer.stackHelper.slice._update();
+        // bcc._perspectiveRenderer.stackHelper.border.helpersSlice = bcc._perspectiveRenderer.stackHelper.slice;
 
         // const sliceGeometry = new StaticGeometryListener(
         //   bcc._perspectiveRenderer.stackHelper.slice,
@@ -506,62 +392,103 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     // }.bind(this));
   }
 
-  getCorrectCamera(id: string) {
-    let camera = null;
-    switch (id) {
-      case '0' || 'r0':
-        camera = this._perspectiveRenderer.camera;
-        break;
-      case '1' || 'r1':
-        camera = this._axialRenderer.camera;
-        break;
-      case '2' || 'r2':
-        camera = this._coronalRenderer.camera;
-        break;
-      case '3' || 'r3':
-        camera = this._sagittalRenderer.camera;
-        break;
+  onAxialChanged() {
+    this._axialRenderer.updateLocalizer([this._coronalRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._axialRenderer.updateClipPlane(this.clipPlaneAxial);
+
+    if (this.contourHelper) {
+      this.contourHelper.geometry = this._axialRenderer.stackHelper.slice.geometry;
     }
-    return camera;
   }
 
-  getCorrectStackHelper(id: string) {
-    let stackHelper = null;
-    switch (id) {
-      case '0' || 'r0':
-      stackHelper = this._axialRenderer.stackHelper;
-        break;
-      case '1' || 'r1':
-      stackHelper = this._axialRenderer.stackHelper;
-        break;
-      case '2' || 'r2':
-      stackHelper = this._coronalRenderer.stackHelper;
-        break;
-      case '3' || 'r3':
-      stackHelper = this._sagittalRenderer.stackHelper;
-        break;
-    }
-    return stackHelper;
+  onCoronalChanged() {
+    this._coronalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._sagittalRenderer.localizerHelper]);
+    this._coronalRenderer.updateClipPlane(this.clipPlaneCoronal);
   }
 
-  getCorrectScene(id: string) {
-    let scene = null;
-    switch (id) {
-      case '0' || 'r0':
-      scene = this._perspectiveRenderer.scene;
-        break;
-      case '1' || 'r1':
-      scene = this._axialRenderer.scene;
-        break;
-      case '2' || 'r2':
-      scene = this._coronalRenderer.scene;
-        break;
-      case '3' || 'r3':
-      scene = this._sagittalRenderer.scene;
-        break;
-    }
-    return scene;
+  onSagittalChanged() {
+    this._sagittalRenderer.updateLocalizer([this._axialRenderer.localizerHelper, this._coronalRenderer.localizerHelper]);
+    this._sagittalRenderer.updateClipPlane(this.clipPlaneSagittal);
   }
+
+  adjustLocalizersOnDoubleClick(ijk: any) {
+    this._axialRenderer.stackHelper.index = ijk.getComponent((this._axialRenderer.stackHelper.orientation + 2) % 3);
+    this._coronalRenderer.stackHelper.index = ijk.getComponent((this._coronalRenderer.stackHelper.orientation + 2) % 3);
+    this._sagittalRenderer.stackHelper.index = ijk.getComponent((this._sagittalRenderer.stackHelper.orientation + 2) % 3);
+
+    this.onAxialChanged();
+    this.onCoronalChanged();
+    this.onSagittalChanged();
+  }
+
+  // getCorrectCamera(id: string) {
+  //   let camera = null;
+  //   switch (id) {
+  //     case '0':
+  //     case 'r0':
+  //       camera = this._axialRenderer.camera;
+  //       break;
+  //     case '1':
+  //     case 'r1':
+  //       camera = this._perspectiveRenderer.camera;
+  //       break;
+  //     case '2':
+  //     case 'r2':
+  //       camera = this._coronalRenderer.camera;
+  //       break;
+  //     case '3':
+  //     case 'r3':
+  //       camera = this._sagittalRenderer.camera;
+  //       break;
+  //   }
+  //   return camera;
+  // }
+
+  // getCorrectStackHelper(id: string) {
+  //   let stackHelper = null;
+  //   switch (id) {
+  //     case '0':
+  //     case 'r0':
+  //       stackHelper = this._axialRenderer.stackHelper;
+  //       break;
+  //     case '1':
+  //     case 'r1':
+  //       stackHelper = this._axialRenderer.stackHelper;
+  //       break;
+  //     case '2':
+  //     case 'r2':
+  //       stackHelper = this._coronalRenderer.stackHelper;
+  //       break;
+  //     case '3':
+  //     case 'r3':
+  //       stackHelper = this._sagittalRenderer.stackHelper;
+  //       break;
+  //   }
+  //   return stackHelper;
+  // }
+
+  // getCorrectScene(id: string) {
+  //   let scene = null;
+  //   switch (id) {
+  //     case '0':
+  //     case 'r0':
+  //       scene = this._axialRenderer.scene;
+  //       break;
+  //     case '1':
+  //     case 'r1':
+  //       scene = this._perspectiveRenderer.scene;
+  //       break;
+  //     case '2':
+  //     case 'r2':
+  //       scene = this._coronalRenderer.scene;
+  //       break;
+  //     case '3':
+  //     case 'r3':
+  //       scene = this._sagittalRenderer.scene;
+  //       break;
+  //   }
+  //   return scene;
+  // }
 
   addEventListeners() {
     // this.renderer.domElement.addEventListener('mousewheel', (event) => this.mousewheel(event));
