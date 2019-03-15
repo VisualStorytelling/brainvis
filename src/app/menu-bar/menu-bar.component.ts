@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.component';
+import { ProvenanceService } from '../provenance.service';
 
 @Component({
   selector: 'app-menu-bar',
@@ -9,7 +10,7 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas/brainvis-canvas.comp
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
   protected now: string;
-  constructor() {
+  constructor(public provenance: ProvenanceService) {
 
   }
 

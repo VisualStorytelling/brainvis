@@ -54,7 +54,10 @@
     <button color="primary" mat-raised-button [matMenuTriggerFor]="appMenu">
       <mat-icon>exposure</mat-icon>
     </button>
-    <button mat-raised-button matTooltip="Save tree in cloud"><mat-icon class="example-icon">backup</mat-icon></button>
+
+    <button mat-raised-button [disabled]="provenance.saveStatus === 'saving'" matTooltip="Save tree in cloud" (click)="provenance.saveGraph()">
+      <mat-icon>backup</mat-icon>
+    </button>
 
     <div id="right">
       {{ now }}
