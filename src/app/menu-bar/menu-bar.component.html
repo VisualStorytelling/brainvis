@@ -51,7 +51,11 @@
         <app-styled-slider [canvas]="canvas"></app-styled-slider>
         <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
     </mat-menu>
-    <button color="primary" mat-raised-button [matMenuTriggerFor]="appMenu">
+    <button
+      matTooltip="Thresholds"
+      mat-raised-button
+      [matMenuTriggerFor]="appMenu"
+    >
       <mat-icon>exposure</mat-icon>
     </button>
 
