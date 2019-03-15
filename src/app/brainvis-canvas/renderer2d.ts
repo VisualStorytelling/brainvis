@@ -223,4 +223,42 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._localizerHelper.canvasWidth = this._domElement.clientWidth;
     this._localizerHelper.canvasHeight = this._domElement.clientHeight;
   }
+
+  onScroll(event) {
+    super.onScroll(event);
+
+    const oldIndex = this._stackHelper.index;
+
+    if (event.delta > 0) {
+      if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+        return;
+      }
+      this._stackHelper.index += 1;
+    } else {
+      if (this._stackHelper.index <= 0) {
+        return;
+      }
+      this._stackHelper.index -= 1;
+    }
+
+    const newIndex = this._stackHelper.index;
+
+    this._canvas.dispatchEvent({
+        type: 'sliceIndexChangeStart',
+        changes: {
+            sliceOrientation: this._sliceOrientation,
+            newIndex: newIndex,
+            oldIndex: oldIndex,
+        }
+    });
+
+    this._canvas.dispatchEvent({
+        type: 'sliceIndexChanged',
+        changes: {
+            sliceOrientation: this._sliceOrientation,
+            newIndex: newIndex,
+            oldIndex: oldIndex,
+        }
+    });
+  }
 }

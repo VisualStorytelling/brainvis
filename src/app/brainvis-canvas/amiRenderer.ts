@@ -57,11 +57,12 @@ export class AMIRenderer {
     }
 
     addEventListeners() {
+        this._controls.addEventListener('mousewheel', this.onScroll.bind(this));
         this._controls.addEventListener('OnScroll', this.onScroll.bind(this));
         this.domElement.addEventListener('dblclick', this.onDoubleClick.bind(this));
     }
 
-    onClick(event) {
+    protected onClick(event) {
         if (this._initialized) {
             const canvas = event.target.parentElement;
             //   const id = event.target.id;
@@ -95,19 +96,19 @@ export class AMIRenderer {
     }
     // r0.domElement.addEventListener('click', onClick);
 
-    onScroll(event) {
+    protected onScroll(event) {
         if (this._initialized) {
-            if (event.delta > 0) {
-                if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
-                    return false;
-                }
-                this._stackHelper.index += 1;
-            } else {
-                if (this._stackHelper.index <= 0) {
-                    return false;
-                }
-                this._stackHelper.index -= 1;
-            }
+            // if (event.delta > 0) {
+            //     if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+            //         return;
+            //     }
+            //     this._stackHelper.index += 1;
+            // } else {
+            //     if (this._stackHelper.index <= 0) {
+            //         return;
+            //     }
+            //     this._stackHelper.index -= 1;
+            // }
 
             this._canvas.onAxialChanged();
             this._canvas.onCoronalChanged();
@@ -115,7 +116,7 @@ export class AMIRenderer {
         }
     }
 
-    onDoubleClick(event) {
+    protected onDoubleClick(event) {
         if (this._initialized) {
             const canvas = event.target.parentElement;
             const id = event.target.id;

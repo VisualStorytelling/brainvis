@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
-import { IAMIRenderer, View } from './utils/types';
+import { IAMIRenderer, View, IOrientation } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { Trackball } from './utils/trackball';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {
   constructor(view: View, canvas: BrainvisCanvasComponent) {
@@ -42,15 +43,16 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._camera.position.z = 250;
 
     // controls
-    this._controls = new AMI.TrackballControl(
+    this._controls = new Trackball( //new AMI.TrackballControl(
       this._camera,
-      this._domElement
+      this._renderer.domElement as HTMLCanvasElement
     );
     this._controls.rotateSpeed = 5.5;
     this._controls.zoomSpeed = 1.2;
     this._controls.panSpeed = 0.8;
     this._controls.staticMoving = true;
     this._controls.dynamicDampingFactor = 0.3;
+    this._controls.initEventListeners();
 
     // scene
     this._scene = new THREE.Scene();
@@ -67,52 +69,20 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
   }
 
   initHelpersStack(stack) {
-      if (!this._initialized) {
-          throw new UninitializedError();
-      }
+    if (!this._initialized) {
+      throw new UninitializedError();
+    }
 
-      this._stackHelper = new AMI.StackHelper(stack);
-      this._stackHelper.bbox.visible = false;
-      this._stackHelper.borderColor = this._sliceColor;
-      this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
-      this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
+    this._stackHelper = new AMI.StackHelper(stack);
+    this._stackHelper.bbox.visible = false;
+    this._stackHelper.borderColor = this._sliceColor;
+    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
+    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
-      // set camera
-      // const worldbb = stack.worldBoundingBox();
-      // const lpsDims = new THREE.Vector3(
-      //     (worldbb[1] - worldbb[0]) / 2,
-      //     (worldbb[3] - worldbb[2]) / 2,
-      //     (worldbb[5] - worldbb[4]) / 2
-      // );
-
-      // // box: {halfDimensions, center}
-      // const box = {
-      //     center: stack.worldCenter().clone(),
-      //     halfDimensions: new THREE.Vector3(
-      //         lpsDims.x + 10,
-      //         lpsDims.y + 10,
-      //         lpsDims.z + 10
-      //     )
-      // };
-
-      // // init and zoom
-      // const canvas = {
-      //     width: this._domElement.clientWidth,
-      //     height: this._domElement.clientHeight
-      // };
-
-      // this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
-      // this._camera.box = box;
-      // this._camera.canvas = canvas;
-      // this._camera.orientation = this._sliceOrientation;
-      // this._camera.update();
-      // this._camera.fitBox(2, 1);
-
-      // this._stackHelper.orientation = this._camera.stackOrientation;
-      // this._stackHelper.index = Math.floor(
-      //     this._stackHelper.orientationMaxIndex / 2
-      // );
-      this._scene.add(this._stackHelper);
+    this._stackHelper.orientation = this._camera.stackOrientation;
+    this._stackHelper.index = Math.floor(
+        this._stackHelper.orientationMaxIndex / 2
+    );
   }
 
   lookAt(vec: THREE.Vector3) {
@@ -133,5 +103,103 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     this._camera.aspect = this._domElement.clientWidth / this._domElement.clientHeight;
     this._camera.updateProjectionMatrix();
     this._renderer.setSize(this._domElement.clientWidth, this._domElement.clientHeight);
+  }
+
+  getCameraOrientation() {
+    const position = this._controls.camera.position.toArray();
+    const target = this._controls.target.toArray();
+    const up = this._controls.camera.up.toArray();
+    const orientation = { position, target, up };
+
+    return orientation;
+  }
+
+  addProvenanceHooks() {
+    this._controls.addEventListener('zoomstart', (event) => {
+      const orientation = this.getCameraOrientation();
+
+      this._canvas.dispatchEvent({
+        type: 'zoomStart',
+        orientation
+      });
+    });
+
+    this._controls.addEventListener('zoomend', (event) => {
+      const orientation = this.getCameraOrientation();
+
+      this._canvas.dispatchEvent({
+        type: 'zoomEnd',
+        orientation
+      });
+    });
+
+    this._controls.addEventListener('start', (event) => {
+      const orientation = this.getCameraOrientation();
+
+      this._canvas.dispatchEvent({
+        type: 'cameraStart',
+        orientation
+      });
+    });
+
+    this._controls.addEventListener('end', (event) => {
+      const orientation = this.getCameraOrientation();
+
+      this._canvas.dispatchEvent({
+        type: 'cameraEnd',
+        orientation
+      });
+    });
+  }
+
+  onScroll(event) {
+    super.onScroll(event);
+
+    let delta = 0;
+    if (event.wheelDelta) {
+        //  WebKit / Opera / Explorer 9
+        delta = event.wheelDelta / 40;
+    } else if (event.detail) {
+        //  Firefox
+        delta = -event.detail / 3;
+    }
+
+    let change = 0;
+    if (delta > 0) {
+        change = 1;
+    } else {
+        change = -1;
+    }
+
+    const oldPosition: THREE.Vector3 = this._stackHelper.slice.planePosition.clone();
+    const intersectionDirection: THREE.Vector3 = this._stackHelper.slice.planeDirection.clone();
+    const newPosition = oldPosition.addScaledVector(intersectionDirection, change);
+
+    this._canvas.dispatchEvent({
+        type: 'perspectiveCameraZoomChangeStart',
+        changes: {
+            position: newPosition.clone(),
+            direction: intersectionDirection.clone(),
+            oldPosition: oldPosition.clone(),
+            oldDirection: intersectionDirection.clone()
+        }
+    });
+
+    this._canvas.dispatchEvent({
+        type: 'perspectiveCameraZoomChanged',
+        changes: {
+            position: newPosition.clone(),
+            direction: intersectionDirection.clone(),
+            oldPosition: oldPosition.clone(),
+            oldDirection: intersectionDirection.clone()
+        }
+    });
+  }
+
+  setCameraOrientation(newOrientation: IOrientation, within: number) {
+    this._controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
+      new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
+      new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
+      within > 0 ? within : 1000);
   }
 }

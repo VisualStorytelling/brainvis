@@ -5,7 +5,7 @@ export class Settings {
     private static instance: Settings;
     private canvas: BrainvisCanvasComponent;
 
-    private _alignMode = false;
+    // private _alignMode = false;
     private _colorMap = 'grayscale';
     private _editMode = false;
     private _editModeDisabled = true;
@@ -25,7 +25,7 @@ export class Settings {
     private _thresholdMinValue = 10;
     private _thresholdUpperBound = 1426;
 
-    get alignMode() { return Settings.instance._alignMode; }
+    // get alignMode() { return Settings.instance._alignMode; }
     get colorMap() { return Settings.instance._colorMap; }
     get editMode() { return Settings.instance._editMode; }
     get editModeDisabled() { return Settings.instance._editModeDisabled; }
@@ -97,12 +97,12 @@ export class Settings {
         Settings.instance._quadViewDisabled = quadViewDisabled;
     }
 
-    @Input() set alignMode(alignMode: boolean) {
-        Settings.instance._alignMode = alignMode;
-        Settings.instance.canvas.toggleAlignMode(alignMode);
-        Settings.instance.alignModeChange.emit(alignMode);
-    }
-    @Output() alignModeChange = new EventEmitter<boolean>();
+    // @Input() set alignMode(alignMode: boolean) {
+    //     Settings.instance._alignMode = alignMode;
+    //     Settings.instance.canvas.toggleAlignMode(alignMode);
+    //     Settings.instance.alignModeChange.emit(alignMode);
+    // }
+    // @Output() alignModeChange = new EventEmitter<boolean>();
 
     @Input() set selectedObjects(newSelectedObjects: THREE.Object3D[]) {
         const oldSelectedObjects = Settings.instance.canvas.objectSelector.getObjects();

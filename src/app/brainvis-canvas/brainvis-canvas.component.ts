@@ -247,7 +247,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
         bcc._perspectiveRenderer.scene.add(boxHelper);
 
         // Freeform slice
-        // bcc._perspectiveRenderer.initHelpersStack(stack);
+        bcc._perspectiveRenderer.initHelpersStack(stack);
 
         // red slice
         bcc._axialRenderer.initHelpersStack(stack);
@@ -567,21 +567,6 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   //     this.sliceManipulator.enabled = interactive;
   //   }
   // }
-
-  // setControlZoom(newOrientation: IOrientation, within: number) {
-  //   this.controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
-  //     new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
-  //     new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
-  //     within > 0 ? within : 1000);
-  // }
-
-  // setControlOrientation(newOrientation: IOrientation, within: number) {
-  //   this.controls.changeCamera(new THREE.Vector3(newOrientation.position[0], newOrientation.position[1], newOrientation.position[2]),
-  //     new THREE.Vector3(newOrientation.target[0], newOrientation.target[1], newOrientation.target[2]),
-  //     new THREE.Vector3(newOrientation.up[0], newOrientation.up[1], newOrientation.up[2]),
-  //     within > 0 ? within : 1000);
-  // }
-
   animate = () => {
     requestAnimationFrame(this.animate);
     if (this._initialized) {
@@ -775,98 +760,122 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this.onEditModeChange(checkBox.currentTarget.checked);
   }
 
-  onAlignModeChange = (visible) => {
-    this.dispatchEvent({
-      type: 'alignModeChanged',
-      change: visible
-    });
-  }
-
-  alignModeToggled = (checkBox) => {
-    this.toggleAlignMode(checkBox.currentTarget.checked);
-    this.onAlignModeChange(checkBox.currentTarget.checked);
-  }
-
-  toggleAlignMode(checked) {
-    if (checked) {
-      this.moveCameraTo2DSlice();
-    } else {
-      this.moveCameraFrom2DSlice();
-      this.settings.editMode = false;
+  setSliceIndex(sliceOrientation: string, index: number) {
+    switch (sliceOrientation) {
+      case 'axial':
+        this._axialRenderer.stackHelper.index = index;
+        break;
+      case 'coronal':
+        this._coronalRenderer.stackHelper.index = index;
+        break;
+      case 'sagittal':
+        this._sagittalRenderer.stackHelper.index = index;
+        break;
+      default:
+        break;
     }
   }
 
-  mousewheel(event) {
-    // TODO: check bounds
-    if (this.settings.alignMode === false) { return; }
-
-    event.preventDefault();
-    event.stopPropagation();
-
-    let delta = 0;
-
-    if (event.wheelDelta) {
-      //  WebKit / Opera / Explorer 9
-
-      delta = event.wheelDelta / 40;
-    } else if (event.detail) {
-      //  Firefox
-
-      delta = -event.detail / 3;
-    }
-
-    let change = 0;
-    if (delta > 0) {
-      change = 1;
-    } else {
-      change = -1;
-    }
-
-    const oldPosition: THREE.Vector3 = this._perspectiveRenderer.stackHelper.slice.planePosition.clone();
-    const intersectionDirection: THREE.Vector3 = this._perspectiveRenderer.stackHelper.slice.planeDirection.clone();
-    const newPosition = oldPosition.addScaledVector(intersectionDirection, change);
-
-    this.sliceManipulator.changeSlicePosition(newPosition, intersectionDirection, 0);
-
-    this.dispatchEvent({
-      type: 'sliceZoomChanged',
-      changes: {
-        position: newPosition.clone(),
-        direction: intersectionDirection.clone(),
-        oldPosition: oldPosition.clone(),
-        oldDirection: intersectionDirection.clone()
-      }
-    });
+  setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
+    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
   }
 
-  sliceMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
-    if (intersection && this.settings.editMode) {
-      this.settings.sliceMouseDown = true;
-
-      if (this.segmentationVoxels.getGridPoint(intersection.point)) {
-        this.settings.segmentationIsDeleting = true;
-        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
-      } else {
-        this.settings.segmentationIsDeleting = false;
-        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
-      }
-    }
+  setPerspectiveCameraOrientation(args: IOrientation, transitionTime: number) {
+    this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
   }
 
-  sliceMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
-    if (intersection) {
-      this.settings.sliceMouseDown = false;
-      this.settings.segmentationIsDeleting = false;
-    }
-  }
+  // onAlignModeChange = (visible) => {
+  //   this.dispatchEvent({
+  //     type: 'alignModeChanged',
+  //     change: visible
+  //   });
+  // }
 
-  sliceMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
-    if (intersection && this.settings.editMode && this.settings.sliceMouseDown) {
-      if (this.settings.segmentationIsDeleting) {
-        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
-      } else {
-        this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
-      }
-    }
-  }
+  // alignModeToggled = (checkBox) => {
+  //   this.toggleAlignMode(checkBox.currentTarget.checked);
+  //   this.onAlignModeChange(checkBox.currentTarget.checked);
+  // }
+
+  // toggleAlignMode(checked) {
+  //   if (checked) {
+  //     this.moveCameraTo2DSlice();
+  //   } else {
+  //     this.moveCameraFrom2DSlice();
+  //     this.settings.editMode = false;
+  //   }
+  // }
+
+  // mousewheel(event) {
+  //   // TODO: check bounds
+  //   if (this.settings.alignMode === false) { return; }
+
+  //   event.preventDefault();
+  //   event.stopPropagation();
+
+  //   let delta = 0;
+
+  //   if (event.wheelDelta) {
+  //     //  WebKit / Opera / Explorer 9
+
+  //     delta = event.wheelDelta / 40;
+  //   } else if (event.detail) {
+  //     //  Firefox
+
+  //     delta = -event.detail / 3;
+  //   }
+
+  //   let change = 0;
+  //   if (delta > 0) {
+  //     change = 1;
+  //   } else {
+  //     change = -1;
+  //   }
+
+  //   const oldPosition: THREE.Vector3 = this._perspectiveRenderer.stackHelper.slice.planePosition.clone();
+  //   const intersectionDirection: THREE.Vector3 = this._perspectiveRenderer.stackHelper.slice.planeDirection.clone();
+  //   const newPosition = oldPosition.addScaledVector(intersectionDirection, change);
+
+  //   this.sliceManipulator.changeSlicePosition(newPosition, intersectionDirection, 0);
+
+  //   this.dispatchEvent({
+  //     type: 'sliceZoomChanged',
+  //     changes: {
+  //       position: newPosition.clone(),
+  //       direction: intersectionDirection.clone(),
+  //       oldPosition: oldPosition.clone(),
+  //       oldDirection: intersectionDirection.clone()
+  //     }
+  //   });
+  // }
+
+  // sliceMouseDown(intersection: THREE.Intersection, pointer: MouseEvent) {
+  //   if (intersection && this.settings.editMode) {
+  //     this.settings.sliceMouseDown = true;
+
+  //     if (this.segmentationVoxels.getGridPoint(intersection.point)) {
+  //       this.settings.segmentationIsDeleting = true;
+  //       this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
+  //     } else {
+  //       this.settings.segmentationIsDeleting = false;
+  //       this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
+  //     }
+  //   }
+  // }
+
+  // sliceMouseUp(intersection: THREE.Intersection, pointer: MouseEvent) {
+  //   if (intersection) {
+  //     this.settings.sliceMouseDown = false;
+  //     this.settings.segmentationIsDeleting = false;
+  //   }
+  // }
+
+  // sliceMouseMove(intersection: THREE.Intersection, pointer: MouseEvent) {
+  //   if (intersection && this.settings.editMode && this.settings.sliceMouseDown) {
+  //     if (this.settings.segmentationIsDeleting) {
+  //       this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, false);
+  //     } else {
+  //       this.segmentationVoxels.paintAt(intersection.point, this.settings.segmentationSize, true);
+  //     }
+  //   }
+  // }
 }

@@ -13,7 +13,6 @@
  */
 
 import * as THREE from 'three';
-import { View } from './types';
 
 export enum STATE {
   NONE = -1,
@@ -29,8 +28,6 @@ export enum STATE {
 export class Trackball extends THREE.EventDispatcher {
   private state: STATE = STATE.NONE;
   private previousState: STATE = STATE.NONE;
-  private views: View[];
-  private viewNumber: number;
   public camera: THREE.Camera;
   private domElement;
   private screen = { left: 0, right: 0, top: 0, bottom: 0, width: 0, height: 0 };
@@ -181,7 +178,7 @@ export class Trackball extends THREE.EventDispatcher {
       event.preventDefault();
     }, false);
 
-    this.handleResize(this.views);
+    this.handleResize();
 
     this.init();
 
@@ -207,24 +204,24 @@ export class Trackball extends THREE.EventDispatcher {
 
   //  methods
 
-  handleResize(views: View[]) {
+  handleResize() {
     if (this.domElement === document) {
-      this.screen.left = window.innerWidth * views[this.viewNumber].width;
+      this.screen.left = window.innerWidth;
       this.screen.right = this.screen.left * 2.0;
       this.screen.top = 0;
-      this.screen.bottom = window.innerHeight * views[this.viewNumber].height;
-      this.screen.width = window.innerWidth * views[this.viewNumber].width;
-      this.screen.height = window.innerHeight * views[this.viewNumber].height;
+      this.screen.bottom = window.innerHeight;
+      this.screen.width = window.innerWidth;
+      this.screen.height = window.innerHeight;
     } else {
       const box = this.domElement.getBoundingClientRect();
       //  adjustments come from similar code in the jquery offset() function
       const d = this.domElement.ownerDocument.documentElement;
-      this.screen.left = (box.left + window.pageXOffset - d.clientLeft) * views[this.viewNumber].width;
+      this.screen.left = (box.left + window.pageXOffset - d.clientLeft);
       this.screen.right = this.screen.left * 2.0;
       this.screen.top = box.top + window.pageYOffset - d.clientTop;
-      this.screen.bottom = box.width * views[this.viewNumber].width;
-      this.screen.width = box.width * views[this.viewNumber].width;
-      this.screen.height = box.height * views[this.viewNumber].height;
+      this.screen.bottom = box.width;
+      this.screen.width = box.width;
+      this.screen.height = box.height;
     }
   }
 
