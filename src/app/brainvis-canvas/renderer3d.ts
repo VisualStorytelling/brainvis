@@ -65,6 +65,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
     // resize event
     this._renderer.domElement.addEventListener('resize', this.onWindowResize, false);
 
+    this.addProvenanceHooks();
     this._initialized = true;
   }
 
@@ -119,7 +120,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       const orientation = this.getCameraOrientation();
 
       this._canvas.dispatchEvent({
-        type: 'zoomStart',
+        type: 'perspectiveCameraZoomChangeStart',
         orientation
       });
     });
@@ -128,7 +129,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       const orientation = this.getCameraOrientation();
 
       this._canvas.dispatchEvent({
-        type: 'zoomEnd',
+        type: 'perspectiveCameraZoomChanged',
         orientation
       });
     });
@@ -137,7 +138,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       const orientation = this.getCameraOrientation();
 
       this._canvas.dispatchEvent({
-        type: 'cameraStart',
+        type: 'perspectiveCameraOrientationChangeStart',
         orientation
       });
     });
@@ -146,7 +147,7 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
       const orientation = this.getCameraOrientation();
 
       this._canvas.dispatchEvent({
-        type: 'cameraEnd',
+        type: 'perspectiveCameraOrientationChanged',
         orientation
       });
     });
@@ -154,46 +155,6 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
   onScroll(event) {
     super.onScroll(event);
-
-    let delta = 0;
-    if (event.wheelDelta) {
-        //  WebKit / Opera / Explorer 9
-        delta = event.wheelDelta / 40;
-    } else if (event.detail) {
-        //  Firefox
-        delta = -event.detail / 3;
-    }
-
-    let change = 0;
-    if (delta > 0) {
-        change = 1;
-    } else {
-        change = -1;
-    }
-
-    const oldPosition: THREE.Vector3 = this._stackHelper.slice.planePosition.clone();
-    const intersectionDirection: THREE.Vector3 = this._stackHelper.slice.planeDirection.clone();
-    const newPosition = oldPosition.addScaledVector(intersectionDirection, change);
-
-    this._canvas.dispatchEvent({
-        type: 'perspectiveCameraZoomChangeStart',
-        changes: {
-            position: newPosition.clone(),
-            direction: intersectionDirection.clone(),
-            oldPosition: oldPosition.clone(),
-            oldDirection: intersectionDirection.clone()
-        }
-    });
-
-    this._canvas.dispatchEvent({
-        type: 'perspectiveCameraZoomChanged',
-        changes: {
-            position: newPosition.clone(),
-            direction: intersectionDirection.clone(),
-            oldPosition: oldPosition.clone(),
-            oldDirection: intersectionDirection.clone()
-        }
-    });
   }
 
   setCameraOrientation(newOrientation: IOrientation, within: number) {
