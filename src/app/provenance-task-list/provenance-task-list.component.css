@@ -1,44 +1,43 @@
-
 .inputContainer {
-    display: flex;
-    justify-content: space-around;
-    height: 100%;
-    margin-top: 10px;
-    background-color: aliceblue;
-    padding: 10px;
-    border-radius: 10px;
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  margin-top: 10px;
+  background-color: aliceblue;
+  padding: 10px;
+  border-radius: 10px;
 }
 
 #taskTable {
-    float: left;
+  float: left;
 }
 
 #taskTable li:hover {
-    background-color: #f9f9f9;
-    cursor: pointer;
+  background-color: #f9f9f9;
+  cursor: pointer;
 }
 
-.inputContainer input[type=“text”] {
-    border: none;
-    width: 200px;
-    background: transparent;
-    padding-left: 10px;
+.taskTitle {
+  border: none;
+  width: 200px;
+  background: transparent;
+  padding-left: 10px;
 }
 
-.inputContainer input[type=“text”]:focus {
-    outline: none;
+.taskTitle:focus {
+  outline: none;
 }
 
 .floatingButton {
-    width: 32px;
-    height: 32px;
-    border-radius: 16px;
-    font-size: 25px;
-    font-weight: bold;
-    padding: 0 0 15px;
-    float: right;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  font-size: 25px;
+  font-weight: bold;
+  padding: 0 0 15px;
+  float: right;
 }
 
 .floatingButton:focus {
-    outline: none;
+  outline: none;
 }
