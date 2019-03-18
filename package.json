@@ -10,6 +10,13 @@
     "lint": "ng lint",
     "e2e": "ng e2e"
   },
+  "workspaces": [
+    "packages/ami",
+    "packages/@visualstorytelling/provenance-core",
+    "packages/@visualstorytelling/provenance-tree-visualization",
+    "packages/@visualstorytelling/provenance-task-list",
+    "packages/@visualstorytelling/slide-deck-visualization"
+  ],
   "private": true,
   "dependencies": {
     "@angular/animations": "^6.0.7",
@@ -24,7 +31,6 @@
     "@angular/platform-browser-dynamic": "^6.0.7",
     "@angular/router": "^6.0.7",
     "core-js": "^2.5.4",
-    "d3": "^5.4.0",
     "hammerjs": "^2.0.8",
     "lodash": "4.14.2",
     "ng5-slider": "^1.1.8",
@@ -38,7 +44,6 @@
     "@angular/cli": "~6.0.8",
     "@angular/compiler-cli": "^6.0.7",
     "@angular/language-service": "^6.0.7",
-    "@types/d3": "^5.0.0",
     "@types/jasmine": "~2.8.6",
     "@types/jasminewd2": "~2.0.3",
     "@types/lodash": "4.14.118",

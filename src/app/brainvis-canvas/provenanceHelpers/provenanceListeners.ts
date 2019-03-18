@@ -4,40 +4,6 @@ import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 import { Settings } from '../utils/settings';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
-  canvas.addEventListener('cameraStart', (startEvent) => {
-    const cameraEndListener = (event) => {
-      tracker.applyAction({
-        metadata: {userIntent: 'exploration'},
-        do: 'setControlOrientation',
-        doArguments: [(event as any).orientation],
-        undo: 'setControlOrientation',
-        undoArguments: [(startEvent as any).orientation],
-      });
-      canvas.removeEventListener('cameraEnd', cameraEndListener);
-    };
-    canvas.addEventListener('cameraEnd', cameraEndListener);
-  });
-
-  let zoomEndListener: EventListener = null;
-  const zoomStartListener = (startEvent) => {
-    canvas.removeEventListener('zoomEnd', zoomEndListener);
-    zoomEndListener = debounce ((event) => {
-      tracker.applyAction({
-        metadata: {
-          userIntent: 'exploration',
-          value: event.orientation
-        },
-        do: 'setControlZoom',
-        doArguments: [event.orientation],
-        undo: 'setControlZoom',
-        undoArguments: [startEvent.orientation],
-      }, true);
-    }, 500, { trailing: true });
-    canvas.addEventListener('zoomEnd', zoomEndListener);
-  };
-  canvas.addEventListener('zoomStart', debounce(zoomStartListener, 500, { leading: true }));
-
-
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
     tracker.applyAction({

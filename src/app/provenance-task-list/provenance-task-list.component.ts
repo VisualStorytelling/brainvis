@@ -1,11 +1,12 @@
-import { Component, ElementRef, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService } from '../provenance.service';
 import { ProvenanceTaskList } from '@visualstorytelling/provenance-task-list';
 
 @Component({
   selector: 'app-provenance-task-list',
-  template: '<div></div>',
-  styleUrls: ['./provenance-task-list.component.css']
+  template: '',
+  styleUrls: ['./provenance-task-list.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ProvenanceTaskListComponent implements OnInit {
   private _taskList: ProvenanceTaskList;
