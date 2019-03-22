@@ -40,5 +40,6 @@ Thumbs.db
 .idea/
 yarn-error.log
 .gitmodules
+.vscode/
 
 packages/

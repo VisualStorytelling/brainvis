@@ -7,7 +7,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
     tracker.applyAction({
-      metadata: {userIntent: 'exploration'},
+      metadata: { userIntent: 'exploration' },
       do: 'setSlicePlaneOrientation',
       doArguments: [position, direction],
       undo: 'setSlicePlaneOrientation',
@@ -18,7 +18,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   canvas.addEventListener('sliceZoomChanged', (event: any) => {
     const { position, direction, oldPosition, oldDirection } = event.changes;
     tracker.applyAction({
-      metadata: {userIntent: 'exploration'},
+      metadata: { userIntent: 'exploration' },
       do: 'setSlicePlaneZoom',
       doArguments: [position, direction],
       undo: 'setSlicePlaneZoom',
@@ -28,7 +28,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.settings.showSliceChange.subscribe(val => {
     tracker.applyAction({
-      metadata: {userIntent: 'configuration'},
+      metadata: { userIntent: 'configuration' },
       do: 'showSlice',
       doArguments: [val],
       undo: 'showSlice',
@@ -38,7 +38,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.settings.showSliceHandleChange.subscribe(val => {
     tracker.applyAction({
-      metadata: {userIntent: 'configuration'},
+      metadata: { userIntent: 'configuration' },
       do: 'showSliceHandle',
       doArguments: [val],
       undo: 'showSliceHandle',
@@ -48,7 +48,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.settings.showObjectsChange.subscribe(val => {
     tracker.applyAction({
-      metadata: {userIntent: 'configuration'},
+      metadata: { userIntent: 'configuration' },
       do: 'showObjects',
       doArguments: [val],
       undo: 'showObjects',
@@ -58,7 +58,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.settings.editModeChange.subscribe(val => {
     tracker.applyAction({
-      metadata: {userIntent: 'configuration'},
+      metadata: { userIntent: 'configuration' },
       do: 'editMode',
       doArguments: [val],
       undo: 'editMode',
@@ -78,7 +78,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
 
   canvas.settings.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
     tracker.applyAction({
-      metadata: {userIntent: 'selection'},
+      metadata: { userIntent: 'selection' },
       do: 'selectedObjects',
       doArguments: [newObjects],
       undo: 'selectedObjects',
@@ -90,12 +90,25 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let sliceIndexEndListener: EventListener = null;
   const sliceIndexStartListener = (startEvent) => {
     canvas.removeEventListener('sliceIndexChanged', sliceIndexEndListener);
-    sliceIndexEndListener = debounce ((event) => {
+    sliceIndexEndListener = debounce((event) => {
+      let label = '';
+      switch (startEvent.changes.sliceOrientation) {
+        case 'axial':
+          label = 'Axial    #: ' + event.changes.newIndex;
+          break;
+        case 'coronal':
+          label = 'Coronal  #: ' + event.changes.newIndex;
+          break;
+        case 'sagittal':
+          label = 'Sagittal #: ' + event.changes.newIndex;
+          break;
+        default:
+          label = 'strange index?';
+      }
       tracker.applyAction({
         metadata: {
-          userIntent: 'exploration',
-          sliceOrientation: startEvent.changes.sliceOrientation,
-          delta: (event.changes.newIndex - startEvent.changes.oldIndex)
+          userIntent: 'configuration',
+          label: label
         },
         do: 'setSliceIndex',
         doArguments: [startEvent.changes.sliceOrientation, event.changes.newIndex],
@@ -111,11 +124,16 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let perspectiveZoomEndListener: EventListener = null;
   const perspectiveZoomStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
-    perspectiveZoomEndListener = debounce ((event) => {
+    perspectiveZoomEndListener = debounce((event) => {
+      let label  = 'P ZOOM:';
+          label += ' ' + event.orientation.position[0].toFixed(0);
+          label += '/' + event.orientation.position[1].toFixed(0);
+          label += '/' + event.orientation.position[2].toFixed(0);
+
       tracker.applyAction({
         metadata: {
           userIntent: 'exploration',
-          value: event.orientation
+          label: label
         },
         do: 'setPerspectiveCameraZoomLevel',
         doArguments: [event.orientation],
@@ -131,11 +149,15 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let perspectiveOrientationEndListener: EventListener = null;
   const perspectiveOrientationStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
-    perspectiveOrientationEndListener = debounce ((event) => {
+    perspectiveOrientationEndListener = debounce((event) => {
+      let label  = 'P XYZ :';
+          label += ' ' + event.orientation.position[0].toFixed(0);
+          label += '/' + event.orientation.position[1].toFixed(0);
+          label += '/' + event.orientation.position[2].toFixed(0);
       tracker.applyAction({
         metadata: {
           userIntent: 'exploration',
-          value: event.orientation
+          label: label
         },
         do: 'setPerspectiveCameraOrientation',
         doArguments: [event.orientation],
