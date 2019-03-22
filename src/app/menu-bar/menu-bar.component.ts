@@ -9,7 +9,7 @@ import { ProvenanceService } from '../provenance.service';
 })
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
-  protected now: string;
+  public now: string;
   constructor(public provenance: ProvenanceService) {
 
   }

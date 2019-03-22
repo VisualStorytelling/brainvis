@@ -10,7 +10,7 @@ export class AppComponent implements OnInit {
   title = 'app';
   private bottomDrawerOpen  = true;
 
-  constructor(private provenance: ProvenanceService) {
+  constructor(public provenance: ProvenanceService) {
     // console.log(arg);
     console.log('constructor');
   }

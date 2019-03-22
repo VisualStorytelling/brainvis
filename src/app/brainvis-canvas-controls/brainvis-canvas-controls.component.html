@@ -10,22 +10,22 @@
 <mat-slide-toggle [(ngModel)]="canvas.settings.quadView" [(disabled)]="canvas.settings.quadViewDisabled">
   Quad view
 </mat-slide-toggle>
-<mat-slide-toggle [(ngModel)]="canvas.settings.alignMode">
+<!-- <mat-slide-toggle [(ngModel)]="canvas.settings.alignMode">
   Align camera to slice
-</mat-slide-toggle>
+</mat-slide-toggle> -->
 <mat-slide-toggle [(ngModel)]="canvas.settings.editMode" [(disabled)]="canvas.settings.editModeDisabled">
   Segmentation mode
 </mat-slide-toggle>
 <mat-slider [(ngModel)]="canvas.settings.segmentationSize" [(disabled)]="canvas.settings.editModeDisabled" [min]='min' [max]='max' [step]='step' >
   Segmentation size
 </mat-slider>
-<mat-form-field>
-    <mat-select [(value)]='selectedColorMap'>
-      <mat-option *ngFor="let cm of availableColorMaps" (onSelectionChange)="change($event)" [value]="cm.value">
-        {{cm.viewValue}}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
+<!-- <mat-form-field>
+  <mat-select [(value)]='selectedColorMap'>
+    <mat-option *ngFor="let cm of availableColorMaps" (onSelectionChange)="change($event)" [value]="cm.value">
+      {{cm.viewValue}}
+    </mat-option>
+  </mat-select>
+</mat-form-field> -->
 <app-styled-slider [canvas]="canvas"></app-styled-slider>
 <button mat-icon-button (click)="provenance.saveGraph()">
   <mat-icon>backup</mat-icon>
