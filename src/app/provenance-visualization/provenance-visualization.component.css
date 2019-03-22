@@ -1,5 +1,5 @@
 app-provenance-visualization {
-  height: 50%;
+  height: 80%;
   width: 300px;
   display: block;
   background-color: white;
@@ -70,6 +70,7 @@ app-provenance-visualization {
 .node.node-active circle {
   stroke: black;
   stroke-width: 1.5px;
+  fill: #286090;
 }
 
 .node text {
@@ -98,7 +99,6 @@ app-provenance-visualization {
 }
 
 .dataAggregation-Box {
-  margin: 8px 0px 0px 12px;
   font-family: sans-serif;
 }
 
@@ -120,4 +120,52 @@ app-provenance-visualization {
 
 .hiddenClass {
   display: none;
+}
+.container {
+  display: flex;
+}
+#aggregationControls {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  height: 90px;
+  padding: 0 10px;
+}
+.caterpillar {
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+/*Legend CSS*/
+
+.legend {
+  flex: 1;
+  box-shadow: 0px 0px 4px #888;
+  margin: 5px;
+}
+.legend ul {
+  list-style-type: none;
+  padding: 0 5px;
+  margin: 3px 0;
+}
+.legend ul li {
+  display: flex;
+  align-items: center;
+  margin-bottom: 3px;
+}
+.legend li .circle {
+  width: 10px;
+  height: 10px;
+  border: 1px solid;
+  border-radius: 6px;
+}
+.legend li .rect {
+  width: 8px;
+  height: 8px;
+  border: 1px solid;
+}
+.legend li span {
+  padding-left: 5px;
+  font-size: 12px;
 }
