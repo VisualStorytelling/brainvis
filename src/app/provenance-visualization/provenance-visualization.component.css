@@ -70,7 +70,6 @@ app-provenance-visualization {
 .node.node-active circle {
   stroke: black;
   stroke-width: 1.5px;
-  fill: #286090;
 }
 
 .node text {
