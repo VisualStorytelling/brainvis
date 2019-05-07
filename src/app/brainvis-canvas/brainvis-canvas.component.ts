@@ -214,6 +214,18 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   loadData(url: string) {
     let loader = new AMI.VolumeLoader();
 
+    [
+      this._axialRenderer,
+      this._perspectiveRenderer,
+      this._coronalRenderer,
+      this._sagittalRenderer
+    ].forEach(renderer => {
+      const scene = renderer.scene;
+      while (scene.children.length > 0) {
+        scene.remove(scene.children[0]);
+      }
+    });
+
     loader
       .load(url)
       .then(function () {
