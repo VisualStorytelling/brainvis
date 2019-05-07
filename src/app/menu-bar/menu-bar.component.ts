@@ -10,15 +10,13 @@ import { ProvenanceService } from '../provenance.service';
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
   protected now: string;
-  constructor(public provenance: ProvenanceService) {
-
-  }
+  constructor(public provenance: ProvenanceService) {}
 
   ngOnInit() {
     setInterval(() => {
       const date = new Date();
-      this.now = `${date.getHours()}:${date.getMinutes()}`;
+      this.now = `${date.getHours()}:${(date.getMinutes() < 10 ? '0' : '') +
+        date.getMinutes()}`;
     }, 1000);
   }
-
 }
