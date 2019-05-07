@@ -6,6 +6,16 @@
     <span>&nbsp;</span>
     <span>&nbsp;</span>
     <span>&nbsp;</span>
+
+    <mat-form-field>
+      <mat-label>Select data</mat-label>
+      <mat-select (selectionChange)="setDataSource($event)">
+        <mat-option *ngFor="let dataSource of dataSources" [value]="dataSource.url">
+          {{ dataSource.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
     <mat-button-toggle
       name="showSliceHandle"
       [checked]="canvas.settings.showSliceHandle"
