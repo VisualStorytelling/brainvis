@@ -8,16 +8,6 @@ const getActions = (canvas: BrainvisCanvasComponent): {[key: string]: ActionFunc
       Promise.resolve(canvas.setSlicePlanePosition({position, direction}, transitionTime)),
   setSlicePlaneZoom: (position, direction, transitionTime) =>
       Promise.resolve(canvas.setSlicePlaneZoom({position, direction}, transitionTime)),
-  showSlice: (value: boolean) => Promise.resolve(canvas.settings.showSlice = value),
-  showObjects: (value: boolean) => Promise.resolve(canvas.settings.showObjects = value),
-  editMode: (value: boolean) => Promise.resolve(canvas.settings.editMode = value),
-  // alignMode: (value: boolean) => Promise.resolve(canvas.settings.alignMode = value),
-  showSliceHandle: (value: boolean) => Promise.resolve(canvas.settings.showSliceHandle = value),
-  // showSegmentedObjects: (value: boolean) => Promise.resolve(canvas.showObjects = value),
-  selectedObjects: (value: THREE.Object3D[]) => Promise.resolve(canvas.settings.selectedObjects = value),
-
-
-
 
   setSliceIndex: (sliceOrientation, index) => Promise.resolve(canvas.setSliceIndex(sliceOrientation, index)),
   setPerspectiveCameraZoomLevel: (args, transitionTime) => Promise.resolve(canvas.setPerspectiveCameraZoom(args, transitionTime)),

@@ -4,7 +4,14 @@ import { IAMIRenderer, View } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
 
+export interface IMeasurement {
+  start: THREE.Vector3;
+  end: THREE.Vector3;
+}
+
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
+  private measurement: IMeasurement | null;
+
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
     this._domElement = <HTMLElement>document.getElementById(view.domId);
@@ -55,56 +62,61 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     // scene
     this._scene = new THREE.Scene();
 
+
+    this._renderer.domElement.addEventListener('click', this.onClick.bind(this));
+
+    // this.scene.add()
+
     this._initialized = true;
   }
 
   initHelpersStack(stack) {
-      if (!this._initialized) {
-          throw new UninitializedError();
-      }
+    if (!this._initialized) {
+        throw new UninitializedError();
+    }
 
-      this._stackHelper = new AMI.StackHelper(stack);
-      this._stackHelper.bbox.visible = false;
-      this._stackHelper.borderColor = this._sliceColor;
-      this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
-      this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
+    this._stackHelper = new AMI.StackHelper(stack);
+    this._stackHelper.bbox.visible = false;
+    this._stackHelper.borderColor = this._sliceColor;
+    this._stackHelper.slice.canvasWidth = this._domElement.clientWidth;
+    this._stackHelper.slice.canvasHeight = this._domElement.clientHeight;
 
-      // set camera
-      const worldbb = stack.worldBoundingBox();
-      const lpsDims = new THREE.Vector3(
-          (worldbb[1] - worldbb[0]) / 2,
-          (worldbb[3] - worldbb[2]) / 2,
-          (worldbb[5] - worldbb[4]) / 2
-      );
+    // set camera
+    const worldbb = stack.worldBoundingBox();
+    const lpsDims = new THREE.Vector3(
+        (worldbb[1] - worldbb[0]) / 2,
+        (worldbb[3] - worldbb[2]) / 2,
+        (worldbb[5] - worldbb[4]) / 2
+    );
 
-      // box: {halfDimensions, center}
-      const box = {
-          center: stack.worldCenter().clone(),
-          halfDimensions: new THREE.Vector3(
-              lpsDims.x + 10,
-              lpsDims.y + 10,
-              lpsDims.z + 10
-          )
-      };
+    // box: {halfDimensions, center}
+    const box = {
+        center: stack.worldCenter().clone(),
+        halfDimensions: new THREE.Vector3(
+            lpsDims.x + 10,
+            lpsDims.y + 10,
+            lpsDims.z + 10
+        )
+    };
 
-      // init and zoom
-      const canvas = {
-          width: this._domElement.clientWidth,
-          height: this._domElement.clientHeight
-      };
+    // init and zoom
+    const canvas = {
+        width: this._domElement.clientWidth,
+        height: this._domElement.clientHeight
+    };
 
-      this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
-      this._camera.box = box;
-      this._camera.canvas = canvas;
-      this._camera.orientation = this._sliceOrientation;
-      this._camera.update();
-      this._camera.fitBox(2, 1);
+    this._camera.directions = [stack.xCosine, stack.yCosine, stack.zCosine];
+    this._camera.box = box;
+    this._camera.canvas = canvas;
+    this._camera.orientation = this._sliceOrientation;
+    this._camera.update();
+    this._camera.fitBox(2, 1);
 
-      this._stackHelper.orientation = this._camera.stackOrientation;
-      this._stackHelper.index = Math.floor(
-          this._stackHelper.orientationMaxIndex / 2
-      );
-      this._scene.add(this._stackHelper);
+    this._stackHelper.orientation = this._camera.stackOrientation;
+    this._stackHelper.index = Math.floor(
+        this._stackHelper.orientationMaxIndex / 2
+    );
+    this._scene.add(this._stackHelper);
   }
 
   initHelpersLocalizer(stack, referencePlane, localizers) {
@@ -260,5 +272,35 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
             oldIndex: oldIndex,
         }
     });
+  }
+
+  protected onClick(event) {
+    super.onClick(event);
+    const mouse = {
+      x: ((event.clientX - this._domElement.offsetLeft) / this._domElement.clientWidth) * 2 - 1,
+      y: -((event.clientY - this._domElement.offsetTop) / this._domElement.clientHeight) * 2 + 1,
+    };
+
+    // if measurementMode...
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera({x: 0, y: 0}, this._camera);
+    // const r = raycaster.intersectObject(this._stackhelper._slice);
+    const r = raycaster.intersectObjects(this._scene.children);
+    console.log(r);
+    console.log(raycaster.intersectObject(this._localizerHelper));
+    if (r.length === 1) {
+      const dotGeometry = new THREE.Geometry();
+      dotGeometry.vertices.push(r[0].point);
+      const dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, depthTest: false } );
+      const dot = new THREE.Points( dotGeometry, dotMaterial );
+      this.scene.add( dot );
+    }
+
+  }
+
+  set measurementMode(isEnabled: boolean) {
+    // toggle default controls to opposite of measurementMode
+    // this._controls.enabled = !isEnabled;
   }
 }

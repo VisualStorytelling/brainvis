@@ -26,45 +26,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     }, true);
   });
 
-  canvas.settings.showSliceChange.subscribe(val => {
-    tracker.applyAction({
-      metadata: { userIntent: 'configuration' },
-      do: 'showSlice',
-      doArguments: [val],
-      undo: 'showSlice',
-      undoArguments: [!val],
-    }, true);
-  });
 
-  canvas.settings.showSliceHandleChange.subscribe(val => {
-    tracker.applyAction({
-      metadata: { userIntent: 'configuration' },
-      do: 'showSliceHandle',
-      doArguments: [val],
-      undo: 'showSliceHandle',
-      undoArguments: [!val],
-    }, true);
-  });
-
-  canvas.settings.showObjectsChange.subscribe(val => {
-    tracker.applyAction({
-      metadata: { userIntent: 'configuration' },
-      do: 'showObjects',
-      doArguments: [val],
-      undo: 'showObjects',
-      undoArguments: [!val],
-    }, true);
-  });
-
-  canvas.settings.editModeChange.subscribe(val => {
-    tracker.applyAction({
-      metadata: { userIntent: 'configuration' },
-      do: 'editMode',
-      doArguments: [val],
-      undo: 'editMode',
-      undoArguments: [!val],
-    }, true);
-  });
 
   // canvas.settings.alignModeChange.subscribe(val => {
   //   tracker.applyAction({
@@ -76,15 +38,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   //   }, true);
   // });
 
-  canvas.settings.selectedObjectsChange.subscribe(([newObjects, oldObjects]) => {
-    tracker.applyAction({
-      metadata: { userIntent: 'selection' },
-      do: 'selectedObjects',
-      doArguments: [newObjects],
-      undo: 'selectedObjects',
-      undoArguments: [oldObjects],
-    }, true);
-  });
+
 
   // Slice Index Listener for all orientations - Debounced
   let sliceIndexEndListener: EventListener = null;

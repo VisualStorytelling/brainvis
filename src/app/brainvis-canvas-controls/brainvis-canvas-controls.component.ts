@@ -24,6 +24,7 @@ export class BrainvisCanvasControlsComponent {
   public step = 2;
   public selectedColorMap = 'grayscale';
 
+
   change(event) {
     if(event.isUserInput) {
       this.canvas.settings.colorMap = event.source.value;

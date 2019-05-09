@@ -17,47 +17,11 @@
     </mat-form-field>
 
     <mat-button-toggle
-      name="showSliceHandle"
-      [checked]="canvas.settings.showSliceHandle"
-      (change)="canvas.settings.showSliceHandle = $event.source.checked"
-      matTooltip="Show slice handle"
+      [checked]="canvas.settings.measurementMode"
+      (change)="canvas.settings.measurementMode = $event.source.checked"
+      matTooltip="Measurement"
     >
-      <mat-icon class="example-icon">arrow_right_alt</mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle
-      [checked]="canvas.settings.showSlice"
-      (change)="canvas.settings.showSlice = $event.source.checked"
-      matTooltip="Show slice"
-    >
-      <mat-icon class="example-icon">aspect_ratio</mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle
-      [checked]="canvas.settings.showObjects"
-      (change)="canvas.settings.showObjects = $event.source.checked"
-      matTooltip="Show segmented objects"
-    >
-      <mat-icon class="example-icon">rounded_corner</mat-icon>
-    </mat-button-toggle>
-    <mat-button-toggle
-      [checked]="canvas.settings.quadView"
-      (change)="canvas.settings.quadView = $event.source.checked"
-      matTooltip="Quad view"
-    >
-      <mat-icon class="example-icon">videocam</mat-icon>
-    </mat-button-toggle>
-    <!-- <mat-button-toggle
-      [checked]="canvas.settings.alignMode"
-      (change)="canvas.settings.alignMode = $event.source.checked"
-      matTooltip="Align camera to slice"
-    >
-      <mat-icon class="example-icon">featured_video</mat-icon>
-    </mat-button-toggle> -->
-    <mat-button-toggle
-      [checked]="false"
-      (change)="false"
-      matTooltip="Segmentation mode"
-    >
-      <mat-icon class="example-icon">edit</mat-icon>
+      <mat-icon class="example-icon">vertical_align_center</mat-icon>
     </mat-button-toggle>
     <mat-menu #appMenu="matMenu">
         <app-styled-slider [canvas]="canvas"></app-styled-slider>
