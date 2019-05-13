@@ -3,14 +3,11 @@ import * as AMI from 'ami.js';
 import { IAMIRenderer, View } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
-
-export interface IMeasurement {
-  start: THREE.Vector3;
-  end: THREE.Vector3;
-}
+import Ruler from './ruler';
 
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
-  private measurement: IMeasurement | null;
+  private _measurementMode: boolean;
+  private _ruler: Ruler | null;
 
   constructor(view: View, canvas: BrainvisCanvasComponent) {
     super(view, canvas);
@@ -66,6 +63,9 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._renderer.domElement.addEventListener('click', this.onClick.bind(this));
 
     // this.scene.add()
+
+    this._ruler = null;
+    this._measurementMode = false;
 
     this._initialized = true;
   }
@@ -237,70 +237,52 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   }
 
   onScroll(event) {
-    super.onScroll(event);
+    if (!this._measurementMode) {
+      super.onScroll(event);
 
-    const oldIndex = this._stackHelper.index;
+      const oldIndex = this._stackHelper.index;
 
-    if (event.delta > 0) {
-      if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
-        return;
+      if (event.delta > 0) {
+        if (this._stackHelper.index >= this._stackHelper.orientationMaxIndex - 1) {
+          return;
+        }
+        this._stackHelper.index += 1;
+      } else {
+        if (this._stackHelper.index <= 0) {
+          return;
+        }
+        this._stackHelper.index -= 1;
       }
-      this._stackHelper.index += 1;
-    } else {
-      if (this._stackHelper.index <= 0) {
-        return;
-      }
-      this._stackHelper.index -= 1;
-    }
 
-    const newIndex = this._stackHelper.index;
+      const newIndex = this._stackHelper.index;
 
-    this._canvas.dispatchEvent({
+      this._canvas.dispatchEvent({
         type: 'sliceIndexChangeStart',
         changes: {
-            sliceOrientation: this._sliceOrientation,
-            newIndex: newIndex,
-            oldIndex: oldIndex,
+          sliceOrientation: this._sliceOrientation,
+          newIndex: newIndex,
+          oldIndex: oldIndex,
         }
-    });
+      });
 
-    this._canvas.dispatchEvent({
+      this._canvas.dispatchEvent({
         type: 'sliceIndexChanged',
         changes: {
-            sliceOrientation: this._sliceOrientation,
-            newIndex: newIndex,
-            oldIndex: oldIndex,
+          sliceOrientation: this._sliceOrientation,
+          newIndex: newIndex,
+          oldIndex: oldIndex,
         }
-    });
-  }
-
-  protected onClick(event) {
-    super.onClick(event);
-    const mouse = {
-      x: ((event.clientX - this._domElement.offsetLeft) / this._domElement.clientWidth) * 2 - 1,
-      y: -((event.clientY - this._domElement.offsetTop) / this._domElement.clientHeight) * 2 + 1,
-    };
-
-    // if measurementMode...
-
-    const raycaster = new THREE.Raycaster();
-    raycaster.setFromCamera({x: 0, y: 0}, this._camera);
-    // const r = raycaster.intersectObject(this._stackhelper._slice);
-    const r = raycaster.intersectObjects(this._scene.children);
-    console.log(r);
-    console.log(raycaster.intersectObject(this._localizerHelper));
-    if (r.length === 1) {
-      const dotGeometry = new THREE.Geometry();
-      dotGeometry.vertices.push(r[0].point);
-      const dotMaterial = new THREE.PointsMaterial( { size: 10, sizeAttenuation: false, depthTest: false } );
-      const dot = new THREE.Points( dotGeometry, dotMaterial );
-      this.scene.add( dot );
+      });
     }
-
   }
 
   set measurementMode(isEnabled: boolean) {
-    // toggle default controls to opposite of measurementMode
-    // this._controls.enabled = !isEnabled;
+    this._measurementMode = isEnabled;
+    if (isEnabled) {
+      this._ruler = new Ruler(this);
+    } else {
+      this._ruler.remove();
+      this._ruler = null;
+    }
   }
 }

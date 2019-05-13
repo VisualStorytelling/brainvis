@@ -17,11 +17,11 @@ export class MenuBarComponent implements OnInit {
   }
 
   public dataSources = [
-    { name: 'adi_brain', url: 'https://rawcdn.githack.com/VisualStorytelling/data/master/fnndsc/adi_brain.nii.gz' },
-    { name: 'adi_slice', url: 'https://rawcdn.githack.com/VisualStorytelling/data/master/fnndsc/adi_slice.nii.gz' },
-    { name: 'carp', url: 'https://rawcdn.githack.com/VisualStorytelling/data/master/mricrogl/carp.nii.gz' },
-    { name: 'chris t1', url: 'https://rawcdn.githack.com/VisualStorytelling/data/master/mricrogl/chris_t1.nii.gz' },
-    { name: 'visiblehuman', url: 'https://rawcdn.githack.com/VisualStorytelling/data/master/mricrogl/visiblehuman.nii.gz' }
+    { name: 'adi_brain', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_brain.nii.gz' },
+    { name: 'adi_slice', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/fnndsc/adi_slice.nii.gz' },
+    { name: 'carp', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/carp.nii.gz' },
+    { name: 'chris t1', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/chris_t1.nii.gz' },
+    { name: 'visiblehuman', url: 'https://rawcdn.githack.com/VisualStorytelling/data/94dd382a51958824eb6bf4cf529f5b7bce383f99/mricrogl/visiblehuman.nii.gz' }
   ];
 
   public setDataSource(change: MatSelectChange) {
