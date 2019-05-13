@@ -276,13 +276,20 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
   }
 
+  createRuler = (evt) => {
+    this._ruler = new Ruler(this);
+    this._domElement.removeEventListener('mousedown', this.createRuler);
+  }
+
   set measurementMode(isEnabled: boolean) {
     this._measurementMode = isEnabled;
     if (isEnabled) {
-      this._ruler = new Ruler(this);
+      this.domElement.addEventListener('mousedown', this.createRuler);
     } else {
-      this._ruler.remove();
-      this._ruler = null;
+      if (this._ruler) {
+        this._ruler.remove();
+        this._ruler = null;
+      }
     }
   }
 }

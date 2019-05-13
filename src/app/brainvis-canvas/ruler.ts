@@ -13,11 +13,16 @@ export default class Ruler {
 
     this.widget = new AMI.RulerWidget(stackHelper.slice.mesh, controls, {
       lps2IJK: stack.lps2IJK,
-      pixelSpacing: stack.frame[stackHelper.index].pixelSpacing,
-      ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
-      worldPosition: new THREE.Vector3(),
+
+      // todo: check if using this _spacing leads to the right scale
+      pixelSpacing: stack._spacing.toArray(),
+      // ultrasoundRegions: stack.frame[stackHelper.index].ultrasoundRegions,
+      // worldPosition: new THREE.Vector3(),
     });
 
+    this.widget.update();
+
+    // add eventlisteners to override the defaults (e.g. disable move slice with mouse)
     this.renderer.domElement.addEventListener('mouseup', this.onMouseUp);
     this.renderer.domElement.addEventListener('mousemove', this.onMouseMove);
     this.renderer.domElement.addEventListener('mousedown', this.onMouseDown);
