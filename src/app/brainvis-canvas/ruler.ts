@@ -82,12 +82,12 @@ export default class Ruler {
       this.changed.emit({
         oldPoints: {
           // todo: get actual old position (not possible with AMI ruler widget atm)
-          p0: this.widget._handles[0].worldPosition,
-          p1: this.widget._handles[1].worldPosition,
+          p0: this.widget._handles[0].worldPosition.clone(),
+          p1: this.widget._handles[1].worldPosition.clone(),
         },
         newPoints: {
-          p0: this.widget._handles[0].worldPosition,
-          p1: this.widget._handles[1].worldPosition,
+          p0: this.widget._handles[0].worldPosition.clone(),
+          p1: this.widget._handles[1].worldPosition.clone(),
         }
       });
     }
