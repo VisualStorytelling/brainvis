@@ -1,4 +1,5 @@
 import { Camera } from 'three';
+import * as THREE from 'three';
 
 export interface IOrientation {
     position: number[];
@@ -36,4 +37,9 @@ export interface IAMIRenderer {
     domElement: HTMLElement;
     init();
     render();
+}
+
+export interface IPointPair {
+    p0: THREE.Vector3;
+    p1: THREE.Vector3;
 }

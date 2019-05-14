@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import * as AMI from 'ami.js';
 import { IAMIRenderer, View, IOrientation } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
-import { BrainvisCanvasComponent } from './brainvis-canvas.component';
+import { BrainvisCanvasComponent, VIEWS } from './brainvis-canvas.component';
 import { Trackball } from './utils/trackball';
 
 export class Renderer3D extends AMIRenderer implements IAMIRenderer {

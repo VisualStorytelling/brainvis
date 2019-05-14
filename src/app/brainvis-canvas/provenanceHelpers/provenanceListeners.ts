@@ -2,6 +2,8 @@ import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 import { debounce } from 'lodash';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
 import { Settings } from '../utils/settings';
+import { Renderer2D } from '../renderer2d';
+import { IPointPair } from '../utils/types';
 
 export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasComponent) => {
   canvas.addEventListener('sliceOrientationChanged', (event: any) => {
@@ -122,4 +124,52 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
     canvas.addEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
   };
   canvas.addEventListener('perspectiveCameraOrientationChangeStart', debounce(perspectiveOrientationStartListener, 500, { leading: true }));
+
+
+  canvas.renderers.forEach(renderer => {
+    if (renderer instanceof Renderer2D) {
+      renderer.rulerRemoved.subscribe((args) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'delete ruler'
+          },
+          do: 'deleteRuler',
+          doArguments: [renderer.sliceOrientation],
+          undo: 'createRuler',
+          undoArguments: [renderer.sliceOrientation, args],
+        };
+        tracker.applyAction(action, true);
+      });
+      renderer.rulerCreated.subscribe((args) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'create ruler'
+          },
+          do: 'createRuler',
+          doArguments: [renderer.sliceOrientation, args],
+          undo: 'deleteRuler',
+          undoArguments: [renderer.sliceOrientation],
+        };
+        tracker.applyAction(action, true);
+      });
+
+      renderer.rulerChanged.subscribe(({oldPoints, newPoints}: { oldPoints: IPointPair, newPoints: IPointPair}) => {
+        const action = {
+          metadata: {
+            userIntent: 'measurement',
+            label: 'update ruler'
+          },
+          do: 'updateRuler',
+          doArguments: [renderer.sliceOrientation, newPoints],
+          undo: 'updateRuler',
+          undoArguments: [renderer.sliceOrientation, oldPoints],
+        };
+        console.log(action);
+        tracker.applyAction(action, true);
+      });
+    }
+  });
+
 };

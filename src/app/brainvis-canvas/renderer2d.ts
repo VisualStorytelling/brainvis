@@ -1,9 +1,10 @@
 import * as THREE from 'three';
 import * as AMI from 'ami.js';
-import { IAMIRenderer, View } from './utils/types';
+import { IAMIRenderer, IPointPair, View } from './utils/types';
 import { AMIRenderer } from './amiRenderer';
 import { BrainvisCanvasComponent } from './brainvis-canvas.component';
 import Ruler from './ruler';
+import { EventEmitter, Output } from '@angular/core';
 
 export class Renderer2D extends AMIRenderer implements IAMIRenderer {
   private _measurementMode: boolean;
@@ -18,7 +19,12 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     this._targetID = view.targetID; // 1
   }
 
+  @Output() rulerCreated = new EventEmitter<IPointPair>();
+  @Output() rulerChanged = new EventEmitter<{oldPoints: IPointPair, newPoints: IPointPair}>();
+  @Output() rulerRemoved = new EventEmitter<IPointPair>();
+
   init() {
+    this.rulerChanged.subscribe(console.log);
     if (this._initialized) {
       return;
     }
@@ -276,20 +282,61 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
     }
   }
 
-  createRuler = (evt) => {
-    this._ruler = new Ruler(this);
-    this._domElement.removeEventListener('mousedown', this.createRuler);
+  startRuler = (evt) => {
+    this._ruler = new Ruler(this, evt);
+    this._domElement.removeEventListener('mousedown', this.startRuler);
+
+    // forward events
+    this._ruler.created.subscribe(arg => this.rulerCreated.emit(arg));
+    this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
   }
+
+  createRuler = ({p0, p1}: IPointPair) => {
+    this._ruler = new Ruler(this);
+
+    // set position
+    this._ruler.widget._handles[0].worldPosition = p0;
+    this._ruler.widget._handles[1].worldPosition = p1;
+
+    // make sure we're not in dragging mode
+    this._ruler.widget._handles[1]._active = false;
+
+    // forward events
+    this._ruler.changed.subscribe(arg => this.rulerChanged.emit(arg));
+  }
+
+  updateRuler = ({p0, p1}: IPointPair) => {
+    if (this._ruler) {
+      // set position
+      this._ruler.widget._handles[0].worldPosition = p0;
+      this._ruler.widget._handles[1].worldPosition = p1;
+      this._ruler.widget.update();
+    }
+  }
+
+  deleteRuler = () => {
+    if (this._ruler) {
+      // get position (needed for the undo provenance action).
+      const p0 = this._ruler.widget._handles[0].worldPosition;
+      const p1 = this._ruler.widget._handles[1].worldPosition;
+
+      this._ruler.remove();
+      this._ruler = null;
+      this.rulerRemoved.emit({p0, p1});
+      this.measurementMode = false;
+    }
+  }
+
+  get sliceOrientation() { return this._sliceOrientation; }
 
   set measurementMode(isEnabled: boolean) {
     this._measurementMode = isEnabled;
     if (isEnabled) {
-      this.domElement.addEventListener('mousedown', this.createRuler);
+      // create a ruler on first click
+      this.domElement.addEventListener('mousedown', this.startRuler);
     } else {
-      if (this._ruler) {
-        this._ruler.remove();
-        this._ruler = null;
-      }
+      this.domElement.removeEventListener('mousedown', this.startRuler);
+      this.deleteRuler();
     }
   }
 }

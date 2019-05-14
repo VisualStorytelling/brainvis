@@ -11,6 +11,13 @@ import { Settings } from './utils/settings';
 import { Renderer2D } from './renderer2d';
 import { Renderer3D } from './renderer3d';
 
+export enum VIEWS {
+  AXIAL = 'axial',
+  SAGITTAL = 'sagittal',
+  CORONAL = 'coronal',
+  FREEFORM = 'freeform',
+}
+
 @Component({
   selector: 'app-brainvis-canvas',
   templateUrl: './brainvis-canvas.component.html',
@@ -30,7 +37,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: 'axial',
+      sliceOrientation: VIEWS.AXIAL,
       sliceColor: 0xff1744,
       targetID: 0
     },
@@ -43,7 +50,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: 'freeform',
+      sliceOrientation: VIEWS.FREEFORM,
       sliceColor: 0xffffff,
       targetID: 1
     },
@@ -56,7 +63,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: 'coronal',
+      sliceOrientation: VIEWS.CORONAL,
       sliceColor: 0x76ff03,
       targetID: 2
     },
@@ -69,7 +76,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       height: 0.5,
 
       color: 0x121212,
-      sliceOrientation: 'sagittal',
+      sliceOrientation: VIEWS.SAGITTAL,
       sliceColor: 0xffea00,
       targetID: 3
     },
@@ -91,10 +98,12 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
 
   private sliceManipulator: SliceManipulatorWidget;
 
+  private _provenance: ProvenanceService;
+
   constructor(elem: ElementRef, provenance: ProvenanceService) {
     super();
     registerActions(provenance.registry, this);
-    addListeners(provenance.tracker, this);
+    this._provenance = provenance;
     this.elem = elem.nativeElement;
   }
 
@@ -106,14 +115,28 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     return this._initialized;
   }
 
-  @HostListener('window:resize', ['$event'])
-  onResize() {
-    [
+  getRenderer(view: VIEWS) {
+    switch (view) {
+      case VIEWS.SAGITTAL: return this._sagittalRenderer;
+      case VIEWS.AXIAL: return this._axialRenderer;
+      case VIEWS.CORONAL: return this._coronalRenderer;
+      case VIEWS.FREEFORM: return this._perspectiveRenderer;
+      default: throw new Error('no such view: ' + view);
+    }
+  }
+
+  get renderers() {
+    return [
       this._axialRenderer,
       this._perspectiveRenderer,
       this._coronalRenderer,
       this._sagittalRenderer
-    ].forEach(renderer => {
+    ];
+  }
+
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    this.renderers.forEach(renderer => {
       if (renderer.scene.children.length > 0) {
         renderer.onWindowResize();
       }
@@ -129,15 +152,13 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._coronalRenderer = new Renderer2D(this.views[2], this);
     this._sagittalRenderer = new Renderer2D(this.views[3], this);
 
-    this._perspectiveRenderer.init();
-    this._axialRenderer.init();
-    this._coronalRenderer.init();
-    this._sagittalRenderer.init();
+    this.renderers.forEach(renderer => renderer.init());
 
     this.addEventListeners();
     this.animate();
 
     this.settings.measurementModeChange.subscribe(this.toggleMeasurementMode.bind(this));
+    addListeners(this._provenance.tracker, this);
   }
 
   toggleMeasurementMode(isEnabled: boolean) {
@@ -146,119 +167,101 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     this._coronalRenderer.measurementMode = isEnabled;
   }
 
-  loadData(url: string) {
+  async loadData(url: string) {
     let loader = new AMI.VolumeLoader();
 
-    [
-      this._axialRenderer,
-      this._perspectiveRenderer,
-      this._coronalRenderer,
-      this._sagittalRenderer
-    ].forEach(renderer => {
+    this.renderers.forEach(renderer => {
       const scene = renderer.scene;
       while (scene.children.length > 0) {
         scene.remove(scene.children[0]);
       }
     });
 
-    loader
-      .load(url)
-      .then(function () {
-        const bcc = <BrainvisCanvasComponent>this;
-        // merge files into clean series/stack/frame structure
-        const series = loader.data[0].mergeSeries(loader.data)[0];
-        loader.free();
-        loader = null;
+    try {
+      await loader.load(url);
+      // merge files into clean series/stack/frame structure
+      const series = loader.data[0].mergeSeries(loader.data)[0];
+      loader.free();
+      loader = null;
 
-        const stack = series.stack[0];
-        stack.prepare();
+      const stack = series.stack[0];
+      stack.prepare();
 
-        // center 3d camera/control on the stack
-        const centerLPS = stack.worldCenter();
-        const perspectiveCamera = <THREE.PerspectiveCamera>bcc._perspectiveRenderer.camera;
-        perspectiveCamera.lookAt(new THREE.Vector3(centerLPS.x, centerLPS.y, centerLPS.z));
-        perspectiveCamera.updateProjectionMatrix();
+      // center 3d camera/control on the stack
+      const centerLPS = stack.worldCenter();
+      const perspectiveCamera = <THREE.PerspectiveCamera>this._perspectiveRenderer.camera;
+      perspectiveCamera.lookAt(new THREE.Vector3(centerLPS.x, centerLPS.y, centerLPS.z));
+      perspectiveCamera.updateProjectionMatrix();
 
-        const perspectiveControls = <THREE.TrackballControls>bcc._perspectiveRenderer.controls;
-        perspectiveControls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
+      const perspectiveControls = <THREE.TrackballControls>this._perspectiveRenderer.controls;
+      perspectiveControls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
 
-        // bounding box
-        const boxHelper = new AMI.BoundingBoxHelper(stack);
-        bcc._perspectiveRenderer.scene.add(boxHelper);
+      // bounding box
+      const boxHelper = new AMI.BoundingBoxHelper(stack);
+      this._perspectiveRenderer.scene.add(boxHelper);
 
-        // Freeform slice
-        bcc._perspectiveRenderer.initHelpersStack(stack);
+      // Freeform slice
+      this._perspectiveRenderer.initHelpersStack(stack);
 
-        // red slice
-        bcc._axialRenderer.initHelpersStack(stack);
-        bcc._perspectiveRenderer.scene.add(bcc._axialRenderer.scene);
-
-        // yellow slice
-        bcc._coronalRenderer.initHelpersStack(stack);
-        bcc._perspectiveRenderer.scene.add(bcc._coronalRenderer.scene);
-
-        // green slice
-        bcc._sagittalRenderer.initHelpersStack(stack);
-        bcc._perspectiveRenderer.scene.add(bcc._sagittalRenderer.scene);
-
-        // Set initial threshold values for white balance
-        bcc.settings.thresholdLowerBound = bcc._axialRenderer.stackHelper.stack.minMax[0];
-        bcc.settings.thresholdUpperBound = bcc._axialRenderer.stackHelper.stack.minMax[1];
-        bcc.settings.thresholdMinValue = bcc._axialRenderer.stackHelper.stack.minMax[0];
-        bcc.settings.thresholdMaxValue = bcc._axialRenderer.stackHelper.stack.minMax[1];
-
-        // Init render to texture target
-        bcc.textureTarget = new THREE.WebGLRenderTarget(
-          bcc._axialRenderer.domElement.clientWidth,
-          bcc._axialRenderer.domElement.clientHeight,
-          {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.NearestFilter,
-            format: THREE.RGBAFormat,
-          }
-        );
-
-        bcc.contourHelper = new AMI.ContourHelper(stack, bcc._axialRenderer.stackHelper.slice.geometry);
-        bcc.contourHelper.canvasWidth = bcc.textureTarget.width;
-        bcc.contourHelper.canvasHeight = bcc.textureTarget.height;
-        bcc.contourHelper.textureToFilter = bcc.textureTarget.texture;
-        bcc.contourScene = new THREE.Scene();
-        bcc.contourScene.add(bcc.contourHelper);
-
-        // create new mesh with Localizer shaders
-        const plane1 = bcc._axialRenderer.stackHelper.slice.cartesianEquation();
-        const plane2 = bcc._coronalRenderer.stackHelper.slice.cartesianEquation();
-        const plane3 = bcc._sagittalRenderer.stackHelper.slice.cartesianEquation();
-
-        // localizer axial slice
-        bcc._axialRenderer.initHelpersLocalizer(stack, plane1, [
-          { plane: plane2, color: new THREE.Color(bcc._coronalRenderer.stackHelper.borderColor) },
-          { plane: plane3, color: new THREE.Color(bcc._sagittalRenderer.stackHelper.borderColor) },
-        ]);
-
-        // localizer coronal slice
-        bcc._coronalRenderer.initHelpersLocalizer(stack, plane2, [
-          { plane: plane1, color: new THREE.Color(bcc._axialRenderer.stackHelper.borderColor) },
-          { plane: plane3, color: new THREE.Color(bcc._sagittalRenderer.stackHelper.borderColor) },
-        ]);
-
-        // localizer sagittal slice
-        bcc._sagittalRenderer.initHelpersLocalizer(stack, plane3, [
-          { plane: plane1, color: new THREE.Color(bcc._axialRenderer.stackHelper.borderColor) },
-          { plane: plane2, color: new THREE.Color(bcc._coronalRenderer.stackHelper.borderColor) },
-        ]);
-
-        // // event listeners
-        bcc._perspectiveRenderer.addEventListeners();
-        bcc._axialRenderer.addEventListeners();
-        bcc._coronalRenderer.addEventListeners();
-        bcc._sagittalRenderer.addEventListeners();
-        bcc._initialized = true;
-      }.bind(this))
-      .catch(function (error) {
-        window.console.log('oops... something went wrong...');
-        window.console.log(error);
+      [this._coronalRenderer, this._axialRenderer, this._sagittalRenderer].forEach(renderer => {
+        renderer.initHelpersStack(stack);
+        this._perspectiveRenderer.scene.add(renderer.scene);
       });
+
+      // Set initial threshold values for white balance
+      this.settings.thresholdLowerBound = this._axialRenderer.stackHelper.stack.minMax[0];
+      this.settings.thresholdUpperBound = this._axialRenderer.stackHelper.stack.minMax[1];
+      this.settings.thresholdMinValue = this._axialRenderer.stackHelper.stack.minMax[0];
+      this.settings.thresholdMaxValue = this._axialRenderer.stackHelper.stack.minMax[1];
+
+      // Init render to texture target
+      this.textureTarget = new THREE.WebGLRenderTarget(
+        this._axialRenderer.domElement.clientWidth,
+        this._axialRenderer.domElement.clientHeight,
+        {
+          minFilter: THREE.LinearFilter,
+          magFilter: THREE.NearestFilter,
+          format: THREE.RGBAFormat,
+        }
+      );
+
+      this.contourHelper = new AMI.ContourHelper(stack, this._axialRenderer.stackHelper.slice.geometry);
+      this.contourHelper.canvasWidth = this.textureTarget.width;
+      this.contourHelper.canvasHeight = this.textureTarget.height;
+      this.contourHelper.textureToFilter = this.textureTarget.texture;
+      this.contourScene = new THREE.Scene();
+      this.contourScene.add(this.contourHelper);
+
+      // create new mesh with Localizer shaders
+      const plane1 = this._axialRenderer.stackHelper.slice.cartesianEquation();
+      const plane2 = this._coronalRenderer.stackHelper.slice.cartesianEquation();
+      const plane3 = this._sagittalRenderer.stackHelper.slice.cartesianEquation();
+
+      // localizer axial slice
+      this._axialRenderer.initHelpersLocalizer(stack, plane1, [
+        {plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor)},
+        {plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor)},
+      ]);
+
+      // localizer coronal slice
+      this._coronalRenderer.initHelpersLocalizer(stack, plane2, [
+        {plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor)},
+        {plane: plane3, color: new THREE.Color(this._sagittalRenderer.stackHelper.borderColor)},
+      ]);
+
+      // localizer sagittal slice
+      this._sagittalRenderer.initHelpersLocalizer(stack, plane3, [
+        {plane: plane1, color: new THREE.Color(this._axialRenderer.stackHelper.borderColor)},
+        {plane: plane2, color: new THREE.Color(this._coronalRenderer.stackHelper.borderColor)},
+      ]);
+
+      // // event listeners
+      this.renderers.forEach(renderer => renderer.addEventListeners());
+      this._initialized = true;
+    } catch (error) {
+      window.console.log('oops... something went wrong...');
+      window.console.log(error);
+    }
   }
 
   onAxialChanged() {
@@ -301,10 +304,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   }
 
   render() {
-    this._perspectiveRenderer.render();
-    this._axialRenderer.render();
-    this._coronalRenderer.render();
-    this._sagittalRenderer.render();
+    this.renderers.forEach(renderer => renderer.render());
   }
 
   setSlicePlanePosition(positions: ISlicePosition, within: number) {
@@ -321,20 +321,9 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
     }
   }
 
-  setSliceIndex(sliceOrientation: string, index: number) {
-    switch (sliceOrientation) {
-      case 'axial':
-        this._axialRenderer.stackHelper.index = index;
-        break;
-      case 'coronal':
-        this._coronalRenderer.stackHelper.index = index;
-        break;
-      case 'sagittal':
-        this._sagittalRenderer.stackHelper.index = index;
-        break;
-      default:
-        break;
-    }
+  setSliceIndex(sliceOrientation: VIEWS, index: number) {
+    const renderer = this.getRenderer(sliceOrientation);
+    renderer.stackHelper.index = index;
   }
 
   setPerspectiveCameraZoom(args: IOrientation, transitionTime: number) {
