@@ -42,14 +42,14 @@
     </mat-button-toggle>
     <mat-button-toggle
       [checked]="false"
-      (change)="false"
+      (change)="(false)"
       matTooltip="Segmentation mode"
     >
       <mat-icon class="example-icon">edit</mat-icon>
     </mat-button-toggle>
     <mat-menu #appMenu="matMenu">
-        <app-styled-slider [canvas]="canvas"></app-styled-slider>
-        <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
+      <app-styled-slider [canvas]="canvas"></app-styled-slider>
+      <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
     </mat-menu>
     <button
       matTooltip="Thresholds"
@@ -59,7 +59,12 @@
       <mat-icon>exposure</mat-icon>
     </button>
 
-    <button mat-raised-button [disabled]="provenance.saveStatus === 'saving'" matTooltip="Save tree in cloud" (click)="provenance.saveGraph()">
+    <button
+      mat-raised-button
+      [disabled]="provenance.saveStatus === 'saving'"
+      matTooltip="Save tree in cloud"
+      (click)="provenance.saveGraph()"
+    >
       <mat-icon>backup</mat-icon>
     </button>
 

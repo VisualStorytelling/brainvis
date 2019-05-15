@@ -2,7 +2,7 @@ app-provenance-visualization {
   height: 80%;
   width: 300px;
   display: block;
-  background-color: white;
+  background-color: #fafafa;
 }
 
 .node {

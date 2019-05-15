@@ -14,7 +14,7 @@
 }
 
 .renderer {
-  background-color: #000;
+  background-color: transparent;
   width: 50%;
   height: 50%;
   -webkit-box-sizing: border-box;

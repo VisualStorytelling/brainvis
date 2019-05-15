@@ -17,10 +17,10 @@ app-provenance-task-list {
   border-radius: 10px;
 }
 
-#taskTable li:hover {
+/* #taskTable li:hover {
   background-color: #f9f9f9;
   cursor: pointer;
-}
+} */
 
 .taskTitle {
   border: none;
