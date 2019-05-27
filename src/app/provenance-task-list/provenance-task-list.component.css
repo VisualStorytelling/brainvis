@@ -5,28 +5,30 @@ app-provenance-task-list {
 #taskTable {
   margin: 0;
   padding: 0 5px;
-  height: 150px;
+  height:calc(100vh - 100px);
+  width: 300px;
   overflow: scroll;
 }
 .inputContainer {
   display: flex;
   justify-content: space-around;
   margin-top: 10px;
-  background-color: coral;
+  background-color: #4b5366;
   padding: 10px;
   border-radius: 10px;
 }
 
-#taskTable li:hover {
+/* #taskTable li:hover {
   background-color: #f9f9f9;
   cursor: pointer;
-}
+} */
 
 .taskTitle {
   border: none;
   width: 200px;
   background: transparent;
   padding-left: 10px;
+  color: #fff;
 }
 
 .taskTitle:focus {
@@ -45,4 +47,77 @@ app-provenance-task-list {
 
 .floatingButton:focus {
   outline: none;
+}
+.slide {
+  width: 150px;
+  height: 50px;
+  border: 1px solid #ccc;
+}
+.taskSlide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  border: 1px solid;
+  width: 0px;
+  position: absolute;
+  transition: all 1s;
+}
+/* .timelineContainer {
+  position: absolute;
+    display: block;
+    height: 50px;
+    transition: left 0.3s ease-in-out;
+}
+.timeline {
+  display: block;
+    width: 100%;
+    height: 2px;
+    background-color: #dfe3e6;
+    list-style: none;
+    padding-left: 210px;
+    padding-right: 300px;
+
+} */
+#TaskTimeline {
+  height: 100%
+}
+.timeline li {
+  position: relative;
+  display: inline-block;
+  list-style-type: none;
+  height: 3px;
+  background: #000;
+  transition: all 1s;
+}
+
+.timeline li::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -4%;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    background: #F45B69;
+}
+.playButton {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  position: absolute;
+  margin-top: 20px;
+}
+#currentTime {
+  position: absolute;
+    top: 24%;
+    left: 35px;
+    bottom: 0;
+    width: 12px;
+    height: 12px;
+    background: #F45B69;
+    border-radius: 6px;
+    z-index: 1;
 }

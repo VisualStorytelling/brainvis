@@ -21,11 +21,11 @@
       (change)="canvas.settings.measurementMode = $event.source.checked"
       matTooltip="Measurement"
     >
-      <mat-icon class="example-icon">vertical_align_center</mat-icon>
+      <mat-icon class="example-icon">videocam</mat-icon>
     </mat-button-toggle>
     <mat-menu #appMenu="matMenu">
-        <app-styled-slider [canvas]="canvas"></app-styled-slider>
-        <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
+      <app-styled-slider [canvas]="canvas"></app-styled-slider>
+      <!--<ng5-slider [(value)]="canvas.settings.thresholdMinValue" [(highValue)]="canvas.settings.thresholdMaxValue" [options]="options"></ng5-slider>-->
     </mat-menu>
     <button
       matTooltip="Thresholds"
@@ -35,7 +35,12 @@
       <mat-icon>exposure</mat-icon>
     </button>
 
-    <button mat-raised-button [disabled]="provenance.saveStatus === 'saving'" matTooltip="Save tree in cloud" (click)="provenance.saveGraph()">
+    <button
+      mat-raised-button
+      [disabled]="provenance.saveStatus === 'saving'"
+      matTooltip="Save tree in cloud"
+      (click)="provenance.saveGraph()"
+    >
       <mat-icon>backup</mat-icon>
     </button>
 

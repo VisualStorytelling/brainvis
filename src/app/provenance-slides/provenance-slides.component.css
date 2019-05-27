@@ -6,7 +6,10 @@ app-provenance-slides {
   display: block;
   background-color: #fff;
 }
-
+#slideDeck {
+  display: flex;
+  align-items: center
+}
 .slides_background_rect {
   fill: #ffffff;
   opacity: 0.01;

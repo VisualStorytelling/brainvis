@@ -12,9 +12,7 @@ import { MatSelectChange } from '@angular/material';
 export class MenuBarComponent implements OnInit {
   @Input() canvas: BrainvisCanvasComponent;
   public now: string;
-  constructor(public provenance: ProvenanceService) {
-
-  }
+  constructor(public provenance: ProvenanceService) {}
 
   public dataSources = [
     { name: 'tcia_1', url: 'https://rawcdn.githack.com/VisualStorytelling/data/a9dd031a51006b8d36aba5c510f0e140616e6bbc/tcia/20000101000000__3000566.nii.gz' },
@@ -37,5 +35,4 @@ export class MenuBarComponent implements OnInit {
       this.now = `${numFormat(date.getHours())}:${numFormat(date.getMinutes())}`;
     }, 1000);
   }
-
 }

@@ -1,8 +1,7 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService } from '../provenance.service';
 import { ProvenanceTaskList } from '@visualstorytelling/provenance-task-list';
-import { ProvenanceSlidedeck } from '@visualstorytelling/provenance-core';
-
+import { ProvenanceSlide, ProvenanceSlidedeck } from '@visualstorytelling/provenance-core';
 @Component({
   selector: 'app-provenance-task-list',
   template: '',
@@ -10,15 +9,19 @@ import { ProvenanceSlidedeck } from '@visualstorytelling/provenance-core';
   encapsulation: ViewEncapsulation.None
 })
 export class ProvenanceTaskListComponent implements OnInit {
+  private _deck: ProvenanceSlidedeck;
   private _taskList: ProvenanceTaskList;
   constructor(
     private elementRef: ElementRef,
     private provenance: ProvenanceService
-  ) {}
-
+  ) { }
+  get deck() {
+    return this._deck;
+  }
   ngOnInit() {
+    this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
     this._taskList = new ProvenanceTaskList(
-      new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser),
+      this._deck,
       this.provenance.graph,
       this.elementRef.nativeElement
     );

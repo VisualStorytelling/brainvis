@@ -1,21 +1,26 @@
-mat-button-toggle, button {
-    color: white;
-    background-color: transparent;
+.mat-toolbar.mat-primary {
+  background: #4b5366;
+  color: #fff;
+}
+mat-button-toggle,
+button {
+  color: white;
+  background-color: transparent;
 }
 mat-button-toggle.mat-button-toggle-checked {
-    background-color: rgba(255,255,255,.4);
+  background-color: rgba(255, 255, 255, 0.4);
 }
 #right {
-    position: absolute;
-    right: 1em;
+  position: absolute;
+  right: 1em;
 }
 mat-toolbar {
-    min-height: 0;
+  min-height: 0;
 }
 mat-toolbar-row {
-    height: auto;
+  height: auto;
 }
 
-.mat-progress-spinner>svg>circle {
-    stroke: white !important;
+.mat-progress-spinner > svg > circle {
+  stroke: white !important;
 }
