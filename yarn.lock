@@ -409,11 +409,6 @@
   version "2.53.43"
   resolved "https://registry.yarnpkg.com/@types/selenium-webdriver/-/selenium-webdriver-2.53.43.tgz#2de3d718819bc20165754c4a59afb7e9833f6707"
 
-"@types/stats@^0.16.30":
-  version "0.16.30"
-  resolved "https://registry.npmjs.org/@types/stats/-/stats-0.16.30.tgz#deb5fa6e59c6d67bd6e0f61a51ef630a83a84ce9"
-  integrity sha1-3rX6blnG1nvW4PYaUe9jCoOoTOk=
-
 "@types/three@^0.84.35":
   version "0.84.37"
   resolved "https://registry.yarnpkg.com/@types/three/-/three-0.84.37.tgz#30ddd17a59a970ef21d252c08ae1cdd7b8b57cff"
