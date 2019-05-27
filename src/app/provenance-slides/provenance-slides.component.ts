@@ -24,6 +24,6 @@ export class ProvenanceSlidesComponent implements OnInit {
 
   ngOnInit() {
     this._deck = new ProvenanceSlidedeck(this.provenance.graph.application, this.provenance.traverser);
-    this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[0]);
+    // this._deckViz = new SlideDeckVisualization(this._deck, this.elementRef.nativeElement.children[0]);
   }
 }
