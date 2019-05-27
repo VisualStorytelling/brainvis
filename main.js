@@ -55002,7 +55002,7 @@ var AppModule = /** @class */ (function () {
 /*! no static exports found */
 /***/ (function(module, exports) {
 
-module.exports = "<mat-slide-toggle [(ngModel)]=\"canvas.settings.showSliceHandle\" [(disabled)]=\"canvas.settings.showSliceHandleDisabled\">\n  Show slice handle\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.settings.showSlice\" [(disabled)]=\"canvas.settings.showSliceDisabled\">\n  Show slice\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.settings.showObjects\" [(disabled)]=\"canvas.settings.showObjectsDisabled\">\n  Show segmented objects\n</mat-slide-toggle>\n<mat-slide-toggle [(ngModel)]=\"canvas.settings.quadView\" [(disabled)]=\"canvas.settings.quadViewDisabled\">\n  Quad view\n</mat-slide-toggle>\n<!-- <mat-slide-toggle [(ngModel)]=\"canvas.settings.alignMode\">\n  Align camera to slice\n</mat-slide-toggle> -->\n<mat-slide-toggle [(ngModel)]=\"canvas.settings.editMode\" [(disabled)]=\"canvas.settings.editModeDisabled\">\n  Segmentation mode\n</mat-slide-toggle>\n<mat-slider [(ngModel)]=\"canvas.settings.segmentationSize\" [(disabled)]=\"canvas.settings.editModeDisabled\" [min]='min' [max]='max' [step]='step' >\n  Segmentation size\n</mat-slider>\n<!-- <mat-form-field>\n  <mat-select [(value)]='selectedColorMap'>\n    <mat-option *ngFor=\"let cm of availableColorMaps\" (onSelectionChange)=\"change($event)\" [value]=\"cm.value\">\n      {{cm.viewValue}}\n    </mat-option>\n  </mat-select>\n</mat-form-field> -->\n<app-styled-slider [canvas]=\"canvas\"></app-styled-slider>\n<button mat-icon-button (click)=\"provenance.saveGraph()\">\n  <mat-icon>backup</mat-icon>\n  Save provenance tree\n  <mat-progress-spinner *ngIf=\"provenance.saveStatus === 'saving'\" [diameter]=\"20\" mode=\"indeterminate\"></mat-progress-spinner>\n</button>"
+module.exports = "<!-- <mat-form-field>\n  <mat-select [(value)]='selectedColorMap'>\n    <mat-option *ngFor=\"let cm of availableColorMaps\" (onSelectionChange)=\"change($event)\" [value]=\"cm.value\">\n      {{cm.viewValue}}\n    </mat-option>\n  </mat-select>\n</mat-form-field> -->\n<app-styled-slider [canvas]=\"canvas\"></app-styled-slider>\n<button mat-icon-button (click)=\"provenance.saveGraph()\">\n  <mat-icon>backup</mat-icon>\n  Save provenance tree\n  <mat-progress-spinner *ngIf=\"provenance.saveStatus === 'saving'\" [diameter]=\"20\" mode=\"indeterminate\"></mat-progress-spinner>\n</button>\n"
 
 /***/ }),
 
@@ -58089,9 +58089,9 @@ if (_environments_environment__WEBPACK_IMPORTED_MODULE_3__["environment"].produc
 }
 else {
     /* show stats */
-    stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-    document.body.appendChild(stats.dom);
-    requestAnimationFrame(animate);
+    // stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
+    // document.body.appendChild( stats.dom );
+    // requestAnimationFrame( animate );
 }
 Object(_angular_platform_browser_dynamic__WEBPACK_IMPORTED_MODULE_1__["platformBrowserDynamic"])().bootstrapModule(_app_app_module__WEBPACK_IMPORTED_MODULE_2__["AppModule"])
     .catch(function (err) { return console.log(err); });
