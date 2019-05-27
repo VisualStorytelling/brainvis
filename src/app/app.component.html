@@ -1,39 +1,21 @@
 <ng-container id="root" *ngIf="provenance.initialized">
   <app-menu-bar [canvas]="canvas"></app-menu-bar>
   <mat-sidenav-container hasBackdrop="false">
-    <mat-sidenav
-      position="end"
-      #sidenav
-      mode="side"
-      [opened]="false"
-      hasBackdrop="false"
-    >
-      <button
-        id="sidenav-trigger"
-        color="primary"
-        style="color: orange"
-        mat-icon-button
-        (click)="sidenav.toggle()"
-      >
+    <mat-sidenav position="end" #sidenav mode="side" [opened]="false" hasBackdrop="false">
+      <button id="sidenav-trigger" color="primary" style="color: orange" mat-icon-button (click)="sidenav.toggle()">
         <mat-icon>menu</mat-icon>
       </button>
 
       <!-- Sidenav content -->
-      <app-provenance-visualization></app-provenance-visualization>
-      <app-provenance-task-list
-        class="task-list-container"
-      ></app-provenance-task-list>
+      <!-- <app-provenance-visualization></app-provenance-visualization> -->
+      <app-provenance-task-list class="task-list-container"></app-provenance-task-list>
     </mat-sidenav>
 
     <mat-sidenav-content>
       <app-brainvis-canvas #canvas></app-brainvis-canvas>
       <div id="top-container">
         <!--<app-brainvis-canvas-controls [canvas]="canvas"></app-brainvis-canvas-controls>-->
-        <app-slide-annotations
-          #slideAnnotations
-          id="annotation-overlay"
-          [slides]="slides"
-        >
+        <app-slide-annotations #slideAnnotations id="annotation-overlay" [slides]="slides">
           bladiebla
         </app-slide-annotations>
       </div>
