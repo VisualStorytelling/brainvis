@@ -539,7 +539,7 @@ if(false) {}
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/tom/Projects/provenance/brainvis/src/styles.css */"./src/styles.css");
+module.exports = __webpack_require__(/*! /home/tom/Projects/visualstorytelling/brainvis/src/styles.css */"./src/styles.css");
 
 
 /***/ })
