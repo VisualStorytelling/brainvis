@@ -5,7 +5,7 @@ export default class SegmentationVoxels extends THREE.Object3D {
 
     private _position: THREE.Vector3 = new THREE.Vector3(0.0, 0.0, 0.0);
     private _grid: boolean[];
-    private _geometry: THREE.CubeGeometry;
+    private _geometry: THREE.BoxGeometry;
     private _material: THREE.MeshBasicMaterial;
     private _voxels: {[key: string]: THREE.Mesh};
     private _gridSize: number;
@@ -25,7 +25,7 @@ export default class SegmentationVoxels extends THREE.Object3D {
         this._width = width;
         this._depth = depth;
 
-        this._geometry = new THREE.CubeGeometry(gridSize, gridSize, gridSize);
+        this._geometry = new THREE.BoxGeometry(gridSize, gridSize, gridSize);
         this._material = new THREE.MeshBasicMaterial({ color: 0x00ff00, transparent:true, opacity:0.5 });
     }
 

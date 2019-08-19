@@ -1,7 +1,6 @@
 import { ProvenanceTracker } from '@visualstorytelling/provenance-core';
 import { debounce } from 'lodash';
 import { BrainvisCanvasComponent } from '../brainvis-canvas.component';
-import { Settings } from '../utils/settings';
 import { Renderer2D } from '../renderer2d';
 import { IPointPair } from '../utils/types';
 
@@ -46,7 +45,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let sliceIndexEndListener: EventListener = null;
   const sliceIndexStartListener = (startEvent) => {
     canvas.removeEventListener('sliceIndexChanged', sliceIndexEndListener);
-    sliceIndexEndListener = debounce((event) => {
+    sliceIndexEndListener = debounce((event: any) => {
       let label = '';
       switch (startEvent.changes.sliceOrientation) {
         case 'axial':
@@ -80,7 +79,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let perspectiveZoomEndListener: EventListener = null;
   const perspectiveZoomStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraZoomChanged', perspectiveZoomEndListener);
-    perspectiveZoomEndListener = debounce((event) => {
+    perspectiveZoomEndListener = debounce((event: any) => {
       let label  = 'P ZOOM:';
           label += ' ' + event.orientation.position[0].toFixed(0);
           label += '/' + event.orientation.position[1].toFixed(0);
@@ -105,7 +104,7 @@ export const addListeners = (tracker: ProvenanceTracker, canvas: BrainvisCanvasC
   let perspectiveOrientationEndListener: EventListener = null;
   const perspectiveOrientationStartListener = (startEvent) => {
     canvas.removeEventListener('perspectiveCameraOrientationChanged', perspectiveOrientationEndListener);
-    perspectiveOrientationEndListener = debounce((event) => {
+    perspectiveOrientationEndListener = debounce((event: any) => {
       let label  = 'P XYZ :';
           label += ' ' + event.orientation.position[0].toFixed(0);
           label += '/' + event.orientation.position[1].toFixed(0);

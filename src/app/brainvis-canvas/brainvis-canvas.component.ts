@@ -193,7 +193,7 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
       perspectiveCamera.lookAt(new THREE.Vector3(centerLPS.x, centerLPS.y, centerLPS.z));
       perspectiveCamera.updateProjectionMatrix();
 
-      const perspectiveControls = <THREE.TrackballControls>this._perspectiveRenderer.controls;
+      const perspectiveControls = this._perspectiveRenderer.controls;
       perspectiveControls.target.set(centerLPS.x, centerLPS.y, centerLPS.z);
 
       // bounding box

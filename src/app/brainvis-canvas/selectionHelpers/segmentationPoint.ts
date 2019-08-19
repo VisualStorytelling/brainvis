@@ -13,7 +13,7 @@ export default class SegmentationPoint extends THREE.Object3D {
 
         this.visible = true;
 
-        const geometry = new THREE.CubeGeometry(1, 1, 1);
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
         const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
 
         this._voxel = new THREE.Mesh(geometry, material);
