@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService } from '../provenance.service';
-import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
+import { ProvenanceTreeVisualization } from '@Visualstorytelling/provenance-tree-visualization';
 
 @Component({
   selector: 'app-provenance-visualization',
@@ -14,10 +14,14 @@ export class ProvenanceVisualizationComponent implements OnInit {
   }
 
   ngOnInit() {
+
     this._viz = new ProvenanceTreeVisualization(
       this.provenance.traverser,
       this.elementRef.nativeElement,
     );
   }
+  // ngAfterViewChecked() {
+  //   this._viz.setZoomExtent();
+  // }
 
 }

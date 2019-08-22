@@ -4,7 +4,10 @@ app-provenance-visualization {
   display: block;
   background-color: #fafafa;
 }
-
+.visualizationContainer {
+  display: flex;
+  flex-direction: column;
+}
 .node {
   fill: lightsteelblue;
   stroke: steelblue;
@@ -96,7 +99,12 @@ app-provenance-visualization {
   font-family: sans-serif;
   font-size: 25px;
 }
-
+#DataAggregationTitle {
+   display: flex;
+    flex: 0.5;
+    justify-content: center;
+    align-items: center;
+}
 .dataAggregation-Box {
   font-family: sans-serif;
 }
@@ -122,6 +130,7 @@ app-provenance-visualization {
 }
 .container {
   display: flex;
+  flex: 1
 }
 #aggregationControls {
   flex: 1;

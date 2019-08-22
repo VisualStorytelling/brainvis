@@ -15,7 +15,7 @@ import {
   MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatDividerModule,
   MatExpansionModule, MatGridListModule, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule,
   MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule, MatSnackBarModule, MatSortModule,
-  MatStepperModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule, MatTreeModule,
+  MatStepperModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule, MatTreeModule, MatTabGroup, MatTab
 } from '@angular/material';
 import { FormsModule } from '@angular/forms';
 import { ProvenanceVisualizationComponent } from './provenance-visualization/provenance-visualization.component';
@@ -53,7 +53,7 @@ import { MenuBarComponent } from './menu-bar/menu-bar.component';
     MatExpansionModule, MatGridListModule, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule,
     MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatRippleModule, MatSnackBarModule, MatSortModule,
     MatStepperModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule, MatTreeModule,
-    Ng5SliderModule
+    Ng5SliderModule, MatTabsModule
   ],
   providers: [ProvenanceService],
   bootstrap: [AppComponent]
