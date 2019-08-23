@@ -31,7 +31,8 @@ export class Renderer2D extends AMIRenderer implements IAMIRenderer {
 
     // renderer
     this._renderer = new THREE.WebGLRenderer({
-      antialias: true
+      antialias: true,
+      preserveDrawingBuffer: true
     });
     this._renderer.autoClear = false;
     this._renderer.localClippingEnabled = true;

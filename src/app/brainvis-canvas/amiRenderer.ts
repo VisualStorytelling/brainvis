@@ -56,6 +56,10 @@ export class AMIRenderer {
         return this._localizerHelper;
     }
 
+    public get renderer() {
+        return this._renderer;
+    }
+
     addEventListeners() {
         this._controls.addEventListener('mousewheel', this.onScroll.bind(this));
         this._controls.addEventListener('OnScroll', this.onScroll.bind(this));

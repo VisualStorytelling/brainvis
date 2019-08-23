@@ -63,14 +63,8 @@ export class ProvenanceService {
       registry: this.registry,
       tracker: this.tracker,
       traverser: this.traverser,
-    }
+    };
 
-    // todo: remove objects from window (used for dev / debug)
-    const w = window as any;
-    w.graph = this.graph;
-    w.registry = this.registry;
-    w.tracker = this.tracker;
-    w.traverser = this.traverser;
   }
 
   constructor() {

@@ -21,7 +21,8 @@ export class Renderer3D extends AMIRenderer implements IAMIRenderer {
 
     // renderer
     this._renderer = new THREE.WebGLRenderer({
-      antialias: true
+      antialias: true,
+      preserveDrawingBuffer: true
     });
     this._renderer.setSize(
       this._domElement.clientWidth,
