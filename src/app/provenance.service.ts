@@ -54,10 +54,16 @@ export class ProvenanceService {
 
   async init() {
     this.graph = await this.tryRestoreGraph() || new ProvenanceGraph({ name: 'brainvis', version: '1.0.0' });
-    console.log(this.graph);
     this.registry = new ActionFunctionRegistry();
     this.tracker = new ProvenanceTracker(this.registry, this.graph);
     this.traverser = new ProvenanceGraphTraverser(this.registry, this.graph, this.tracker);
+
+    (window as any).prov = {
+      graph: this.graph,
+      registry: this.registry,
+      tracker: this.tracker,
+      traverser: this.traverser,
+    }
 
     // todo: remove objects from window (used for dev / debug)
     const w = window as any;

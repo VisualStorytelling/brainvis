@@ -1,7 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit } from '@angular/core';
 import { ProvenanceSlidesComponent } from '../provenance-slides/provenance-slides.component';
-import { SlideAnnotation } from '@visualstorytelling/provenance-core';
-import { toScreenCoordinates, registry, fromScreenCoordinates } from '../annotate';
+import { ProvenanceService } from '../provenance.service';
 
 @Component({
   selector: 'app-slide-annotations',
@@ -10,50 +9,24 @@ import { toScreenCoordinates, registry, fromScreenCoordinates } from '../annotat
 })
 export class SlideAnnotationsComponent implements OnInit {
   @Input() slides: ProvenanceSlidesComponent;
-  public JSON: any;
-  public console: any;
 
-  constructor() {
-    // console.log(registry[0].fromScreenCoordinates({x: 100, y: 100}));
-    // console.log(toScreenCoordinates({name: 'dummyAnnotator', x: 100, y: 100}));
-    this.JSON = JSON;
-    this.console = console;
+  public annotationText(): string {
+    const selectedSlide = this.slides.deck.selectedSlide;
+    if (!selectedSlide) {
+      return '';
+    }
+    const annotation = selectedSlide.annotations[0];
+    if (annotation) {
+      return annotation.data;
+    } else {
+      return '';
+    }
+  }
+
+  constructor(private elementRef: ElementRef, private provenance: ProvenanceService) {
   }
 
   ngOnInit() {
-    if (this.slides && this.slides.deck) {
-      console.log(this.slides.deck.selectedSlide);
-    }
   }
 
-  get annotations() {
-    const selectedSlide = this.slides.deck.selectedSlide;
-    return selectedSlide ? selectedSlide.annotations : [];
-  }
-
-  updateAnnotation(annotation: SlideAnnotation, value: string) {
-    annotation.data = { ...annotation.data, text: value };
-  }
-
-  dragEnd(annotation, event) {
-    const annotatedCoordinates = fromScreenCoordinates({ x: event.clientX, y: event.clientY });
-    if (annotatedCoordinates) {
-      annotation.data.coordinates = annotatedCoordinates;
-    }
-  }
-
-  annotationXY(annotation: SlideAnnotation) {
-    if (annotation.data.coordinates) {
-      return toScreenCoordinates(annotation.data.coordinates);
-    }
-    return ({ x: 0, y: 0 });
-  }
-
-  newAnnotation() {
-    if (this.slides.deck.selectedSlide) {
-      this.slides.deck.selectedSlide.addAnnotation(
-        new SlideAnnotation({ text: '' })
-      );
-    }
-  }
 }

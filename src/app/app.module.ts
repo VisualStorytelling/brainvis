@@ -23,7 +23,7 @@ import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides
 import { ProvenanceTaskListComponent } from './provenance-task-list/provenance-task-list.component';
 
 import { SlideAnnotationsComponent } from './slide-annotations/slide-annotations.component';
-import { SlidesContainerComponent } from './ui/slides-container/slides-container.component';
+import { SlidesContainerComponent } from './slides-container/slides-container.component';
 
 import { Ng5SliderModule } from 'ng5-slider';
 import { StyledSliderComponent } from './brainvis-canvas-controls/styled-slider/styled-slider.component';
