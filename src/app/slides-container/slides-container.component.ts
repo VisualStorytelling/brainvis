@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { trigger, style, animate, transition, state } from '@angular/animations';
-import { SlideAnnotationsComponent } from 'src/app/slide-annotations/slide-annotations.component';
 
 @Component({
   selector: 'app-slides-container',
@@ -20,7 +19,6 @@ import { SlideAnnotationsComponent } from 'src/app/slide-annotations/slide-annot
 })
 
 export class SlidesContainerComponent implements OnInit {
-  @Input() slideAnnotations: SlideAnnotationsComponent;
   @Input() opened = false;
 
   ngOnInit() {

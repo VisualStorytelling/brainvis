@@ -332,4 +332,8 @@ export class BrainvisCanvasComponent extends THREE.EventDispatcher implements On
   setPerspectiveCameraOrientation(args: IOrientation, transitionTime: number) {
     this._perspectiveRenderer.setCameraOrientation(args, transitionTime);
   }
+  getScreenShot() {
+    // return this._sagittalRenderer.renderer.domElement.toDataURL();
+    return this._perspectiveRenderer.renderer.domElement.toDataURL();
+  }
 }
