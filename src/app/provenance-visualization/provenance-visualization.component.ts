@@ -1,6 +1,6 @@
 import { Component, ElementRef, OnInit, ViewEncapsulation } from '@angular/core';
 import { ProvenanceService } from '../provenance.service';
-import { ProvenanceTreeVisualization } from '@Visualstorytelling/provenance-tree-visualization';
+import { ProvenanceTreeVisualization } from '@visualstorytelling/provenance-tree-visualization';
 
 @Component({
   selector: 'app-provenance-visualization',
