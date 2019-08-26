@@ -1,9 +1,0 @@
-:host {
-    position: absolute;
-    top: 1em;
-    left: 50%;
-    transform: translateX(-50%);
-    color: pink;
-    font-size: 2em;
-    /*z-index: 1001;*/
-}

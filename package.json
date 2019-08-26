@@ -13,6 +13,7 @@
     "build-storybook": "build-storybook"
   },
   "private": true,
+  "browser": { "fs": false, "path": false, "os": false},
   "dependencies": {
     "@angular/animations": "^8.2.2",
     "@angular/cdk": "^8.1.3",
