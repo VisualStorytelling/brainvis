@@ -15,8 +15,9 @@ export class ProvenanceTaskListComponent implements OnInit {
     private provenance: ProvenanceService
   ) { }
 
-  ngOnInit() {    
+  ngOnInit() {
     this._taskList = new ProvenanceTaskList(
+      this.provenance.traverser,
       this.provenance.graph,
       this.elementRef.nativeElement
     );

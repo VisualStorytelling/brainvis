@@ -148,3 +148,6 @@ input[type=radio]:checked ~ ul {
 .nodeList li {
   margin-top: 10px;
 }
+.nodeList li label {
+  cursor: pointer;
+}
