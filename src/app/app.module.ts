@@ -22,7 +22,6 @@ import { ProvenanceVisualizationComponent } from './provenance-visualization/pro
 import { ProvenanceSlidesComponent } from './provenance-slides/provenance-slides.component';
 import { ProvenanceTaskListComponent } from './provenance-task-list/provenance-task-list.component';
 
-import { SlideAnnotationsComponent } from './slide-annotations/slide-annotations.component';
 import { SlidesContainerComponent } from './slides-container/slides-container.component';
 
 import { Ng5SliderModule } from 'ng5-slider';
@@ -37,7 +36,6 @@ import { MenuBarComponent } from './menu-bar/menu-bar.component';
     BrainvisCanvasControlsComponent,
     ProvenanceVisualizationComponent,
     ProvenanceSlidesComponent,
-    SlideAnnotationsComponent,
     StyledSliderComponent,
     ProvenanceTaskListComponent,
     SlidesContainerComponent,
