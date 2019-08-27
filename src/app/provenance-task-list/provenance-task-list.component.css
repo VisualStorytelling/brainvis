@@ -10,25 +10,16 @@ app-provenance-task-list {
   overflow: scroll;
 }
 .inputContainer {
-  /* display: flex;
-  justify-content: space-around; */
   margin-top: 10px;
-  background-color: #4b5366;
   padding: 10px;
   border-radius: 10px;
 }
-
-/* #taskTable li:hover {
-  background-color: #f9f9f9;
-  cursor: pointer;
-} */
 
 .taskTitle {
   border: none;
   width: 200px;
   background: transparent;
   padding-left: 10px;
-  color: #fff;
 }
 
 .taskTitle:focus {
@@ -63,67 +54,8 @@ app-provenance-task-list {
   position: absolute;
   transition: all 1s;
 }
-/* .timelineContainer {
-  position: absolute;
-    display: block;
-    height: 50px;
-    transition: left 0.3s ease-in-out;
-}
-.timeline {
-  display: block;
-    width: 100%;
-    height: 2px;
-    background-color: #dfe3e6;
-    list-style: none;
-    padding-left: 210px;
-    padding-right: 300px;
 
-} */
-#TaskTimeline {
-  height: 100%
-}
-.timeline li {
-  position: relative;
-  display: inline-block;
-  list-style-type: none;
-  height: 3px;
-  background: #000;
-  transition: all 1s;
-}
 
-.timeline li::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: -4%;
-    bottom: 0;
-    width: 12px;
-    height: 12px;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    background: #F45B69;
-}
-.playButton {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  position: absolute;
-  margin-top: 20px;
-}
-#currentTime {
-  position: absolute;
-    top: 24%;
-    left: 35px;
-    bottom: 0;
-    width: 12px;
-    height: 12px;
-    background: #F45B69;
-    border-radius: 6px;
-    z-index: 1;
-}
-.details {
-  display: none;
-}
 
 input[type=radio] ~ ul { 
 	max-height: 0;
@@ -142,9 +74,7 @@ input[type=radio]:checked ~ ul {
 	max-width: 100%;
 	opacity: 1;
 }
-.nodeList {
-  color: #fff
-}
+
 .nodeList li {
   margin-top: 10px;
 }
